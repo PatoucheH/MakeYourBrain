@@ -1,0 +1,260 @@
+# ===========================
+# Flutter/Dart
+# ===========================
+
+# Fichiers générés
+*.dart.js
+*.info.json
+*.js
+*.js_
+*.js.deps
+*.js.map
+*.freezed.dart
+*.g.dart
+*.gr.dart
+*.mocks.dart
+
+# Build
+/build/
+**/build/
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+pubspec.lock
+
+# Test coverage
+coverage/
+.test_coverage.dart
+
+# ===========================
+# Supabase
+# ===========================
+
+# Secrets et configuration locale
+supabase/.env
+supabase/.env.*
+!supabase/.env.example
+supabase/.temp/
+supabase/.branches/
+
+# Fichiers générés par Supabase CLI
+supabase/.supabase/
+supabase/functions/.deno/
+
+# Edge Functions - fichiers locaux
+supabase/functions/*/.env
+supabase/functions/*/node_modules/
+
+# Logs Supabase
+supabase/logs/
+
+# ===========================
+# Android
+# ===========================
+
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+**/android/**/*.keystore
+**/android/**/*.jks
+!**/android/gradle/wrapper/gradle-wrapper.jar
+
+# ===========================
+# iOS/macOS
+# ===========================
+
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/DerivedData/
+**/ios/**/.symlinks/
+**/ios/**/Flutter/App.framework
+**/ios/**/Flutter/Flutter.framework
+**/ios/**/Flutter/Flutter.podspec
+**/ios/**/Flutter/Generated.xcconfig
+**/ios/**/Flutter/ephemeral/
+**/ios/**/Flutter/flutter_assets/
+**/ios/**/Flutter/flutter_export_environment.sh
+**/ios/**/Pods/
+**/ios/**/ServiceDefinitions.plist
+**/ios/**/profile
+**/ios/**/xcuserdata
+**/ios/.symlinks/
+**/ios/Flutter/.last_build_id
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+**/macos/Flutter/ephemeral/
+**/macos/Pods/
+**/macos/.symlinks/
+
+# ===========================
+# Web
+# ===========================
+
+lib/generated_plugin_registrant.dart
+
+# ===========================
+# Windows
+# ===========================
+
+**/windows/flutter/generated_plugin_registrant.cc
+**/windows/flutter/generated_plugin_registrant.h
+**/windows/flutter/generated_plugins.cmake
+**/windows/flutter/ephemeral/
+
+# ===========================
+# Linux
+# ===========================
+
+**/linux/flutter/generated_plugin_registrant.cc
+**/linux/flutter/generated_plugin_registrant.h
+**/linux/flutter/generated_plugins.cmake
+**/linux/flutter/ephemeral/
+
+# ===========================
+# IDE & Editors
+# ===========================
+
+# VS Code (garder les settings partagées si besoin)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/libraries
+.idea/caches
+
+# Xcode
+*.xcworkspace
+xcuserdata/
+
+# ===========================
+# Environnement & Secrets
+# ===========================
+
+# Fichiers d'environnement
+.env
+.env.*
+!.env.example
+*.env.local
+*.env.*.local
+
+# Clés et certificats
+*.pem
+*.p12
+*.key
+*.cert
+*.crt
+google-services.json
+GoogleService-Info.plist
+
+# Firebase (si utilisé avec Supabase)
+firebase_options.dart
+
+# Configuration Supabase locale
+lib/config/supabase_config.dart
+lib/core/config/supabase_credentials.dart
+
+# ===========================
+# Système d'exploitation
+# ===========================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# ===========================
+# Logs & Temporaires
+# ===========================
+
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+logs/
+tmp/
+temp/
+
+# ===========================
+# Dépendances & Packages
+# ===========================
+
+node_modules/
+.npm/
+.yarn/
+yarn-error.log
+
+# ===========================
+# Tests & Coverage
+# ===========================
+
+coverage/
+*.lcov
+.dart_tool/test/
+test-results/
+
+# ===========================
+# Documentation générée
+# ===========================
+
+doc/api/
+.dartdoc_options.json
+
+# ===========================
+# Divers
+# ===========================
+
+# Fichiers de crash
+crash_log_*.json
+*.stackdump
+
+# Symbolication
+app.*.symbols
+
+# Obfuscation
+app.*.map.json
+
+# Exceptions - fichiers à garder
+!.gitkeep
+!.gitattributes
