@@ -42,13 +42,26 @@ class QuizRepository {
     required String selectedAnswerId,
     required bool isCorrect,
     required String languageUsed,
+    required String themeId,
   }) async {
+    // Sauvegarder la réponse
     await _supabase.from('user_answers').insert({
       'user_id': userId,
       'question_id': questionId,
       'selected_answer_id': selectedAnswerId,
       'is_correct': isCorrect,
       'language_used': languageUsed,
+    });
+
+    // Mettre à jour les stats
+    await _supabase.rpc('increment_user_stats', params: {
+      'p_user_id': userId,
+      'p_is_correct': isCorrect,
+    });
+    await _supabase.rpc('add_theme_xp', params: {
+      'p_user_id': userId,
+      'p_theme_id': themeId,
+      'p_is_correct': isCorrect,
     });
   }
 }

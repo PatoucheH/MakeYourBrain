@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'quiz_page.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../core/providers/language_provider.dart';
 import '../../data/repositories/quiz_repository.dart';
 import '../../data/models/theme_model.dart';
 
@@ -24,7 +27,8 @@ class _ThemeSelectionPageState extends State<ThemeSelectionPage> {
 
   Future<void> loadThemes() async {
     try {
-      final result = await _repository.getThemes('en');
+      final languageCode = context.read<LanguageProvider>().currentLanguage;
+      final result = await _repository.getThemes(languageCode);
       setState(() {
         themes = result;
         isLoading = false;
@@ -39,16 +43,17 @@ class _ThemeSelectionPageState extends State<ThemeSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select a Theme'),
+        title: Text(l10n.selectTheme),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : errorMessage != null
               ? Center(
                   child: Text(
-                    errorMessage!,
+                    '${l10n.errorLoadingThemes}: $errorMessage',
                     style: const TextStyle(color: Colors.red),
                   ),
                 )

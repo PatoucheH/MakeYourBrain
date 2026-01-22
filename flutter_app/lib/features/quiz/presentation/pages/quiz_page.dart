@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../core/providers/language_provider.dart';
 import '../../data/repositories/quiz_repository.dart';
 import '../../data/models/theme_model.dart';
 import '../../data/models/question_model.dart';
+import '../../../auth/data/repositories/auth_repository.dart';
+import '../../../../features/profile/data/repositories/profile_repository.dart';
 
 class QuizPage extends StatefulWidget {
   final ThemeModel theme;
@@ -29,11 +34,17 @@ class _QuizPageState extends State<QuizPage> {
 
   Future<void> loadQuestions() async {
     try {
+      final languageCode = context.read<LanguageProvider>().currentLanguage;
       final result = await _repository.getQuestions(
         themeId: widget.theme.id,
-        languageCode: 'en',
+        languageCode: languageCode,
         limit: 10,
       );
+      final authRepo = AuthRepository();
+      final profileRepo = ProfileRepository();
+      if (authRepo.isLoggedIn()) {
+        await profileRepo.updateStreak(authRepo.getCurrentUserId()!);
+      }
       setState(() {
         questions = result;
         isLoading = false;
@@ -50,7 +61,7 @@ class _QuizPageState extends State<QuizPage> {
     }
   }
 
-  void selectAnswer(String answerId, bool isCorrect) {
+  void selectAnswer(String answerId, bool isCorrect, String questionId) async {
     if (hasAnswered) return;
 
     setState(() {
@@ -58,6 +69,23 @@ class _QuizPageState extends State<QuizPage> {
       hasAnswered = true;
       if (isCorrect) score++;
     });
+
+    //  SAUVEGARDER LA RÉPONSE
+    final authRepo = AuthRepository();
+      if (authRepo.isLoggedIn()) {
+        try {
+          await _repository.saveUserAnswer(
+            userId: authRepo.getCurrentUserId()!,
+            questionId: questionId,
+            selectedAnswerId: answerId,
+            isCorrect: isCorrect,
+            languageUsed: context.read<LanguageProvider>().currentLanguage,
+            themeId: widget.theme.id,
+          );
+        } catch (e) {
+          print('Error saving answer: $e');
+        }
+      }
 
     // Attendre 2 secondes puis passer à la question suivante
     Future.delayed(const Duration(seconds: 2), () {
@@ -68,35 +96,35 @@ class _QuizPageState extends State<QuizPage> {
           selectedAnswerId = null;
         });
       } else {
-        // Quiz terminé
         showResultDialog();
       }
     });
   }
 
   void showResultDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Quiz Completed! 🎉'),
+        title: Text(l10n.quizCompleted),
         content: Text(
-          'Your score: $score/${questions.length}\n'
+          '${l10n.yourScore}: $score/${questions.length}\n'
           '${((score / questions.length) * 100).toStringAsFixed(0)}%',
           style: const TextStyle(fontSize: 18),
         ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Fermer le dialog
-              Navigator.of(context).pop(); // Retour à la sélection de thème
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
             },
-            child: const Text('Back to Themes'),
+            child: Text(l10n.backToThemes),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Fermer le dialog
-              // Recommencer le quiz
+              Navigator.of(context).pop();
               setState(() {
                 currentQuestionIndex = 0;
                 score = 0;
@@ -105,7 +133,7 @@ class _QuizPageState extends State<QuizPage> {
               });
               loadQuestions();
             },
-            child: const Text('Try Again'),
+            child: Text(l10n.tryAgain),
           ),
         ],
       ),
@@ -114,6 +142,7 @@ class _QuizPageState extends State<QuizPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (isLoading) {
       return Scaffold(
         appBar: AppBar(title: Text(widget.theme.name)),
@@ -124,8 +153,8 @@ class _QuizPageState extends State<QuizPage> {
     if (questions.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: Text(widget.theme.name)),
-        body: const Center(
-          child: Text('No questions available for this theme'),
+        body: Center(
+          child: Text(l10n.noQuestionsAvailable),
         ),
       );
     }
@@ -158,7 +187,7 @@ class _QuizPageState extends State<QuizPage> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  'Score: $score/${questions.length}',
+                  '${l10n.yourScore}: $score/${questions.length}',
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
@@ -204,7 +233,7 @@ class _QuizPageState extends State<QuizPage> {
                 child: ElevatedButton(
                   onPressed: hasAnswered
                       ? null
-                      : () => selectAnswer(answer.id, answer.isCorrect),
+                      : () => selectAnswer(answer.id, answer.isCorrect, currentQuestion.id),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.all(16),
                     backgroundColor: showCorrect
@@ -232,8 +261,8 @@ class _QuizPageState extends State<QuizPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        '💡 Explanation:',
+                      Text(
+                        l10n.explanation,
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       const SizedBox(height: 8),
