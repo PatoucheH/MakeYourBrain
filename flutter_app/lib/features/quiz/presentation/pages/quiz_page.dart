@@ -62,44 +62,36 @@ class _QuizPageState extends State<QuizPage> {
   }
 
   void selectAnswer(String answerId, bool isCorrect, String questionId) async {
-    if (hasAnswered) return;
+  if (hasAnswered) return;
 
-    setState(() {
-      selectedAnswerId = answerId;
-      hasAnswered = true;
-      if (isCorrect) score++;
-    });
+  setState(() {
+    selectedAnswerId = answerId;
+    hasAnswered = true;
+    if (isCorrect) score++;
+  });
 
-    //  SAUVEGARDER LA RÉPONSE
-    final authRepo = AuthRepository();
-      if (authRepo.isLoggedIn()) {
-        try {
-          await _repository.saveUserAnswer(
-            userId: authRepo.getCurrentUserId()!,
-            questionId: questionId,
-            selectedAnswerId: answerId,
-            isCorrect: isCorrect,
-            languageUsed: context.read<LanguageProvider>().currentLanguage,
-            themeId: widget.theme.id,
-          );
-        } catch (e) {
-          print('Error saving answer: $e');
-        }
-      }
-
-    // Attendre 2 secondes puis passer à la question suivante
-    Future.delayed(const Duration(seconds: 2), () {
-      if (currentQuestionIndex < questions.length - 1) {
-        setState(() {
-          currentQuestionIndex++;
-          hasAnswered = false;
-          selectedAnswerId = null;
-        });
-      } else {
-        showResultDialog();
-      }
-    });
+  // Sauvegarder la réponse
+  final authRepo = AuthRepository();
+  if (authRepo.isLoggedIn()) {
+    try {
+      await _repository.saveUserAnswer(
+        userId: authRepo.getCurrentUserId()!,
+        questionId: questionId,
+        selectedAnswerId: answerId,
+        isCorrect: isCorrect,
+        languageUsed: context.read<LanguageProvider>().currentLanguage,
+        themeId: widget.theme.id,
+      );
+    } catch (e) {
+      print('Error saving answer: $e');
+    }
   }
+
+  // Afficher le dialog immédiatement
+  if (mounted) {
+    showAnswerDialog(isCorrect);
+  }
+}
 
   void showResultDialog() {
     final l10n = AppLocalizations.of(context)!;
@@ -134,6 +126,85 @@ class _QuizPageState extends State<QuizPage> {
               loadQuestions();
             },
             child: Text(l10n.tryAgain),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showAnswerDialog(bool isCorrect) {
+    final l10n = AppLocalizations.of(context)!;
+    final currentQuestion = questions[currentQuestionIndex];
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: isCorrect ? Colors.green.shade50 : Colors.red.shade50,
+        title: Row(
+          children: [
+            Icon(
+              isCorrect ? Icons.check_circle : Icons.cancel,
+              color: isCorrect ? Colors.green : Colors.red,
+              size: 32,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              isCorrect ? '✅ Correct !' : '❌ Incorrect',
+              style: TextStyle(
+                color: isCorrect ? Colors.green.shade900 : Colors.red.shade900,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (currentQuestion.explanation != null) ...[
+                Text(
+                  l10n.explanation,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  currentQuestion.explanation!,
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              
+              // Passer à la question suivante ou afficher résultats
+              if (currentQuestionIndex < questions.length - 1) {
+                setState(() {
+                  currentQuestionIndex++;
+                  hasAnswered = false;
+                  selectedAnswerId = null;
+                });
+              } else {
+                showResultDialog();
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isCorrect ? Colors.green : Colors.red,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: const Text(
+              'Continue →',
+              style: TextStyle(fontSize: 16),
+            ),
           ),
         ],
       ),
@@ -250,28 +321,6 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               );
             }).toList(),
-
-            // Explication (si répondu)
-            if (hasAnswered && currentQuestion.explanation != null) ...[
-              const SizedBox(height: 20),
-              Card(
-                color: Colors.blue.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.explanation,
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(currentQuestion.explanation!),
-                    ],
-                  ),
-                ),
-              ),
-            ],
           ],
         ),
       ),

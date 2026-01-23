@@ -4,7 +4,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'shared/services/supabase_service.dart';
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/quiz/presentation/pages/home_page.dart';
+import 'features/quiz/presentation/pages/theme_preferences_page.dart';
 import 'features/auth/data/repositories/auth_repository.dart';
+import 'features/quiz/data/repositories/theme_preferences_repository.dart';
 import 'core/providers/language_provider.dart';
 import '../l10n/app_localizations.dart';
 
@@ -81,10 +83,65 @@ class _AuthGateState extends State<AuthGate> {
       );
     }
 
-    final authRepo = AuthRepository();
-    
-    return authRepo.isLoggedIn() 
-        ? const HomePage() 
-        : const LoginPage();
+    return const AuthChecker();
+  }
+}
+
+class AuthChecker extends StatefulWidget {
+  const AuthChecker({super.key});
+
+  @override
+  State<AuthChecker> createState() => _AuthCheckerState();
+}
+
+class _AuthCheckerState extends State<AuthChecker> {
+  final _authRepo = AuthRepository();
+  final _prefsRepo = ThemePreferencesRepository();
+  bool _isChecking = true;
+  Widget? _destination;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthAndOnboarding();
+  }
+
+  Future<void> _checkAuthAndOnboarding() async {
+    if (!_authRepo.isLoggedIn()) {
+      setState(() {
+        _destination = const LoginPage();
+        _isChecking = false;
+      });
+      return;
+    }
+
+    // User connecté, vérifier si onboarding fait
+    try {
+      final userId = _authRepo.getCurrentUserId()!;
+      final hasCompletedOnboarding = await _prefsRepo.hasCompletedOnboarding(userId);
+
+      setState(() {
+        _destination = hasCompletedOnboarding 
+            ? const HomePage() 
+            : const ThemePreferencesPage();
+        _isChecking = false;
+      });
+    } catch (e) {
+      setState(() {
+        _destination = const ThemePreferencesPage();
+        _isChecking = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isChecking) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    return _destination ?? const LoginPage();
   }
 }
