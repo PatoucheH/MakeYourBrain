@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../../quiz/presentation/pages/home_page.dart';
@@ -51,6 +52,51 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> _loginWithFacebook() async {
+    setState(() => _isLoading = true);
+    
+    try {
+      final success = await _repository.signInWithFacebook();
+      
+      if (!success) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open Facebook login')),
+          );
+        }
+        return;
+      }
+
+      // Écouter les changements d'auth
+      final subscription = _repository.authStateChanges.listen((state) {
+        if (state.event == AuthChangeEvent.signedIn && mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        }
+      });
+
+      // Timeout après 60 secondes
+      await Future.delayed(const Duration(seconds: 60));
+      subscription.cancel();
+      
+      if (mounted && !_repository.isLoggedIn()) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login timeout. Please try again.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Facebook login error: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -67,6 +113,51 @@ class _LoginPageState extends State<LoginPage> {
                 style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 50),
+              
+              // Facebook Login Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _isLoading ? null : _loginWithFacebook,
+                  icon: _isLoading 
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Icon(Icons.facebook, size: 24),
+                  label: Text(
+                    _isLoading ? 'Connecting...' : 'Continue with Facebook',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1877F2),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.all(16),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Divider
+              Row(
+                children: [
+                  const Expanded(child: Divider()),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      'OR',
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
+                  ),
+                  const Expanded(child: Divider()),
+                ],
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Email/Password fields
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(

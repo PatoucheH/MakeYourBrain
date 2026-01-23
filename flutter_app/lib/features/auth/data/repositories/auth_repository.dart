@@ -1,3 +1,6 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../../../shared/services/supabase_service.dart';
 import '../models/user_model.dart';
 
@@ -19,6 +22,21 @@ class AuthRepository {
       password: password,
     );
   }
+
+  // Connexion avec Facebook
+Future<bool> signInWithFacebook() async {
+  try {
+    final response = await _supabase.auth.signInWithOAuth(
+      OAuthProvider.facebook,
+      redirectTo: kIsWeb ? null : 'https://gqicisbofczmmjogfogz.supabase.co/auth/v1/callback',
+    );
+    
+    return response;
+  } catch (e) {
+    print('Facebook login error: $e');
+    return false;
+  }
+}
 
   // Déconnexion
   Future<void> signOut() async {
@@ -50,7 +68,6 @@ class AuthRepository {
         .maybeSingle();
 
     if (response == null) {
-      // Créer les stats si n'existent pas
       await _supabase.from('user_stats').insert({
         'user_id': userId,
         'preferred_language': 'en',
@@ -80,4 +97,7 @@ class AuthRepository {
       'updated_at': DateTime.now().toIso8601String(),
     });
   }
+
+  // Écouter les changements d'auth
+  Stream<AuthState> get authStateChanges => _supabase.auth.onAuthStateChange;
 }
