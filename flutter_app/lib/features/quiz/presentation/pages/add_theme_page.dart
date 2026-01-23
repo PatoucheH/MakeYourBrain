@@ -1,0 +1,199 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/language_provider.dart';
+import '../../data/repositories/quiz_repository.dart';
+import '../../data/repositories/theme_preferences_repository.dart';
+import '../../data/models/theme_model.dart';
+import '../../../auth/data/repositories/auth_repository.dart';
+import '../../../../l10n/app_localizations.dart';
+
+class AddThemePage extends StatefulWidget {
+  final List<String> currentPreferences;
+
+  const AddThemePage({super.key, required this.currentPreferences});
+
+  @override
+  State<AddThemePage> createState() => _AddThemePageState();
+}
+
+class _AddThemePageState extends State<AddThemePage> {
+  final _quizRepo = QuizRepository();
+  final _prefsRepo = ThemePreferencesRepository();
+  final _authRepo = AuthRepository();
+  
+  List<ThemeModel> availableThemes = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadAvailableThemes();
+  }
+
+  Future<void> loadAvailableThemes() async {
+    try {
+      final languageCode = context.read<LanguageProvider>().currentLanguage;
+      final allThemes = await _quizRepo.getThemes(languageCode);
+      
+      // Filtrer pour garder uniquement les thèmes NON préférés
+      final available = allThemes
+          .where((theme) => !widget.currentPreferences.contains(theme.id))
+          .toList();
+      
+      setState(() {
+        availableThemes = available;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading themes: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> addThemeToPreferences(ThemeModel theme) async {
+    try {
+      final userId = _authRepo.getCurrentUserId()!;
+      final updatedPreferences = [...widget.currentPreferences, theme.id];
+      
+      await _prefsRepo.savePreferences(userId, updatedPreferences);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${theme.name} added to favorites! ⭐')),
+        );
+        
+        // Retourner à HomePage avec refresh
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error adding theme: $e')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('➕ ${l10n.addTheme}'),
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : availableThemes.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.check_circle_outline,
+                          size: 80,
+                          color: Colors.green.shade300,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.allThemesInFavorites,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: availableThemes.length,
+                  itemBuilder: (context, index) {
+                    final theme = availableThemes[index];
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: InkWell(
+                        onTap: () => addThemeToPreferences(theme),
+                        borderRadius: BorderRadius.circular(16),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              // Icon
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade50,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    theme.icon,
+                                    style: const TextStyle(fontSize: 32),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              
+                              // Info
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      theme.name,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      theme.description,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade50,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.add,
+                                  color: Colors.green.shade700,
+                                  size: 24,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+    );
+  }
+}

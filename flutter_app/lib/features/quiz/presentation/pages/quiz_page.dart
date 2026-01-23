@@ -150,7 +150,7 @@ class _QuizPageState extends State<QuizPage> {
             ),
             const SizedBox(width: 12),
             Text(
-              isCorrect ? '✅ Correct !' : '❌ Incorrect',
+              isCorrect ? l10n.correctAnswer : l10n.incorrectAnswer,
               style: TextStyle(
                 color: isCorrect ? Colors.green.shade900 : Colors.red.shade900,
                 fontWeight: FontWeight.bold,
@@ -201,8 +201,8 @@ class _QuizPageState extends State<QuizPage> {
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
-            child: const Text(
-              'Continue →',
+            child: Text(
+              l10n.continueButton,
               style: TextStyle(fontSize: 16),
             ),
           ),

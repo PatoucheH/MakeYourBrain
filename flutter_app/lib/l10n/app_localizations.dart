@@ -349,6 +349,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Selected'**
   String get selected;
+
+  /// No description provided for @myFavoriteThemes.
+  ///
+  /// In en, this message translates to:
+  /// **'My Favorite Themes'**
+  String get myFavoriteThemes;
+
+  /// No description provided for @addTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Theme'**
+  String get addTheme;
+
+  /// No description provided for @allThemes.
+  ///
+  /// In en, this message translates to:
+  /// **'All Themes'**
+  String get allThemes;
+
+  /// No description provided for @noFavoriteThemes.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorite themes yet!'**
+  String get noFavoriteThemes;
+
+  /// No description provided for @tapAddTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap \"Add Theme\" to get started'**
+  String get tapAddTheme;
+
+  /// No description provided for @aboutThisTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'About this theme'**
+  String get aboutThisTheme;
+
+  /// No description provided for @moreFeaturesComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'🚀 More features coming soon!\nLeaderboard, Time Challenge, Versus Mode...'**
+  String get moreFeaturesComingSoon;
+
+  /// No description provided for @removeFromFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from favorites?'**
+  String get removeFromFavorites;
+
+  /// No description provided for @removeFavoriteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {themeName} from your favorite themes?'**
+  String removeFavoriteConfirm(Object themeName);
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// No description provided for @allThemesInFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have all themes in your favorites! 🎉'**
+  String get allThemesInFavorites;
+
+  /// No description provided for @manageFavoriteThemes.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Favorite Themes'**
+  String get manageFavoriteThemes;
+
+  /// No description provided for @noFavoriteThemesProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorite themes yet.'**
+  String get noFavoriteThemesProfile;
+
+  /// No description provided for @correctAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'✅ Correct!'**
+  String get correctAnswer;
+
+  /// No description provided for @incorrectAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'❌ Incorrect'**
+  String get incorrectAnswer;
+
+  /// No description provided for @continueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue →'**
+  String get continueButton;
 }
 
 class _AppLocalizationsDelegate

@@ -134,4 +134,59 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get selected => 'Sélectionné';
+
+  @override
+  String get myFavoriteThemes => 'Mes Thèmes Favoris';
+
+  @override
+  String get addTheme => 'Ajouter un Thème';
+
+  @override
+  String get allThemes => 'Tous les Thèmes';
+
+  @override
+  String get noFavoriteThemes => 'Aucun thème favori !';
+
+  @override
+  String get tapAddTheme => 'Appuyez sur \"Ajouter un Thème\" pour commencer';
+
+  @override
+  String get aboutThisTheme => 'À propos de ce thème';
+
+  @override
+  String get moreFeaturesComingSoon =>
+      '🚀 Plus de fonctionnalités bientôt !\nClassement, Défi Chrono, Mode Versus...';
+
+  @override
+  String get removeFromFavorites => 'Retirer des favoris ?';
+
+  @override
+  String removeFavoriteConfirm(Object themeName) {
+    return 'Retirer $themeName de vos thèmes favoris ?';
+  }
+
+  @override
+  String get cancel => 'Annuler';
+
+  @override
+  String get remove => 'Retirer';
+
+  @override
+  String get allThemesInFavorites =>
+      'Vous avez déjà tous les thèmes en favoris ! 🎉';
+
+  @override
+  String get manageFavoriteThemes => 'Gérer les Thèmes Favoris';
+
+  @override
+  String get noFavoriteThemesProfile => 'Aucun thème favori pour le moment.';
+
+  @override
+  String get correctAnswer => '✅ Correct !';
+
+  @override
+  String get incorrectAnswer => '❌ Incorrect';
+
+  @override
+  String get continueButton => 'Continuer →';
 }

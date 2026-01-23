@@ -134,4 +134,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selected => 'Selected';
+
+  @override
+  String get myFavoriteThemes => 'My Favorite Themes';
+
+  @override
+  String get addTheme => 'Add Theme';
+
+  @override
+  String get allThemes => 'All Themes';
+
+  @override
+  String get noFavoriteThemes => 'No favorite themes yet!';
+
+  @override
+  String get tapAddTheme => 'Tap \"Add Theme\" to get started';
+
+  @override
+  String get aboutThisTheme => 'About this theme';
+
+  @override
+  String get moreFeaturesComingSoon =>
+      '🚀 More features coming soon!\nLeaderboard, Time Challenge, Versus Mode...';
+
+  @override
+  String get removeFromFavorites => 'Remove from favorites?';
+
+  @override
+  String removeFavoriteConfirm(Object themeName) {
+    return 'Remove $themeName from your favorite themes?';
+  }
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get allThemesInFavorites =>
+      'You already have all themes in your favorites! 🎉';
+
+  @override
+  String get manageFavoriteThemes => 'Manage Favorite Themes';
+
+  @override
+  String get noFavoriteThemesProfile => 'No favorite themes yet.';
+
+  @override
+  String get correctAnswer => '✅ Correct!';
+
+  @override
+  String get incorrectAnswer => '❌ Incorrect';
+
+  @override
+  String get continueButton => 'Continue →';
 }

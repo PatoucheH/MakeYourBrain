@@ -41,5 +41,22 @@
   "noQuestionsAvailable": "No questions available for this theme",
   "explanation": "💡 Explanation:",
   "createAccount": "Create Account",
-  "selected": "Selected"
+  "selected": "Selected",
+  "myFavoriteThemes": "My Favorite Themes",
+  "addTheme": "Add Theme",
+  "allThemes": "All Themes",
+  "noFavoriteThemes": "No favorite themes yet!",
+  "tapAddTheme": "Tap \"Add Theme\" to get started",
+  "aboutThisTheme": "About this theme",
+  "moreFeaturesComingSoon": "🚀 More features coming soon!\nLeaderboard, Time Challenge, Versus Mode...",
+  "removeFromFavorites": "Remove from favorites?",
+  "removeFavoriteConfirm": "Remove {themeName} from your favorite themes?",
+  "cancel": "Cancel",
+  "remove": "Remove",
+  "allThemesInFavorites": "You already have all themes in your favorites! 🎉",
+  "manageFavoriteThemes": "Manage Favorite Themes",
+  "noFavoriteThemesProfile": "No favorite themes yet.",
+  "correctAnswer": "✅ Correct!",
+  "incorrectAnswer": "❌ Incorrect",
+  "continueButton": "Continue →"
 }

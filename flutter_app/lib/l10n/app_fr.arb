@@ -41,5 +41,22 @@
   "noQuestionsAvailable": "Aucune question disponible pour ce thème",
   "explanation": "💡 Explication :",
   "createAccount": "Créer un Compte",
-  "selected": "Sélectionné"
+  "selected": "Sélectionné",
+  "myFavoriteThemes": "Mes Thèmes Favoris",
+  "addTheme": "Ajouter un Thème",
+  "allThemes": "Tous les Thèmes",
+  "noFavoriteThemes": "Aucun thème favori !",
+  "tapAddTheme": "Appuyez sur \"Ajouter un Thème\" pour commencer",
+  "aboutThisTheme": "À propos de ce thème",
+  "moreFeaturesComingSoon": "🚀 Plus de fonctionnalités bientôt !\nClassement, Défi Chrono, Mode Versus...",
+  "removeFromFavorites": "Retirer des favoris ?",
+  "removeFavoriteConfirm": "Retirer {themeName} de vos thèmes favoris ?",
+  "cancel": "Annuler",
+  "remove": "Retirer",
+  "allThemesInFavorites": "Vous avez déjà tous les thèmes en favoris ! 🎉",
+  "manageFavoriteThemes": "Gérer les Thèmes Favoris",
+  "noFavoriteThemesProfile": "Aucun thème favori pour le moment.",
+  "correctAnswer": "✅ Correct !",
+  "incorrectAnswer": "❌ Incorrect",
+  "continueButton": "Continuer →"
 }

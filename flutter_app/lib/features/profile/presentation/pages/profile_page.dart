@@ -5,6 +5,9 @@ import '../../../../core/providers/language_provider.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../data/repositories/profile_repository.dart';
+import '../../../quiz/data/repositories/theme_preferences_repository.dart';
+import '../../../quiz/data/repositories/quiz_repository.dart';
+import '../../../quiz/data/models/theme_model.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -16,8 +19,13 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final _authRepo = AuthRepository();
   final _profileRepo = ProfileRepository();
+  final _prefsRepo = ThemePreferencesRepository();
+  final _quizRepo = QuizRepository();
+  
   UserModel? userStats;
   List<Map<String, dynamic>> progressByTheme = [];
+  List<ThemeModel> favoriteThemes = [];
+  List<String> favoriteThemeIds = [];
   bool isLoading = true;
   String selectedLanguage = 'en';
 
@@ -29,17 +37,25 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> loadProfile() async {
     try {
-      final stats = await _authRepo.getUserStats();
-      final progress = await _profileRepo.getProgressByTheme(
-        _authRepo.getCurrentUserId()!,
-      );
-      
       final currentLang = context.read<LanguageProvider>().currentLanguage;
+      final userId = _authRepo.getCurrentUserId()!;
+      
+      final stats = await _authRepo.getUserStats();
+      final progress = await _profileRepo.getProgressByTheme(userId);
+      
+      // Charger les thèmes préférés
+      final preferredIds = await _prefsRepo.getPreferences(userId);
+      final allThemes = await _quizRepo.getThemes(currentLang);
+      final preferred = allThemes
+          .where((theme) => preferredIds.contains(theme.id))
+          .toList();
 
       setState(() {
         userStats = stats;
         selectedLanguage = currentLang;
         progressByTheme = progress;
+        favoriteThemes = preferred;
+        favoriteThemeIds = preferredIds;
         isLoading = false;
       });
     } catch (e) {
@@ -70,6 +86,39 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       }
     }
+  }
+
+  Future<void> removeThemeFromFavorites(BuildContext context, String themeId, String themeName) async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final userId = _authRepo.getCurrentUserId()!;
+      final updatedPreferences = favoriteThemeIds
+          .where((id) => id != themeId)
+          .toList();
+      
+      await _prefsRepo.savePreferences(userId, updatedPreferences);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$themeName removed from favorites')),
+        );
+        loadProfile();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.errorRemovingTheme}: $e')),
+        );
+      }
+    }
+  }
+
+  Color _getColorForLevel(int level) {
+    if (level >= 10) return Colors.purple;
+    if (level >= 7) return Colors.red;
+    if (level >= 5) return Colors.orange;
+    if (level >= 3) return Colors.green;
+    return Colors.blue;
   }
 
   @override
@@ -145,7 +194,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         ),
                         Text(l10n.currentStreak),
-                        Text('${l10n.bestStreak}: ${userStats?.bestStreak ?? 0} ${l10n.days}', 
+                        Text(
+                          '${l10n.bestStreak}: ${userStats?.bestStreak ?? 0} ${l10n.days}',
                           style: const TextStyle(color: Colors.grey),
                         ),
                       ],
@@ -264,7 +314,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.blue,
+                                color: _getColorForLevel(level),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -292,7 +342,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                 ),
                                 Text(
-                                  '${((xpProgress) * 100).toStringAsFixed(0)}%',
+                                  '${(xpProgress * 100).toStringAsFixed(0)}%',
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
@@ -319,17 +369,68 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 );
               }).toList(),
+
+            const SizedBox(height: 24),
+
+            // Manage Favorite Themes
+            Text(
+              l10n.manageFavoriteThemes,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+
+            if (favoriteThemes.isEmpty)
+              Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(l10n.noFavoriteThemesProfile),
+                ),
+              )
+            else
+              ...favoriteThemes.map((theme) {
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: ListTile(
+                    leading: Text(
+                      theme.icon,
+                      style: const TextStyle(fontSize: 32),
+                    ),
+                    title: Text(theme.name),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.remove_circle, color: Colors.red),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(l10n.removeFromFavorites),
+                            content: Text('Remove ${theme.name} from your favorite themes?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(l10n.cancel),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  removeThemeFromFavorites(context, theme.id, theme.name);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: Text(l10n.remove),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              }).toList(),
           ],
         ),
       ),
     );
-  }
-
-  Color _getColorForLevel(int level) {
-    if (level >= 10) return Colors.purple;
-    if (level >= 7) return Colors.red;
-    if (level >= 5) return Colors.orange;
-    if (level >= 3) return Colors.green;
-    return Colors.blue;
   }
 }
