@@ -58,5 +58,14 @@
   "noFavoriteThemesProfile": "No favorite themes yet.",
   "correctAnswer": "✅ Correct!",
   "incorrectAnswer": "❌ Incorrect",
-  "continueButton": "Continue →"
+  "continueButton": "Continue →",
+  "leaderboard": "Leaderboard",
+"viewLeaderboard": "View Leaderboard",
+"global": "Global",
+"thisWeek": "This Week",
+"yourGlobalRank": "Your Global Rank",
+"yourWeeklyRank": "Your Weekly Rank",
+"yourThemeRank": "Your Rank",
+"accuracy": "accuracy",
+"points": "pts"
 }

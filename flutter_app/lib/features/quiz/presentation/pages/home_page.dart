@@ -12,6 +12,7 @@ import '../../../profile/data/repositories/profile_repository.dart';
 import 'theme_detail_page.dart';
 import 'all_themes_page.dart';
 import 'add_theme_page.dart';
+import '../../../leaderboard/presentation/pages/leaderboard_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -117,6 +118,16 @@ class _HomePageState extends State<HomePage> {
               );
               // Recharger au retour du profil (si préférences modifiées)
               loadFavoriteThemes();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.leaderboard),
+            tooltip: l10n.leaderboard,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LeaderboardPage()),
+              );
             },
           ),
           IconButton(

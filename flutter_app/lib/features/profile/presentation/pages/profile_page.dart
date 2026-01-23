@@ -107,7 +107,7 @@ class _ProfilePageState extends State<ProfilePage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.errorRemovingTheme}: $e')),
+          SnackBar(content: Text('Error removing theme : $e')),
         );
       }
     }

@@ -79,7 +79,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get questions => 'Questions';
 
   @override
-  String get accuracy => 'Accuracy';
+  String get accuracy => 'accuracy';
 
   @override
   String get progressByTheme => 'Progress by Theme';
@@ -189,4 +189,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get continueButton => 'Continue →';
+
+  @override
+  String get leaderboard => 'Leaderboard';
+
+  @override
+  String get viewLeaderboard => 'View Leaderboard';
+
+  @override
+  String get global => 'Global';
+
+  @override
+  String get thisWeek => 'This Week';
+
+  @override
+  String get yourGlobalRank => 'Your Global Rank';
+
+  @override
+  String get yourWeeklyRank => 'Your Weekly Rank';
+
+  @override
+  String get yourThemeRank => 'Your Rank';
+
+  @override
+  String get points => 'pts';
 }

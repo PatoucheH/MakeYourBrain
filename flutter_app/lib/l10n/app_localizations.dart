@@ -239,7 +239,7 @@ abstract class AppLocalizations {
   /// No description provided for @accuracy.
   ///
   /// In en, this message translates to:
-  /// **'Accuracy'**
+  /// **'accuracy'**
   String get accuracy;
 
   /// No description provided for @progressByTheme.
@@ -451,6 +451,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue →'**
   String get continueButton;
+
+  /// No description provided for @leaderboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaderboard'**
+  String get leaderboard;
+
+  /// No description provided for @viewLeaderboard.
+  ///
+  /// In en, this message translates to:
+  /// **'View Leaderboard'**
+  String get viewLeaderboard;
+
+  /// No description provided for @global.
+  ///
+  /// In en, this message translates to:
+  /// **'Global'**
+  String get global;
+
+  /// No description provided for @thisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get thisWeek;
+
+  /// No description provided for @yourGlobalRank.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Global Rank'**
+  String get yourGlobalRank;
+
+  /// No description provided for @yourWeeklyRank.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Weekly Rank'**
+  String get yourWeeklyRank;
+
+  /// No description provided for @yourThemeRank.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Rank'**
+  String get yourThemeRank;
+
+  /// No description provided for @points.
+  ///
+  /// In en, this message translates to:
+  /// **'pts'**
+  String get points;
 }
 
 class _AppLocalizationsDelegate

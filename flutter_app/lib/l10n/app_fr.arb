@@ -58,5 +58,14 @@
   "noFavoriteThemesProfile": "Aucun thème favori pour le moment.",
   "correctAnswer": "✅ Correct !",
   "incorrectAnswer": "❌ Incorrect",
-  "continueButton": "Continuer →"
+  "continueButton": "Continuer →",
+  "leaderboard": "Classement",
+"viewLeaderboard": "Voir le Classement",
+"global": "Mondial",
+"thisWeek": "Cette Semaine",
+"yourGlobalRank": "Votre Rang Mondial",
+"yourWeeklyRank": "Votre Rang Hebdo",
+"yourThemeRank": "Votre Rang",
+"accuracy": "précision",
+"points": "pts"
 }

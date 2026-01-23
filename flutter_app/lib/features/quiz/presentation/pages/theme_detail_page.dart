@@ -4,6 +4,7 @@ import '../../data/models/theme_model.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
 import 'quiz_page.dart';
+import '../../../leaderboard/presentation/pages/leaderboard_page.dart';
 
 class ThemeDetailPage extends StatefulWidget {
   final ThemeModel theme;
@@ -204,6 +205,44 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Leaderboard Button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LeaderboardPage(
+                                themeId: widget.theme.id,
+                                themeName: widget.theme.name,
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.leaderboard, size: 24),
+                        label: Text(
+                          l10n.viewLeaderboard,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(16),
+                          side: BorderSide(color: themeColor, width: 2),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
                       ),
                     ),
