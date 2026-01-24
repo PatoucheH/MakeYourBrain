@@ -9,6 +9,7 @@ import 'features/auth/data/repositories/auth_repository.dart';
 import 'features/quiz/data/repositories/theme_preferences_repository.dart';
 import 'core/providers/language_provider.dart';
 import '../l10n/app_localizations.dart';
+import 'features/lives/data/providers/lives_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,8 +17,11 @@ void main() async {
   await SupabaseService.initialize();
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => LanguageProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => LanguageProvider()),
+        ChangeNotifierProvider(create: (context) => LivesProvider()),
+      ],
       child: const MyApp(),
     ),
   );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/provider.dart';
+import '../../../lives/data/providers/lives_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
 import '../../data/repositories/quiz_repository.dart';
@@ -69,6 +71,11 @@ class _QuizPageState extends State<QuizPage> {
     hasAnswered = true;
     if (isCorrect) score++;
   });
+
+  if (!isCorrect && mounted) {
+    final livesProvider = context.read<LivesProvider>();
+    await livesProvider.useLife();
+  }
 
   // Sauvegarder la réponse
   final authRepo = AuthRepository();

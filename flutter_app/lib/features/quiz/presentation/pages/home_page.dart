@@ -13,6 +13,7 @@ import 'theme_detail_page.dart';
 import 'all_themes_page.dart';
 import 'add_theme_page.dart';
 import '../../../leaderboard/presentation/pages/leaderboard_page.dart';
+import '../../../lives/presentation/widgets/lives_indicator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -108,6 +109,10 @@ class _HomePageState extends State<HomePage> {
         title: Text(l10n.appName),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: LivesIndicator(),
+          ),
           IconButton(
             icon: const Icon(Icons.person),
             tooltip: l10n.profile,

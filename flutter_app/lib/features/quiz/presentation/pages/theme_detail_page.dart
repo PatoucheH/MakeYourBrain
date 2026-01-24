@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/models/theme_model.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
 import 'quiz_page.dart';
 import '../../../leaderboard/presentation/pages/leaderboard_page.dart';
+import '../../../lives/data/providers/lives_provider.dart';
 
 class ThemeDetailPage extends StatefulWidget {
   final ThemeModel theme;
@@ -175,7 +177,41 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                     child: SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          final livesProvider = context.read<LivesProvider>();
+                          
+                          if (livesProvider.currentLives <= 0) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('❤️ No Lives Left'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Text('You need at least 1 life to play.'),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'Next life in: ${livesProvider.getTimeUntilNextLife()}',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('OK'),
+                                  ),
+                                  // TODO: Bouton "Watch Ad" pour plus tard
+                                ],
+                              ),
+                            );
+                            return;
+                          }
+                          
                           Navigator.push(
                             context,
                             MaterialPageRoute(
