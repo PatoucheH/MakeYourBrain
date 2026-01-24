@@ -60,12 +60,12 @@
   "incorrectAnswer": "❌ Incorrect",
   "continueButton": "Continue →",
   "leaderboard": "Leaderboard",
-"viewLeaderboard": "View Leaderboard",
-"global": "Global",
-"thisWeek": "This Week",
-"yourGlobalRank": "Your Global Rank",
-"yourWeeklyRank": "Your Weekly Rank",
-"yourThemeRank": "Your Rank",
-"accuracy": "accuracy",
-"points": "pts"
+  "viewLeaderboard": "View Leaderboard",
+  "global": "Global",
+  "thisWeek": "This Week",
+  "yourGlobalRank": "Your Global Rank",
+  "yourWeeklyRank": "Your Weekly Rank",
+  "yourThemeRank": "Your Rank",
+  "accuracy": "accuracy",
+  "points": "pts"
 }

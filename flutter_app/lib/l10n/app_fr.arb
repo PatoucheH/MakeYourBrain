@@ -60,12 +60,12 @@
   "incorrectAnswer": "❌ Incorrect",
   "continueButton": "Continuer →",
   "leaderboard": "Classement",
-"viewLeaderboard": "Voir le Classement",
-"global": "Mondial",
-"thisWeek": "Cette Semaine",
-"yourGlobalRank": "Votre Rang Mondial",
-"yourWeeklyRank": "Votre Rang Hebdo",
-"yourThemeRank": "Votre Rang",
-"accuracy": "précision",
-"points": "pts"
+  "viewLeaderboard": "Voir le Classement",
+  "global": "Mondial",
+  "thisWeek": "Cette Semaine",
+  "yourGlobalRank": "Votre Rang Mondial",
+  "yourWeeklyRank": "Votre Rang Hebdo",
+  "yourThemeRank": "Votre Rang",
+  "accuracy": "précision",
+  "points": "pts"
 }
