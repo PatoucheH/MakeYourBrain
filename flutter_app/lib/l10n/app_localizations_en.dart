@@ -213,4 +213,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get points => 'pts';
+
+  @override
+  String get loadingAdd => 'Loading add ....';
+
+  @override
+  String get winLifes => '+2 Lives! Keep playing!';
+
+  @override
+  String get noLife => 'No Lives Left!';
+
+  @override
+  String get needLifes => 'You need lives to play.';
+
+  @override
+  String get nextLife => 'Next life in:';
+
+  @override
+  String get orWatchAdd => 'Or watch an add to get +2 lives instantly!';
+
+  @override
+  String get close => 'close';
+
+  @override
+  String get watchAdd => 'Watch Add (+2 ❤️)';
+
+  @override
+  String get getMoreLifes => 'Get more lifes';
+
+  @override
+  String get currentLife => 'Current life';
 }

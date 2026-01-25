@@ -499,6 +499,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'pts'**
   String get points;
+
+  /// No description provided for @loadingAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading add ....'**
+  String get loadingAdd;
+
+  /// No description provided for @winLifes.
+  ///
+  /// In en, this message translates to:
+  /// **'+2 Lives! Keep playing!'**
+  String get winLifes;
+
+  /// No description provided for @noLife.
+  ///
+  /// In en, this message translates to:
+  /// **'No Lives Left!'**
+  String get noLife;
+
+  /// No description provided for @needLifes.
+  ///
+  /// In en, this message translates to:
+  /// **'You need lives to play.'**
+  String get needLifes;
+
+  /// No description provided for @nextLife.
+  ///
+  /// In en, this message translates to:
+  /// **'Next life in:'**
+  String get nextLife;
+
+  /// No description provided for @orWatchAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Or watch an add to get +2 lives instantly!'**
+  String get orWatchAdd;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'close'**
+  String get close;
+
+  /// No description provided for @watchAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch Add (+2 ❤️)'**
+  String get watchAdd;
+
+  /// No description provided for @getMoreLifes.
+  ///
+  /// In en, this message translates to:
+  /// **'Get more lifes'**
+  String get getMoreLifes;
+
+  /// No description provided for @currentLife.
+  ///
+  /// In en, this message translates to:
+  /// **'Current life'**
+  String get currentLife;
 }
 
 class _AppLocalizationsDelegate

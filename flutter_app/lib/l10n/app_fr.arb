@@ -67,5 +67,15 @@
   "yourWeeklyRank": "Votre Rang Hebdo",
   "yourThemeRank": "Votre Rang",
   "accuracy": "précision",
-  "points": "pts"
+  "points": "pts",
+  "loadingAdd": "Chargement d'une pub....",
+  "winLifes": "+2 Vies ! Continuez à jouer",
+  "noLife": "Plus de vie !",
+  "needLifes": "Vous avez besoin de vie pour jouer",
+  "nextLife": "Prochaine vie dans :",
+  "orWatchAdd": "Ou regarder une pub pour gagner 2 vies",
+  "close": "fermer",
+  "watchAdd": "Regarder une pub(+2 ❤️)",
+  "getMoreLifes": "Avoir plus de vies",
+  "currentLife": "Vie actuelle"
 }

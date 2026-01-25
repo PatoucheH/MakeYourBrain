@@ -7,6 +7,7 @@ import '../../../profile/data/repositories/profile_repository.dart';
 import 'quiz_page.dart';
 import '../../../leaderboard/presentation/pages/leaderboard_page.dart';
 import '../../../lives/data/providers/lives_provider.dart';
+import '../../../lives/presentation/widgets/no_lives_dialog.dart';
 
 class ThemeDetailPage extends StatefulWidget {
   final ThemeModel theme;
@@ -183,31 +184,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                           if (livesProvider.currentLives <= 0) {
                             showDialog(
                               context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('❤️ No Lives Left'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Text('You need at least 1 life to play.'),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'Next life in: ${livesProvider.getTimeUntilNextLife()}',
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blue,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text('OK'),
-                                  ),
-                                  // TODO: Bouton "Watch Ad" pour plus tard
-                                ],
-                              ),
+                              builder: (context) => const NoLivesDialog(),
                             );
                             return;
                           }

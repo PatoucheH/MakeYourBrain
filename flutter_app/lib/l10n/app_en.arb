@@ -67,5 +67,15 @@
   "yourWeeklyRank": "Your Weekly Rank",
   "yourThemeRank": "Your Rank",
   "accuracy": "accuracy",
-  "points": "pts"
+  "points": "pts",
+  "loadingAdd": "Loading add ....",
+  "winLifes": "+2 Lives! Keep playing!",
+  "noLife": "No Lives Left!",
+  "needLifes": "You need lives to play.",
+  "nextLife": "Next life in:",
+  "orWatchAdd": "Or watch an add to get +2 lives instantly!",
+  "close": "close",
+  "watchAdd": "Watch Add (+2 ❤️)",
+  "getMoreLifes": "Get more lifes",
+  "currentLife": "Current life"
 }

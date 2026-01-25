@@ -9,6 +9,7 @@ import '../../data/models/theme_model.dart';
 import '../../data/models/question_model.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../../features/profile/data/repositories/profile_repository.dart';
+import '../../../lives/presentation/widgets/no_lives_dialog.dart';
 
 class QuizPage extends StatefulWidget {
   final ThemeModel theme;
@@ -35,6 +36,7 @@ class _QuizPageState extends State<QuizPage> {
   }
 
   Future<void> loadQuestions() async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final languageCode = context.read<LanguageProvider>().currentLanguage;
       final result = await _repository.getQuestions(
@@ -57,48 +59,61 @@ class _QuizPageState extends State<QuizPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading questions: $e')),
+          SnackBar(content: Text('${l10n.errorLoadingQuestions} : $e')),
         );
       }
     }
   }
 
   void selectAnswer(String answerId, bool isCorrect, String questionId) async {
-  if (hasAnswered) return;
+    if (hasAnswered) return;
 
-  setState(() {
-    selectedAnswerId = answerId;
-    hasAnswered = true;
-    if (isCorrect) score++;
-  });
+    setState(() {
+      selectedAnswerId = answerId;
+      hasAnswered = true;
+      if (isCorrect) score++;
+    });
 
-  if (!isCorrect && mounted) {
-    final livesProvider = context.read<LivesProvider>();
-    await livesProvider.useLife();
-  }
+    if (!isCorrect && mounted) {
+      final livesProvider = context.read<LivesProvider>();
+      await livesProvider.useLife();
+      if (livesProvider.currentLives <= 0 && mounted) {
+        // Afficher le popup
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => NoLivesDialog(
+            onClose: () {
+              Navigator.pop(context); // Retour à ThemeDetailPage
+            },
+          ),
+        );
+        return; // Arrêter l'exécution
+      }
+    }
 
-  // Sauvegarder la réponse
-  final authRepo = AuthRepository();
-  if (authRepo.isLoggedIn()) {
-    try {
-      await _repository.saveUserAnswer(
-        userId: authRepo.getCurrentUserId()!,
-        questionId: questionId,
-        selectedAnswerId: answerId,
-        isCorrect: isCorrect,
-        languageUsed: context.read<LanguageProvider>().currentLanguage,
-        themeId: widget.theme.id,
-      );
-    } catch (e) {
-      print('Error saving answer: $e');
+    // Sauvegarder la réponse
+    final authRepo = AuthRepository();
+    if (authRepo.isLoggedIn()) {
+      try {
+        await _repository.saveUserAnswer(
+          userId: authRepo.getCurrentUserId()!,
+          questionId: questionId,
+          selectedAnswerId: answerId,
+          isCorrect: isCorrect,
+          languageUsed: context.read<LanguageProvider>().currentLanguage,
+          themeId: widget.theme.id,
+        );
+      } catch (e) {
+        print('Error saving answer: $e');
+      }
+    }
+
+    // Afficher le dialog immédiatement
+    if (mounted) {
+      showAnswerDialog(isCorrect);
     }
   }
-
-  // Afficher le dialog immédiatement
-  if (mounted) {
-    showAnswerDialog(isCorrect);
-  }
-}
 
   void showResultDialog() {
     final l10n = AppLocalizations.of(context)!;
@@ -254,7 +269,7 @@ class _QuizPageState extends State<QuizPage> {
           ),
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

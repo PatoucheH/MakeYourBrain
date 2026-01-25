@@ -213,4 +213,34 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get points => 'pts';
+
+  @override
+  String get loadingAdd => 'Chargement d\'une pub....';
+
+  @override
+  String get winLifes => '+2 Vies ! Continuez à jouer';
+
+  @override
+  String get noLife => 'Plus de vie !';
+
+  @override
+  String get needLifes => 'Vous avez besoin de vie pour jouer';
+
+  @override
+  String get nextLife => 'Prochaine vie dans :';
+
+  @override
+  String get orWatchAdd => 'Ou regarder une pub pour gagner 2 vies';
+
+  @override
+  String get close => 'fermer';
+
+  @override
+  String get watchAdd => 'Regarder une pub(+2 ❤️)';
+
+  @override
+  String get getMoreLifes => 'Avoir plus de vies';
+
+  @override
+  String get currentLife => 'Vie actuelle';
 }
