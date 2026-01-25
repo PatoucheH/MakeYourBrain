@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/repositories/quiz_repository.dart';
 import '../../data/models/theme_model.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
@@ -35,7 +36,6 @@ class _AllThemesPageState extends State<AllThemesPage> {
       final languageCode = context.read<LanguageProvider>().currentLanguage;
       final themesResult = await _quizRepo.getThemes(languageCode);
       
-      // Charger la progression pour chaque thème
       final userId = _authRepo.getCurrentUserId();
       if (userId != null) {
         final progress = await _profileRepo.getProgressByTheme(userId);
@@ -67,11 +67,11 @@ class _AllThemesPageState extends State<AllThemesPage> {
   }
 
   Color _getColorForLevel(int level) {
-    if (level >= 10) return Colors.purple;
-    if (level >= 7) return Colors.red;
-    if (level >= 5) return Colors.orange;
-    if (level >= 3) return Colors.green;
-    return Colors.blue;
+    if (level >= 10) return AppColors.level10plus;
+    if (level >= 7) return AppColors.level7_9;
+    if (level >= 5) return AppColors.level5_6;
+    if (level >= 3) return AppColors.level3_4;
+    return AppColors.level1_2;
   }
 
   @override
@@ -115,7 +115,6 @@ class _AllThemesPageState extends State<AllThemesPage> {
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         children: [
-                          // Icon
                           Container(
                             width: 60,
                             height: 60,
@@ -132,7 +131,6 @@ class _AllThemesPageState extends State<AllThemesPage> {
                           ),
                           const SizedBox(width: 16),
                           
-                          // Info
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,7 +168,6 @@ class _AllThemesPageState extends State<AllThemesPage> {
                                 ),
                                 const SizedBox(height: 8),
                                 
-                                // XP Bar
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: LinearProgressIndicator(

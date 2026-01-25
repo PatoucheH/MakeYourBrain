@@ -17,22 +17,20 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
     final l10n = AppLocalizations.of(context)!;
     final livesProvider = context.read<LivesProvider>();
     
-    // Fermer le dialog actuel
     Navigator.pop(context);
     
-    // Afficher un loading pendant la "pub"
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => Center(
         child: Card(
           child: Padding(
-            padding: EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
                 Text(l10n.loadingAdd),
               ],
             ),
@@ -41,24 +39,20 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
       ),
     );
     
-    // Simuler la durée de la pub (3 secondes)
     await Future.delayed(const Duration(seconds: 3));
     
-    // Fermer le loading
     if (mounted) {
       Navigator.of(context).pop();
     }
     
-    // Ajouter les vies
     await livesProvider.addLivesFromAd();
     
-    // Afficher un message de succès
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.winLifes),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -70,11 +64,22 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
     return Consumer<LivesProvider>(
       builder: (context, livesProvider, child) {
         return AlertDialog(
-          title: Row(
+          title: Column(
             children: [
-              Icon(Icons.heart_broken, color: Colors.red, size: 32),
-              SizedBox(width: 12),
-              Text(l10n.noLife),
+              Image.asset(
+                'assets/branding/mascot/brainly_encourage.png',
+                height: 100,
+              ),
+              const SizedBox(height: 12),
+              
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.heart_broken, color: Colors.red, size: 32),
+                  const SizedBox(width: 12),
+                  Text(l10n.noLife),
+                ],
+              ),
             ],
           ),
           content: Column(
@@ -83,11 +88,10 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
               Text(
                 l10n.needLifes,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
               
-              // Timer
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -101,7 +105,7 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
                     const SizedBox(height: 8),
                     Text(
                       l10n.nextLife,
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                     ),
                     Text(
                       livesProvider.getTimeUntilNextLife(),
@@ -119,11 +123,10 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
               const Divider(),
               const SizedBox(height: 8),
               
-              // Message pub
               Text(
                 l10n.orWatchAdd,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   fontStyle: FontStyle.italic,
                 ),

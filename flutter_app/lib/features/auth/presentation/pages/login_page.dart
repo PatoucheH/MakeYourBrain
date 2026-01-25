@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../../quiz/presentation/pages/home_page.dart';
 import '../../../../main.dart';
@@ -69,7 +70,6 @@ class _LoginPageState extends State<LoginPage> {
         return;
       }
 
-      // Écouter les changements d'auth
       final subscription = _repository.authStateChanges.listen((state) {
         if (state.event == AuthChangeEvent.signedIn && mounted) {
           Navigator.of(context).pushReplacement(
@@ -78,7 +78,6 @@ class _LoginPageState extends State<LoginPage> {
         }
       });
 
-      // Timeout après 60 secondes
       await Future.delayed(const Duration(seconds: 60));
       subscription.cancel();
       
@@ -109,13 +108,22 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.asset(
+                'assets/branding/mascot/brainly_neutral.png',
+                height: 150,
+              ),
+              const SizedBox(height: 20),
+              
               Text(
                 l10n.appName,
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.brainPurple,
+                ),
               ),
               const SizedBox(height: 50),
               
-              // Facebook Login Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -141,7 +149,6 @@ class _LoginPageState extends State<LoginPage> {
               
               const SizedBox(height: 24),
               
-              // Divider
               Row(
                 children: [
                   const Expanded(child: Divider()),
@@ -158,7 +165,6 @@ class _LoginPageState extends State<LoginPage> {
               
               const SizedBox(height: 24),
               
-              // Email/Password fields
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(

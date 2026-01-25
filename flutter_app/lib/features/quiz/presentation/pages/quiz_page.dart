@@ -10,87 +10,10 @@ import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../../features/profile/data/repositories/profile_repository.dart';
 import '../../../lives/presentation/widgets/no_lives_dialog.dart';
 
-/// Classe utilitaire pour calculer la répartition de difficulté
-class DifficultyDistribution {
-  final int easyPercent;
-  final int mediumPercent;
-  final int hardPercent;
-
-  DifficultyDistribution({
-    required this.easyPercent,
-    required this.mediumPercent,
-    required this.hardPercent,
-  });
-
-  /// Calcule la distribution selon le niveau du joueur
-  static DifficultyDistribution getForLevel(int level) {
-    if (level <= 3) {
-      // Niveaux 1-3 : Débutant - que du facile
-      return DifficultyDistribution(
-        easyPercent: 100,
-        mediumPercent: 0,
-        hardPercent: 0,
-      );
-    } else if (level <= 6) {
-      // Niveaux 4-6 : Introduction au moyen
-      return DifficultyDistribution(
-        easyPercent: 80,
-        mediumPercent: 20,
-        hardPercent: 0,
-      );
-    } else if (level <= 9) {
-      // Niveaux 7-9 : Plus de questions moyennes
-      return DifficultyDistribution(
-        easyPercent: 60,
-        mediumPercent: 40,
-        hardPercent: 0,
-      );
-    } else if (level <= 12) {
-      // Niveaux 10-12 : Introduction au difficile
-      return DifficultyDistribution(
-        easyPercent: 50,
-        mediumPercent: 40,
-        hardPercent: 10,
-      );
-    } else if (level <= 15) {
-      // Niveaux 13-15 : Équilibre moyen/difficile
-      return DifficultyDistribution(
-        easyPercent: 30,
-        mediumPercent: 50,
-        hardPercent: 20,
-      );
-    } else if (level <= 18) {
-      // Niveaux 16-18 : Majoritairement moyen et difficile
-      return DifficultyDistribution(
-        easyPercent: 20,
-        mediumPercent: 50,
-        hardPercent: 30,
-      );
-    } else {
-      // Niveaux 19+ : Expert - surtout moyen et difficile
-      return DifficultyDistribution(
-        easyPercent: 10,
-        mediumPercent: 50,
-        hardPercent: 40,
-      );
-    }
-  }
-
-  @override
-  String toString() {
-    return 'Easy: $easyPercent%, Medium: $mediumPercent%, Hard: $hardPercent%';
-  }
-}
-
 class QuizPage extends StatefulWidget {
   final ThemeModel theme;
-  final int userLevel; // Nouveau paramètre pour le niveau du joueur
 
-  const QuizPage({
-    super.key,
-    required this.theme,
-    this.userLevel = 1, // Par défaut niveau 1
-  });
+  const QuizPage({super.key, required this.theme});
 
   @override
   State<QuizPage> createState() => _QuizPageState();
@@ -108,58 +31,33 @@ class _QuizPageState extends State<QuizPage> {
   @override
   void initState() {
     super.initState();
-    // ✅ Ne pas appeler loadQuestions() ici
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // ✅ Charger les questions ici car le contexte est maintenant disponible
-    if (isLoading && questions.isEmpty) {
-      loadQuestions();
-    }
+    loadQuestions();
   }
 
   Future<void> loadQuestions() async {
     try {
       final languageCode = context.read<LanguageProvider>().currentLanguage;
-      
-      // Calculer la distribution de difficulté selon le niveau
-      final distribution = DifficultyDistribution.getForLevel(widget.userLevel);
-      
-      print('📊 Niveau ${widget.userLevel} - Distribution: ${distribution.toString()}');
-      
       final result = await _repository.getQuestions(
         themeId: widget.theme.id,
         languageCode: languageCode,
         limit: 10,
-        easyPercent: distribution.easyPercent,
-        mediumPercent: distribution.mediumPercent,
-        hardPercent: distribution.hardPercent,
       );
-      
       final authRepo = AuthRepository();
       final profileRepo = ProfileRepository();
       if (authRepo.isLoggedIn()) {
         await profileRepo.updateStreak(authRepo.getCurrentUserId()!);
       }
-      
-      if (mounted) {
-        setState(() {
-          questions = result;
-          isLoading = false;
-        });
-      }
+      setState(() {
+        questions = result;
+        isLoading = false;
+      });
     } catch (e) {
-      print('Error loading questions: $e');
+      setState(() {
+        isLoading = false;
+      });
       if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-        
-        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.errorLoadingQuestions} : $e')),
+          SnackBar(content: Text('Error loading questions: $e')),
         );
       }
     }
@@ -191,7 +89,6 @@ class _QuizPageState extends State<QuizPage> {
       }
     }
 
-    // Sauvegarder la réponse
     final authRepo = AuthRepository();
     if (authRepo.isLoggedIn()) {
       try {
@@ -220,11 +117,21 @@ class _QuizPageState extends State<QuizPage> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text(l10n.quizCompleted),
+        title: Column(
+          children: [
+            Image.asset(
+              'assets/branding/mascot/brainly_victory.png',
+              height: 120,
+            ),
+            const SizedBox(height: 12),
+            Text(l10n.quizCompleted),
+          ],
+        ),
         content: Text(
           '${l10n.yourScore}: $score/${questions.length}\n'
           '${((score / questions.length) * 100).toStringAsFixed(0)}%',
           style: const TextStyle(fontSize: 18),
+          textAlign: TextAlign.center,
         ),
         actions: [
           TextButton(
@@ -261,20 +168,33 @@ class _QuizPageState extends State<QuizPage> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         backgroundColor: isCorrect ? Colors.green.shade50 : Colors.red.shade50,
-        title: Row(
+        title: Column(
           children: [
-            Icon(
-              isCorrect ? Icons.check_circle : Icons.cancel,
-              color: isCorrect ? Colors.green : Colors.red,
-              size: 32,
+            Image.asset(
+              isCorrect 
+                ? 'assets/branding/mascot/brainly_happy.png'
+                : 'assets/branding/mascot/brainly_fail.png',
+              height: 100,
             ),
-            const SizedBox(width: 12),
-            Text(
-              isCorrect ? l10n.correctAnswer : l10n.incorrectAnswer,
-              style: TextStyle(
-                color: isCorrect ? Colors.green.shade900 : Colors.red.shade900,
-                fontWeight: FontWeight.bold,
-              ),
+            const SizedBox(height: 12),
+            
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  isCorrect ? Icons.check_circle : Icons.cancel,
+                  color: isCorrect ? Colors.green : Colors.red,
+                  size: 32,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  isCorrect ? l10n.correctAnswer : l10n.incorrectAnswer,
+                  style: TextStyle(
+                    color: isCorrect ? Colors.green.shade900 : Colors.red.shade900,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -322,7 +242,7 @@ class _QuizPageState extends State<QuizPage> {
             ),
             child: Text(
               l10n.continueButton,
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
           ),
         ],
@@ -371,7 +291,6 @@ class _QuizPageState extends State<QuizPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Score
             Card(
               color: Colors.blue.shade50,
               child: Padding(
@@ -385,7 +304,6 @@ class _QuizPageState extends State<QuizPage> {
             ),
             const SizedBox(height: 20),
 
-            // Difficulté
             Chip(
               label: Text(
                 currentQuestion.difficulty.toUpperCase(),
@@ -399,7 +317,6 @@ class _QuizPageState extends State<QuizPage> {
             ),
             const SizedBox(height: 20),
 
-            // Question
             Card(
               elevation: 4,
               child: Padding(
@@ -412,7 +329,6 @@ class _QuizPageState extends State<QuizPage> {
             ),
             const SizedBox(height: 30),
 
-            // Réponses
             ...currentQuestion.answers.map((answer) {
               final isSelected = selectedAnswerId == answer.id;
               final showCorrect = hasAnswered && answer.isCorrect;

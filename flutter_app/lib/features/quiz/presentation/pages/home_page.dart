@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/repositories/quiz_repository.dart';
 import '../../data/repositories/theme_preferences_repository.dart';
 import '../../data/models/theme_model.dart';
@@ -44,18 +45,13 @@ class _HomePageState extends State<HomePage> {
       final userId = _authRepo.getCurrentUserId()!;
       final languageCode = context.read<LanguageProvider>().currentLanguage;
       
-      // Charger les IDs des thèmes préférés
       final preferredIds = await _prefsRepo.getPreferences(userId);
-      
-      // Charger tous les thèmes
       final allThemes = await _quizRepo.getThemes(languageCode);
       
-      // Filtrer pour garder uniquement les préférés
       final preferred = allThemes
           .where((theme) => preferredIds.contains(theme.id))
           .toList();
       
-      // Charger la progression
       final progress = await _profileRepo.getProgressByTheme(userId);
       final progressMap = <String, Map<String, dynamic>>{};
       for (var p in progress) {
@@ -86,18 +82,17 @@ class _HomePageState extends State<HomePage> {
       ),
     );
     
-    // Si un thème a été ajouté, recharger
     if (result == true) {
       loadFavoriteThemes();
     }
   }
 
   Color _getColorForLevel(int level) {
-    if (level >= 10) return Colors.purple;
-    if (level >= 7) return Colors.red;
-    if (level >= 5) return Colors.orange;
-    if (level >= 3) return Colors.green;
-    return Colors.blue;
+    if (level >= 10) return AppColors.level10plus;
+    if (level >= 7) return AppColors.level7_9;
+    if (level >= 5) return AppColors.level5_6;
+    if (level >= 3) return AppColors.level3_4;
+    return AppColors.level1_2;
   }
 
   @override
@@ -106,8 +101,25 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.appName),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/branding/logo/brainly_logo.png',
+              height: 40,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              l10n.appName,
+              style: const TextStyle(
+                color: AppColors.brainPurple,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: true,
+        backgroundColor: AppColors.brainLightPurple.withOpacity(0.15),
         actions: [
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
@@ -121,7 +133,6 @@ class _HomePageState extends State<HomePage> {
                 context,
                 MaterialPageRoute(builder: (context) => const ProfilePage()),
               );
-              // Recharger au retour du profil (si préférences modifiées)
               loadFavoriteThemes();
             },
           ),
@@ -153,7 +164,6 @@ class _HomePageState extends State<HomePage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // Header avec boutons
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -184,7 +194,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(height: 16),
                       
-                      // Boutons
                       Row(
                         children: [
                           Expanded(
@@ -225,7 +234,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 
-                // Liste des thèmes préférés
                 Expanded(
                   child: favoriteThemes.isEmpty
                       ? Center(
@@ -291,7 +299,6 @@ class _HomePageState extends State<HomePage> {
                                   padding: const EdgeInsets.all(16),
                                   child: Row(
                                     children: [
-                                      // Icon
                                       Container(
                                         width: 70,
                                         height: 70,
@@ -312,7 +319,6 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       const SizedBox(width: 16),
                                       
-                                      // Info
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -350,7 +356,6 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                             const SizedBox(height: 10),
                                             
-                                            // XP Bar
                                             ClipRRect(
                                               borderRadius: BorderRadius.circular(8),
                                               child: LinearProgressIndicator(

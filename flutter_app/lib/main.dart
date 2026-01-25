@@ -8,7 +8,8 @@ import 'features/quiz/presentation/pages/theme_preferences_page.dart';
 import 'features/auth/data/repositories/auth_repository.dart';
 import 'features/quiz/data/repositories/theme_preferences_repository.dart';
 import 'core/providers/language_provider.dart';
-import '../l10n/app_localizations.dart';
+import 'core/theme/app_colors.dart';
+import 'l10n/app_localizations.dart';
 import 'features/lives/data/providers/lives_provider.dart';
 
 void main() async {
@@ -37,8 +38,33 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'Make Your Brain',
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.brainPurple,
+              primary: AppColors.brainPurple,
+              secondary: AppColors.brainLightPurple,
+            ),
             useMaterial3: true,
+            scaffoldBackgroundColor: AppColors.backgroundLight,
+            appBarTheme: AppBarTheme(
+              backgroundColor: AppColors.brainLightPurple.withOpacity(0.15),
+              foregroundColor: AppColors.brainPurple,
+              elevation: 0,
+            ),
+            cardTheme: CardThemeData(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.brainPurple,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
           ),
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -119,7 +145,6 @@ class _AuthCheckerState extends State<AuthChecker> {
       return;
     }
 
-    // User connecté, vérifier si onboarding fait
     try {
       final userId = _authRepo.getCurrentUserId()!;
       final hasCompletedOnboarding = await _prefsRepo.hasCompletedOnboarding(userId);

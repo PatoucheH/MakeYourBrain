@@ -1,6 +1,7 @@
 class ThemeModel {
   final String id;
   final String icon;
+  final String? iconPath;
   final String color;
   final String name;
   final String description;
@@ -9,6 +10,7 @@ class ThemeModel {
   ThemeModel({
     required this.id,
     required this.icon,
+    this.iconPath,
     required this.color,
     required this.name,
     required this.description,
@@ -20,6 +22,7 @@ class ThemeModel {
     return ThemeModel(
       id: json['id'],
       icon: json['icon'],
+      iconPath: json['icon_path'],
       color: json['color'],
       name: json['name'],
       description: json['description'],

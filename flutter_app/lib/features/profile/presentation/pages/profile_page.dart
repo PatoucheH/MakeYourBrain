@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../data/repositories/profile_repository.dart';
@@ -43,7 +44,6 @@ class _ProfilePageState extends State<ProfilePage> {
       final stats = await _authRepo.getUserStats();
       final progress = await _profileRepo.getProgressByTheme(userId);
       
-      // Charger les thèmes préférés
       final preferredIds = await _prefsRepo.getPreferences(userId);
       final allThemes = await _quizRepo.getThemes(currentLang);
       final preferred = allThemes
@@ -89,7 +89,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> removeThemeFromFavorites(BuildContext context, String themeId, String themeName) async {
-    final l10n = AppLocalizations.of(context)!;
     try {
       final userId = _authRepo.getCurrentUserId()!;
       final updatedPreferences = favoriteThemeIds
@@ -114,11 +113,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Color _getColorForLevel(int level) {
-    if (level >= 10) return Colors.purple;
-    if (level >= 7) return Colors.red;
-    if (level >= 5) return Colors.orange;
-    if (level >= 3) return Colors.green;
-    return Colors.blue;
+    if (level >= 10) return AppColors.level10plus;
+    if (level >= 7) return AppColors.level7_9;
+    if (level >= 5) return AppColors.level5_6;
+    if (level >= 3) return AppColors.level3_4;
+    return AppColors.level1_2;
   }
 
   @override
@@ -141,7 +140,6 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Email
             Card(
               child: ListTile(
                 leading: const Icon(Icons.email),
@@ -151,7 +149,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 16),
 
-            // Language selector
             Card(
               child: ListTile(
                 leading: const Icon(Icons.language),
@@ -170,14 +167,12 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 24),
 
-            // Stats section
             Text(
               l10n.statistics,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
 
-            // Streak
             Card(
               color: Colors.orange.shade50,
               child: Padding(
@@ -206,7 +201,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 12),
 
-            // Overall stats
             Row(
               children: [
                 Expanded(
@@ -252,7 +246,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 24),
 
-            // Progress by theme
             Text(
               l10n.progressByTheme,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -274,6 +267,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 final xpProgress = xp / xpForNextLevel;
                 final total = theme['total_questions'] ?? 0;
                 final correct = theme['correct_answers'] ?? 0;
+                final themeColor = _getColorForLevel(level);
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 16),
@@ -314,7 +308,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: _getColorForLevel(level),
+                                color: themeColor,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -357,9 +351,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 value: xpProgress,
                                 minHeight: 10,
                                 backgroundColor: Colors.grey.shade200,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  _getColorForLevel(level),
-                                ),
+                                valueColor: AlwaysStoppedAnimation<Color>(themeColor),
                               ),
                             ),
                           ],
@@ -372,7 +364,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
             const SizedBox(height: 24),
 
-            // Manage Favorite Themes
             Text(
               l10n.manageFavoriteThemes,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -382,7 +373,7 @@ class _ProfilePageState extends State<ProfilePage> {
             if (favoriteThemes.isEmpty)
               Card(
                 child: Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Text(l10n.noFavoriteThemesProfile),
                 ),
               )

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/language_provider.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/repositories/quiz_repository.dart';
 import '../../data/repositories/theme_preferences_repository.dart';
 import '../../data/models/theme_model.dart';
@@ -35,7 +36,6 @@ class _AddThemePageState extends State<AddThemePage> {
       final languageCode = context.read<LanguageProvider>().currentLanguage;
       final allThemes = await _quizRepo.getThemes(languageCode);
       
-      // Filtrer pour garder uniquement les thèmes NON préférés
       final available = allThemes
           .where((theme) => !widget.currentPreferences.contains(theme.id))
           .toList();
@@ -66,7 +66,6 @@ class _AddThemePageState extends State<AddThemePage> {
           SnackBar(content: Text('${theme.name} added to favorites! ⭐')),
         );
         
-        // Retourner à HomePage avec refresh
         Navigator.pop(context, true);
       }
     } catch (e) {
@@ -103,7 +102,7 @@ class _AddThemePageState extends State<AddThemePage> {
                         Text(
                           l10n.allThemesInFavorites,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
                           ),
@@ -131,12 +130,11 @@ class _AddThemePageState extends State<AddThemePage> {
                           padding: const EdgeInsets.all(16),
                           child: Row(
                             children: [
-                              // Icon
                               Container(
                                 width: 60,
                                 height: 60,
                                 decoration: BoxDecoration(
-                                  color: Colors.blue.shade50,
+                                  color: AppColors.brainLightPurple.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Center(
@@ -148,7 +146,6 @@ class _AddThemePageState extends State<AddThemePage> {
                               ),
                               const SizedBox(width: 16),
                               
-                              // Info
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

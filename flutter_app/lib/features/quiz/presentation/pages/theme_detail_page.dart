@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/models/theme_model.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
@@ -60,11 +61,11 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
   }
 
   Color _getColorForLevel(int level) {
-    if (level >= 10) return Colors.purple;
-    if (level >= 7) return Colors.red;
-    if (level >= 5) return Colors.orange;
-    if (level >= 3) return Colors.green;
-    return Colors.blue;
+    if (level >= 10) return AppColors.level10plus;
+    if (level >= 7) return AppColors.level7_9;
+    if (level >= 5) return AppColors.level5_6;
+    if (level >= 3) return AppColors.level3_4;
+    return AppColors.level1_2;
   }
 
   @override
@@ -88,7 +89,6 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
           : SingleChildScrollView(
               child: Column(
                 children: [
-                  // XP & Level Section
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
@@ -104,7 +104,6 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                     ),
                     child: Column(
                       children: [
-                        // Level Badge
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 20,
@@ -132,7 +131,6 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // XP Progress
                         Column(
                           children: [
                             Row(
@@ -172,7 +170,6 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                   
                   const SizedBox(height: 32),
                   
-                  // Start Quiz Button
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: SizedBox(
@@ -189,14 +186,10 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                             return;
                           }
                           
-                          // MODIFICATION ICI : Passer le niveau au QuizPage
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => QuizPage(
-                                theme: widget.theme,
-                                userLevel: level, // ✅ Nouveau paramètre
-                              ),
+                              builder: (context) => QuizPage(theme: widget.theme),
                             ),
                           );
                         },
@@ -229,7 +222,6 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
 
                   const SizedBox(height: 16),
 
-                  // Leaderboard Button
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: SizedBox(
@@ -249,7 +241,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                         icon: const Icon(Icons.leaderboard, size: 24),
                         label: Text(
                           l10n.viewLeaderboard,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -267,7 +259,6 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                   
                   const SizedBox(height: 24),
                   
-                  // Theme Description
                   Padding(
                     padding: const EdgeInsets.all(24),
                     child: Card(
@@ -297,7 +288,6 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                     ),
                   ),
                   
-                  // Placeholder for future features
                   Padding(
                     padding: const EdgeInsets.all(24),
                     child: Text(
