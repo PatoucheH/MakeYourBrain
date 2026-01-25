@@ -98,7 +98,6 @@ class _QuizPageState extends State<QuizPage> {
           selectedAnswerId: answerId,
           isCorrect: isCorrect,
           languageUsed: context.read<LanguageProvider>().currentLanguage,
-          themeId: widget.theme.id,
         );
       } catch (e) {
         print('Error saving answer: $e');
@@ -110,28 +109,72 @@ class _QuizPageState extends State<QuizPage> {
     }
   }
 
-  void showResultDialog() {
+  void showResultDialog() async {
     final l10n = AppLocalizations.of(context)!;
-    
+    final xpEarned = score * 10; // 10 XP par bonne réponse
+
+    // Ajouter l'XP à la fin du quiz
+    final authRepo = AuthRepository();
+    if (authRepo.isLoggedIn() && score > 0) {
+      try {
+        await _repository.addQuizCompletionXp(
+          userId: authRepo.getCurrentUserId()!,
+          themeId: widget.theme.id,
+          correctAnswers: score,
+        );
+      } catch (e) {
+        print('Error adding XP: $e');
+      }
+    }
+
+    if (!mounted) return;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Column(
-          children: [
-            Image.asset(
-              'assets/branding/mascot/brainly_victory.png',
-              height: 120,
-            ),
-            const SizedBox(height: 12),
-            Text(l10n.quizCompleted),
-          ],
-        ),
-        content: Text(
-          '${l10n.yourScore}: $score/${questions.length}\n'
-          '${((score / questions.length) * 100).toStringAsFixed(0)}%',
-          style: const TextStyle(fontSize: 18),
-          textAlign: TextAlign.center,
+        title: Text(l10n.quizCompleted, textAlign: TextAlign.center),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/branding/mascot/brainly_victory.png',
+                height: 100,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '${l10n.yourScore}: $score/${questions.length}\n'
+                '${((score / questions.length) * 100).toStringAsFixed(0)}%',
+                style: const TextStyle(fontSize: 18),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.amber.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.amber.shade400),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.star, color: Colors.amber.shade700, size: 24),
+                    const SizedBox(width: 8),
+                    Text(
+                      '+$xpEarned ${l10n.xp}',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.amber.shade800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(

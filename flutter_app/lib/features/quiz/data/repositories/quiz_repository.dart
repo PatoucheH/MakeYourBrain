@@ -41,14 +41,13 @@ class QuizRepository {
         .toList();
   }
 
-  // Sauvegarder la réponse d'un user
+  // Sauvegarder la réponse d'un user (sans XP - l'XP est ajouté à la fin du quiz)
   Future<void> saveUserAnswer({
     required String userId,
     required String questionId,
     required String selectedAnswerId,
     required bool isCorrect,
     required String languageUsed,
-    required String themeId,
   }) async {
     // Sauvegarder la réponse
     await _supabase.from('user_answers').insert({
@@ -64,10 +63,21 @@ class QuizRepository {
       'p_user_id': userId,
       'p_is_correct': isCorrect,
     });
-    await _supabase.rpc('add_theme_xp', params: {
-      'p_user_id': userId,
-      'p_theme_id': themeId,
-      'p_is_correct': isCorrect,
-    });
+  }
+
+  // Ajouter l'XP à la fin du quiz pour toutes les bonnes réponses
+  Future<void> addQuizCompletionXp({
+    required String userId,
+    required String themeId,
+    required int correctAnswers,
+  }) async {
+    // Appeler add_theme_xp pour chaque bonne réponse
+    for (int i = 0; i < correctAnswers; i++) {
+      await _supabase.rpc('add_theme_xp', params: {
+        'p_user_id': userId,
+        'p_theme_id': themeId,
+        'p_is_correct': true,
+      });
+    }
   }
 }

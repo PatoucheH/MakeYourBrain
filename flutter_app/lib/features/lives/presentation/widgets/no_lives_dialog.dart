@@ -64,74 +64,71 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
     return Consumer<LivesProvider>(
       builder: (context, livesProvider, child) {
         return AlertDialog(
-          title: Column(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/branding/mascot/brainly_encourage.png',
-                height: 100,
-              ),
-              const SizedBox(height: 12),
-              
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.heart_broken, color: Colors.red, size: 32),
-                  const SizedBox(width: 12),
-                  Text(l10n.noLife),
-                ],
-              ),
+              const Icon(Icons.heart_broken, color: Colors.red, size: 28),
+              const SizedBox(width: 8),
+              Text(l10n.noLife),
             ],
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                l10n.needLifes,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 16),
-              
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue.shade200, width: 2),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset(
+                  'assets/branding/mascot/brainly_encourage.png',
+                  height: 80,
                 ),
-                child: Column(
-                  children: [
-                    const Icon(Icons.access_time, color: Colors.blue, size: 40),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.nextLife,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                    Text(
-                      livesProvider.getTimeUntilNextLife(),
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+                const SizedBox(height: 12),
+                Text(
+                  l10n.needLifes,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.blue.shade200, width: 2),
+                  ),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.access_time, color: Colors.blue, size: 32),
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.nextLife,
+                        style: const TextStyle(fontSize: 14),
                       ),
-                    ),
-                  ],
+                      Text(
+                        livesProvider.getTimeUntilNextLife(),
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              
-              const SizedBox(height: 16),
-              const Divider(),
-              const SizedBox(height: 8),
-              
-              Text(
-                l10n.orWatchAdd,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontStyle: FontStyle.italic,
+
+                const SizedBox(height: 12),
+                const Divider(),
+                const SizedBox(height: 4),
+
+                Text(
+                  l10n.orWatchAdd,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
