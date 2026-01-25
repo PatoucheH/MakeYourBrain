@@ -189,10 +189,14 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                             return;
                           }
                           
+                          // MODIFICATION ICI : Passer le niveau au QuizPage
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => QuizPage(theme: widget.theme),
+                              builder: (context) => QuizPage(
+                                theme: widget.theme,
+                                userLevel: level, // ✅ Nouveau paramètre
+                              ),
                             ),
                           );
                         },

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:provider/provider.dart';
 import '../../../lives/data/providers/lives_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
@@ -11,10 +10,87 @@ import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../../features/profile/data/repositories/profile_repository.dart';
 import '../../../lives/presentation/widgets/no_lives_dialog.dart';
 
+/// Classe utilitaire pour calculer la répartition de difficulté
+class DifficultyDistribution {
+  final int easyPercent;
+  final int mediumPercent;
+  final int hardPercent;
+
+  DifficultyDistribution({
+    required this.easyPercent,
+    required this.mediumPercent,
+    required this.hardPercent,
+  });
+
+  /// Calcule la distribution selon le niveau du joueur
+  static DifficultyDistribution getForLevel(int level) {
+    if (level <= 3) {
+      // Niveaux 1-3 : Débutant - que du facile
+      return DifficultyDistribution(
+        easyPercent: 100,
+        mediumPercent: 0,
+        hardPercent: 0,
+      );
+    } else if (level <= 6) {
+      // Niveaux 4-6 : Introduction au moyen
+      return DifficultyDistribution(
+        easyPercent: 80,
+        mediumPercent: 20,
+        hardPercent: 0,
+      );
+    } else if (level <= 9) {
+      // Niveaux 7-9 : Plus de questions moyennes
+      return DifficultyDistribution(
+        easyPercent: 60,
+        mediumPercent: 40,
+        hardPercent: 0,
+      );
+    } else if (level <= 12) {
+      // Niveaux 10-12 : Introduction au difficile
+      return DifficultyDistribution(
+        easyPercent: 50,
+        mediumPercent: 40,
+        hardPercent: 10,
+      );
+    } else if (level <= 15) {
+      // Niveaux 13-15 : Équilibre moyen/difficile
+      return DifficultyDistribution(
+        easyPercent: 30,
+        mediumPercent: 50,
+        hardPercent: 20,
+      );
+    } else if (level <= 18) {
+      // Niveaux 16-18 : Majoritairement moyen et difficile
+      return DifficultyDistribution(
+        easyPercent: 20,
+        mediumPercent: 50,
+        hardPercent: 30,
+      );
+    } else {
+      // Niveaux 19+ : Expert - surtout moyen et difficile
+      return DifficultyDistribution(
+        easyPercent: 10,
+        mediumPercent: 50,
+        hardPercent: 40,
+      );
+    }
+  }
+
+  @override
+  String toString() {
+    return 'Easy: $easyPercent%, Medium: $mediumPercent%, Hard: $hardPercent%';
+  }
+}
+
 class QuizPage extends StatefulWidget {
   final ThemeModel theme;
+  final int userLevel; // Nouveau paramètre pour le niveau du joueur
 
-  const QuizPage({super.key, required this.theme});
+  const QuizPage({
+    super.key,
+    required this.theme,
+    this.userLevel = 1, // Par défaut niveau 1
+  });
 
   @override
   State<QuizPage> createState() => _QuizPageState();
@@ -32,32 +108,56 @@ class _QuizPageState extends State<QuizPage> {
   @override
   void initState() {
     super.initState();
-    loadQuestions();
+    // ✅ Ne pas appeler loadQuestions() ici
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // ✅ Charger les questions ici car le contexte est maintenant disponible
+    if (isLoading && questions.isEmpty) {
+      loadQuestions();
+    }
   }
 
   Future<void> loadQuestions() async {
-    final l10n = AppLocalizations.of(context)!;
     try {
       final languageCode = context.read<LanguageProvider>().currentLanguage;
+      
+      // Calculer la distribution de difficulté selon le niveau
+      final distribution = DifficultyDistribution.getForLevel(widget.userLevel);
+      
+      print('📊 Niveau ${widget.userLevel} - Distribution: ${distribution.toString()}');
+      
       final result = await _repository.getQuestions(
         themeId: widget.theme.id,
         languageCode: languageCode,
         limit: 10,
+        easyPercent: distribution.easyPercent,
+        mediumPercent: distribution.mediumPercent,
+        hardPercent: distribution.hardPercent,
       );
+      
       final authRepo = AuthRepository();
       final profileRepo = ProfileRepository();
       if (authRepo.isLoggedIn()) {
         await profileRepo.updateStreak(authRepo.getCurrentUserId()!);
       }
-      setState(() {
-        questions = result;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      
       if (mounted) {
+        setState(() {
+          questions = result;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading questions: $e');
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+        
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${l10n.errorLoadingQuestions} : $e')),
         );
@@ -78,17 +178,16 @@ class _QuizPageState extends State<QuizPage> {
       final livesProvider = context.read<LivesProvider>();
       await livesProvider.useLife();
       if (livesProvider.currentLives <= 0 && mounted) {
-        // Afficher le popup
         showDialog(
           context: context,
           barrierDismissible: false,
           builder: (context) => NoLivesDialog(
             onClose: () {
-              Navigator.pop(context); // Retour à ThemeDetailPage
+              Navigator.pop(context);
             },
           ),
         );
-        return; // Arrêter l'exécution
+        return;
       }
     }
 
@@ -109,7 +208,6 @@ class _QuizPageState extends State<QuizPage> {
       }
     }
 
-    // Afficher le dialog immédiatement
     if (mounted) {
       showAnswerDialog(isCorrect);
     }
@@ -207,7 +305,6 @@ class _QuizPageState extends State<QuizPage> {
             onPressed: () {
               Navigator.of(context).pop();
               
-              // Passer à la question suivante ou afficher résultats
               if (currentQuestionIndex < questions.length - 1) {
                 setState(() {
                   currentQuestionIndex++;

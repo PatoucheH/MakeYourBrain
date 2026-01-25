@@ -17,17 +17,23 @@ class QuizRepository {
         .toList();
   }
 
-  // Récupérer des questions aléatoires pour un thème
+  // Récupérer des questions aléatoires pour un thème avec contrôle de difficulté
   Future<List<QuestionModel>> getQuestions({
     required String themeId,
     required String languageCode,
     int limit = 10,
+    int easyPercent = 100,
+    int mediumPercent = 0,
+    int hardPercent = 0,
   }) async {
     final response = await _supabase
         .rpc('get_random_questions', params: {
           'p_theme_id': themeId,
           'p_language_code': languageCode,
           'p_limit': limit,
+          'p_easy_percent': easyPercent,
+          'p_medium_percent': mediumPercent,
+          'p_hard_percent': hardPercent,
         });
 
     return (response as List)
