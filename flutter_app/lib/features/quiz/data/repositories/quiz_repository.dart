@@ -70,6 +70,7 @@ class QuizRepository {
     required String userId,
     required String themeId,
     required int correctAnswers,
+    int bonusXp = 0,
   }) async {
     // Appeler add_theme_xp pour chaque bonne réponse
     for (int i = 0; i < correctAnswers; i++) {
@@ -78,6 +79,27 @@ class QuizRepository {
         'p_theme_id': themeId,
         'p_is_correct': true,
       });
+    }
+
+    // Ajouter le bonus XP (pour les quiz chronométrés)
+    if (bonusXp > 0) {
+      try {
+        await _supabase.rpc('add_bonus_xp', params: {
+          'p_user_id': userId,
+          'p_theme_id': themeId,
+          'p_bonus_xp': bonusXp,
+        });
+      } catch (e) {
+        // Fallback: add bonus XP by calling add_theme_xp multiple times (10 XP per call)
+        final bonusCalls = bonusXp ~/ 10;
+        for (int i = 0; i < bonusCalls; i++) {
+          await _supabase.rpc('add_theme_xp', params: {
+            'p_user_id': userId,
+            'p_theme_id': themeId,
+            'p_is_correct': true,
+          });
+        }
+      }
     }
   }
 }

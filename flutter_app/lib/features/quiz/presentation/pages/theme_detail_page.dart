@@ -6,6 +6,7 @@ import '../../data/models/theme_model.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
 import 'quiz_page.dart';
+import 'timed_quiz_page.dart';
 import '../../../leaderboard/presentation/pages/leaderboard_page.dart';
 import '../../../lives/data/providers/lives_provider.dart';
 import '../../../lives/presentation/widgets/no_lives_dialog.dart';
@@ -267,6 +268,53 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                             ),
                             const SizedBox(height: 16),
 
+                            // Timed Quiz Button
+                            Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFFF9800), Color(0xFFFF5722)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFFF9800).withOpacity(0.4),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton(
+                                onPressed: () => _showTimerSelectionDialog(context, l10n),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.all(20),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.timer, size: 28, color: Colors.white),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      l10n.timedQuiz,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
                             // Leaderboard Button
                             Container(
                               width: double.infinity,
@@ -380,6 +428,202 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                           ],
                         ),
                       ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showTimerSelectionDialog(BuildContext context, AppLocalizations l10n) {
+    final livesProvider = context.read<LivesProvider>();
+
+    if (livesProvider.currentLives <= 0) {
+      showDialog(
+        context: context,
+        builder: (context) => const NoLivesDialog(),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+              // Timer Icon
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFF9800), Color(0xFFFF5722)],
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.timer,
+                  color: Colors.white,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                l10n.timedQuiz,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.brainPurple,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                l10n.chooseYourTime,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.warningLight,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: AppColors.warning, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.timedQuizDescription,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.warning,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Time options
+              _buildTimeOption(
+                context: dialogContext,
+                seconds: 30,
+                label: l10n.seconds30,
+                bonus: '+20 XP',
+                color: AppColors.error,
+                livesProvider: livesProvider,
+              ),
+              const SizedBox(height: 12),
+              _buildTimeOption(
+                context: dialogContext,
+                seconds: 45,
+                label: l10n.seconds45,
+                bonus: '+10 XP',
+                color: AppColors.warning,
+                livesProvider: livesProvider,
+              ),
+              const SizedBox(height: 12),
+              _buildTimeOption(
+                context: dialogContext,
+                seconds: 60,
+                label: l10n.seconds60,
+                bonus: '+5 XP',
+                color: AppColors.success,
+                livesProvider: livesProvider,
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(
+                  l10n.cancel,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimeOption({
+    required BuildContext context,
+    required int seconds,
+    required String label,
+    required String bonus,
+    required Color color,
+    required LivesProvider livesProvider,
+  }) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () async {
+          await livesProvider.useLife();
+          if (!mounted) return;
+          Navigator.pop(context);
+          Navigator.push(
+            this.context,
+            MaterialPageRoute(
+              builder: (context) => TimedQuizPage(
+                theme: widget.theme,
+                totalSeconds: seconds,
+              ),
+            ),
+          );
+        },
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: color.withOpacity(0.3), width: 2),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.timer, color: color, size: 28),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  bonus,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
           ),

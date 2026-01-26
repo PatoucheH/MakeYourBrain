@@ -559,6 +559,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current life'**
   String get currentLife;
+
+  /// No description provided for @timedQuiz.
+  ///
+  /// In en, this message translates to:
+  /// **'Timed Quiz'**
+  String get timedQuiz;
+
+  /// No description provided for @chooseYourTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your time'**
+  String get chooseYourTime;
+
+  /// No description provided for @timesUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Time\'s up!'**
+  String get timesUp;
+
+  /// No description provided for @seconds30.
+  ///
+  /// In en, this message translates to:
+  /// **'30 seconds'**
+  String get seconds30;
+
+  /// No description provided for @seconds45.
+  ///
+  /// In en, this message translates to:
+  /// **'45 seconds'**
+  String get seconds45;
+
+  /// No description provided for @seconds60.
+  ///
+  /// In en, this message translates to:
+  /// **'1 minute'**
+  String get seconds60;
+
+  /// No description provided for @timedQuizDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This mode uses 1 life to participate. Mistakes don\'t cost extra lives.'**
+  String get timedQuizDescription;
+
+  /// No description provided for @timeBonus.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Bonus'**
+  String get timeBonus;
+
+  /// No description provided for @questionsAnswered.
+  ///
+  /// In en, this message translates to:
+  /// **'Questions answered'**
+  String get questionsAnswered;
 }
 
 class _AppLocalizationsDelegate

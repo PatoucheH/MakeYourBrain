@@ -243,4 +243,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currentLife => 'Current life';
+
+  @override
+  String get timedQuiz => 'Timed Quiz';
+
+  @override
+  String get chooseYourTime => 'Choose your time';
+
+  @override
+  String get timesUp => 'Time\'s up!';
+
+  @override
+  String get seconds30 => '30 seconds';
+
+  @override
+  String get seconds45 => '45 seconds';
+
+  @override
+  String get seconds60 => '1 minute';
+
+  @override
+  String get timedQuizDescription =>
+      'This mode uses 1 life to participate. Mistakes don\'t cost extra lives.';
+
+  @override
+  String get timeBonus => 'Time Bonus';
+
+  @override
+  String get questionsAnswered => 'Questions answered';
 }

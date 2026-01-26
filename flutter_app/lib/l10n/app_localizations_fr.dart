@@ -243,4 +243,32 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get currentLife => 'Vie actuelle';
+
+  @override
+  String get timedQuiz => 'Quiz Chronométré';
+
+  @override
+  String get chooseYourTime => 'Choisissez votre temps';
+
+  @override
+  String get timesUp => 'Temps écoulé !';
+
+  @override
+  String get seconds30 => '30 secondes';
+
+  @override
+  String get seconds45 => '45 secondes';
+
+  @override
+  String get seconds60 => '1 minute';
+
+  @override
+  String get timedQuizDescription =>
+      'Ce mode utilise 1 vie pour participer. Les erreurs ne font pas perdre de vies.';
+
+  @override
+  String get timeBonus => 'Bonus Temps';
+
+  @override
+  String get questionsAnswered => 'Questions répondues';
 }

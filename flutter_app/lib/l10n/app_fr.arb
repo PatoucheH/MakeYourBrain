@@ -77,5 +77,14 @@
   "close": "fermer",
   "watchAdd": "Regarder une pub(+2 ❤️)",
   "getMoreLifes": "Avoir plus de vies",
-  "currentLife": "Vie actuelle"
+  "currentLife": "Vie actuelle",
+  "timedQuiz": "Quiz Chronométré",
+  "chooseYourTime": "Choisissez votre temps",
+  "timesUp": "Temps écoulé !",
+  "seconds30": "30 secondes",
+  "seconds45": "45 secondes",
+  "seconds60": "1 minute",
+  "timedQuizDescription": "Ce mode utilise 1 vie pour participer. Les erreurs ne font pas perdre de vies.",
+  "timeBonus": "Bonus Temps",
+  "questionsAnswered": "Questions répondues"
 }
