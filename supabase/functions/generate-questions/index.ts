@@ -30,10 +30,10 @@ serve(async (req) => {
 
       const themeName = themeTranslation?.name || 'General Knowledge'
 
-      const TARGET_QUESTIONS = 5
+      const TARGET_QUESTIONS = 10
       let questionsAdded = 0
       let attempts = 0
-      const MAX_ATTEMPTS = 5
+      const MAX_ATTEMPTS = 10
 
       while (questionsAdded < TARGET_QUESTIONS && attempts < MAX_ATTEMPTS) {
         attempts++
