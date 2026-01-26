@@ -271,4 +271,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get questionsAnswered => 'Questions answered';
+
+  @override
+  String themesSelected(int count) {
+    return '$count themes selected';
+  }
+
+  @override
+  String get maxThemesReached => 'Maximum 3 themes allowed';
+
+  @override
+  String get maxThemesMessage =>
+      'You can only have 3 favorite themes. Remove one to add another.';
 }

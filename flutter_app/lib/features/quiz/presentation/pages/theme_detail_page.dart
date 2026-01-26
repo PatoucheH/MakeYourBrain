@@ -237,7 +237,10 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => QuizPage(theme: widget.theme),
+                                      builder: (context) => QuizPage(
+                                        theme: widget.theme,
+                                        userLevel: level,
+                                      ),
                                     ),
                                   );
                                 },
@@ -584,6 +587,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
               builder: (context) => TimedQuizPage(
                 theme: widget.theme,
                 totalSeconds: seconds,
+                userLevel: level,
               ),
             ),
           );

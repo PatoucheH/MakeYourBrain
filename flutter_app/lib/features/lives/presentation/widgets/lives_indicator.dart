@@ -56,30 +56,38 @@ class LivesIndicator extends StatelessWidget {
 
               // Current lives display
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 decoration: BoxDecoration(
                   color: AppColors.brainPurpleLight.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ...List.generate(livesProvider.maxLives, (index) {
-                      final hasLife = index < livesProvider.currentLives;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
-                        child: Icon(
-                          hasLife ? Icons.favorite : Icons.favorite_border,
-                          color: hasLife ? Colors.red : AppColors.textLight,
-                          size: 24,
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Icon(
+                          Icons.favorite,
+                          color: livesProvider.currentLives <= 2 ? AppColors.error : Colors.red,
+                          size: 48,
                         ),
-                      );
-                    }),
+                        Text(
+                          '${livesProvider.currentLives}',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(width: 8),
                     Text(
-                      '${livesProvider.currentLives}/${livesProvider.maxLives}',
+                      '/${livesProvider.maxLives}',
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: AppColors.brainPurple,
                       ),
@@ -87,17 +95,6 @@ class LivesIndicator extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-
-              Text(
-                l10n.watchAdd,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 15,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-
               if (livesProvider.currentLives < livesProvider.maxLives) ...[
                 const SizedBox(height: 16),
                 Container(
@@ -125,43 +122,50 @@ class LivesIndicator extends StatelessWidget {
               ],
               const SizedBox(height: 24),
 
-              // Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(l10n.cancel),
+              // Buttons - Stacked vertically
+              SizedBox(
+                width: double.infinity,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: const LinearGradient(
+                      colors: [AppColors.success, Color(0xFF059669)],
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        gradient: const LinearGradient(
-                          colors: [AppColors.success, Color(0xFF059669)],
-                        ),
-                      ),
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          Navigator.pop(context);
-                          await _watchAd(context);
-                        },
-                        icon: const Icon(Icons.play_circle_outline, color: Colors.white),
-                        label: Text(
-                          l10n.watchAdd,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      await _watchAd(context);
+                    },
+                    icon: const Icon(Icons.play_circle_outline, color: Colors.white),
+                    label: Text(
+                      l10n.watchAdd,
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                   ),
-                ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: Text(
+                    l10n.cancel,
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -231,77 +235,76 @@ class LivesIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<LivesProvider>(
       builder: (context, livesProvider, child) {
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Hearts
-            Row(
-              children: List.generate(livesProvider.maxLives, (index) {
-                final hasLife = index < livesProvider.currentLives;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 1),
-                  child: Icon(
-                    hasLife ? Icons.favorite : Icons.favorite_border,
-                    color: hasLife ? Colors.red : AppColors.textLight,
-                    size: iconSize,
-                  ),
-                );
-              }),
-            ),
+        final isLow = livesProvider.currentLives <= 2;
 
-            // Add button
-            if (showAddButton) ...[
-              const SizedBox(width: 4),
-              MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: () => _showAdDialog(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: AppColors.successLight,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.add,
-                      size: iconSize * 0.8,
-                      color: AppColors.success,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-
-            // Timer
-            if (showTimer && livesProvider.currentLives < livesProvider.maxLives) ...[
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppColors.infoLight,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
+        return MouseRegion(
+          cursor: showAddButton ? SystemMouseCursors.click : SystemMouseCursors.basic,
+          child: GestureDetector(
+            onTap: showAddButton ? () => _showAdDialog(context) : null,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Heart with number inside
+                Stack(
+                  alignment: Alignment.center,
                   children: [
                     Icon(
-                      Icons.access_time,
-                      size: iconSize * 0.7,
-                      color: AppColors.info,
+                      Icons.favorite,
+                      color: isLow ? AppColors.error : Colors.red,
+                      size: iconSize * 1.6,
                     ),
-                    const SizedBox(width: 3),
                     Text(
-                      livesProvider.getTimeUntilNextLife(),
+                      '${livesProvider.currentLives}',
                       style: TextStyle(
-                        fontSize: iconSize * 0.65,
+                        fontSize: iconSize * 0.6,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.info,
+                        color: Colors.white,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ],
+                const SizedBox(width: 4),
+                Text(
+                  '/${livesProvider.maxLives}',
+                  style: TextStyle(
+                    fontSize: iconSize * 0.75,
+                    fontWeight: FontWeight.bold,
+                    color: isLow ? AppColors.error : AppColors.textSecondary,
+                  ),
+                ),
+
+                // Timer
+                if (showTimer && livesProvider.currentLives < livesProvider.maxLives) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.infoLight,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          size: iconSize * 0.7,
+                          color: AppColors.info,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          livesProvider.getTimeUntilNextLife(),
+                          style: TextStyle(
+                            fontSize: iconSize * 0.65,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.info,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
         );
       },
     );

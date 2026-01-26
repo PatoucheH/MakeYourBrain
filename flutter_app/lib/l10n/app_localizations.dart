@@ -613,6 +613,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Questions answered'**
   String get questionsAnswered;
+
+  /// No description provided for @themesSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} themes selected'**
+  String themesSelected(int count);
+
+  /// No description provided for @maxThemesReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum 3 themes allowed'**
+  String get maxThemesReached;
+
+  /// No description provided for @maxThemesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You can only have 3 favorite themes. Remove one to add another.'**
+  String get maxThemesMessage;
 }
 
 class _AppLocalizationsDelegate

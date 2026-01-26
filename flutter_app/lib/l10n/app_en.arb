@@ -86,5 +86,15 @@
   "seconds60": "1 minute",
   "timedQuizDescription": "This mode uses 1 life to participate. Mistakes don't cost extra lives.",
   "timeBonus": "Time Bonus",
-  "questionsAnswered": "Questions answered"
+  "questionsAnswered": "Questions answered",
+  "themesSelected": "{count} themes selected",
+  "@themesSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "maxThemesReached": "Maximum 3 themes allowed",
+  "maxThemesMessage": "You can only have 3 favorite themes. Remove one to add another."
 }

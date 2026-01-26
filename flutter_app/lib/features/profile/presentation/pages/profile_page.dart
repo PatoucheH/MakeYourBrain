@@ -26,6 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
   UserModel? userStats;
   List<Map<String, dynamic>> progressByTheme = [];
   List<ThemeModel> favoriteThemes = [];
+  List<ThemeModel> allThemes = [];
   List<String> favoriteThemeIds = [];
   bool isLoading = true;
   String selectedLanguage = 'en';
@@ -45,8 +46,8 @@ class _ProfilePageState extends State<ProfilePage> {
       final progress = await _profileRepo.getProgressByTheme(userId);
 
       final preferredIds = await _prefsRepo.getPreferences(userId);
-      final allThemes = await _quizRepo.getThemes(currentLang);
-      final preferred = allThemes
+      final themes = await _quizRepo.getThemes(currentLang);
+      final preferred = themes
           .where((theme) => preferredIds.contains(theme.id))
           .toList();
 
@@ -54,6 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
         userStats = stats;
         selectedLanguage = currentLang;
         progressByTheme = progress;
+        allThemes = themes;
         favoriteThemes = preferred;
         favoriteThemeIds = preferredIds;
         isLoading = false;
@@ -490,6 +492,11 @@ class _ProfilePageState extends State<ProfilePage> {
         final correct = theme['correct_answers'] ?? 0;
         final themeColor = _getColorForLevel(level);
 
+        // Get translated theme name
+        final themeId = theme['theme_id'];
+        final translatedTheme = allThemes.where((t) => t.id == themeId).firstOrNull;
+        final themeName = translatedTheme?.name ?? theme['theme_name'] ?? 'Unknown';
+
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
@@ -528,7 +535,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          theme['theme_name'] ?? 'Unknown',
+                          themeName,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

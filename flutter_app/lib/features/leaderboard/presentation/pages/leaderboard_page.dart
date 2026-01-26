@@ -266,11 +266,11 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                           ),
                         ),
                       ),
-                      if (scoreKey == 'total_xp' || scoreKey == 'xp')
+                      if (scoreKey == 'xp')
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
-                            'Lv ${scoreKey == 'xp' ? (item['level'] ?? 0) : (item['total_levels'] ?? 0)}',
+                            'Lv ${item['level'] ?? 0}',
                             style: TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,

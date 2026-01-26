@@ -158,42 +158,27 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildAppBar(AppLocalizations l10n) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         children: [
-          // Logo
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: AppColors.softShadow,
-            ),
-            child: Image.asset(
-              'assets/branding/logo/brainly_logo.png',
-              height: 36,
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Title
+          // Logo + Title
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Text(
-                  l10n.appName,
-                  style: const TextStyle(
-                    color: AppColors.brainPurple,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Image.asset(
+                  'assets/branding/logo/brainly_logo.png',
+                  height: 28,
                 ),
-                Text(
-                  'Train your brain!',
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 12,
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    l10n.appName,
+                    style: const TextStyle(
+                      color: AppColors.brainPurple,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -202,49 +187,88 @@ class _HomePageState extends State<HomePage> {
 
           // Lives Indicator
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: AppColors.white,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: AppColors.softShadow,
             ),
             child: const LivesIndicator(),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
 
-          // Action Buttons
-          _buildIconButton(
-            Icons.person_outline,
-            () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfilePage()),
-              );
-              loadFavoriteThemes();
-            },
-          ),
-          const SizedBox(width: 8),
-          _buildIconButton(
-            Icons.leaderboard_outlined,
-            () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const LeaderboardPage()),
-              );
-            },
-          ),
-          const SizedBox(width: 8),
-          _buildIconButton(
-            Icons.logout,
-            () async {
-              await _authRepo.signOut();
-              if (context.mounted) {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              }
-            },
-            color: AppColors.error,
+          // Menu Button with all actions
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: AppColors.softShadow,
+            ),
+            child: PopupMenuButton<String>(
+              icon: const Icon(
+                Icons.menu,
+                color: AppColors.brainPurple,
+                size: 20,
+              ),
+              padding: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              onSelected: (value) async {
+                if (value == 'profile') {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfilePage()),
+                  );
+                  loadFavoriteThemes();
+                } else if (value == 'leaderboard') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LeaderboardPage()),
+                  );
+                } else if (value == 'logout') {
+                  await _authRepo.signOut();
+                  if (context.mounted) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => const LoginPage()),
+                    );
+                  }
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'profile',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.person_outline, color: AppColors.brainPurple),
+                      const SizedBox(width: 12),
+                      Text(l10n.profile),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'leaderboard',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.leaderboard_outlined, color: AppColors.brainPurple),
+                      const SizedBox(width: 12),
+                      Text(l10n.viewLeaderboard),
+                    ],
+                  ),
+                ),
+                const PopupMenuDivider(),
+                PopupMenuItem(
+                  value: 'logout',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.logout, color: AppColors.error),
+                      const SizedBox(width: 12),
+                      Text(l10n.logout, style: const TextStyle(color: AppColors.error)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -301,11 +325,19 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        '${favoriteThemes.length} themes selected',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 14,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${favoriteThemes.length}/3',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -325,10 +357,19 @@ class _HomePageState extends State<HomePage> {
             children: [
               Expanded(
                 child: _buildActionButton(
-                  icon: Icons.add_circle_outline,
+                  icon: favoriteThemes.length >= 3 ? Icons.block : Icons.add_circle_outline,
                   label: l10n.addTheme,
-                  color: AppColors.success,
-                  onTap: navigateToAddTheme,
+                  color: favoriteThemes.length >= 3 ? AppColors.textLight : AppColors.success,
+                  onTap: favoriteThemes.length >= 3
+                      ? () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.maxThemesMessage),
+                              backgroundColor: AppColors.warning,
+                            ),
+                          );
+                        }
+                      : navigateToAddTheme,
                 ),
               ),
               const SizedBox(width: 12),
@@ -375,14 +416,17 @@ class _HomePageState extends State<HomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: color, size: 24),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
+              Icon(icon, color: color, size: 22),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],

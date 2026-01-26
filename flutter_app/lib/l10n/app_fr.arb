@@ -86,5 +86,8 @@
   "seconds60": "1 minute",
   "timedQuizDescription": "Ce mode utilise 1 vie pour participer. Les erreurs ne font pas perdre de vies.",
   "timeBonus": "Bonus Temps",
-  "questionsAnswered": "Questions répondues"
+  "questionsAnswered": "Questions répondues",
+  "themesSelected": "{count} thèmes sélectionnés",
+  "maxThemesReached": "Maximum 3 thèmes autorisés",
+  "maxThemesMessage": "Vous ne pouvez avoir que 3 thèmes favoris. Supprimez-en un pour en ajouter un autre."
 }

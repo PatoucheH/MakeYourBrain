@@ -14,11 +14,40 @@ import '../../../lives/presentation/widgets/lives_indicator.dart';
 
 class QuizPage extends StatefulWidget {
   final ThemeModel theme;
+  final int userLevel;
 
-  const QuizPage({super.key, required this.theme});
+  const QuizPage({super.key, required this.theme, required this.userLevel});
 
   @override
   State<QuizPage> createState() => _QuizPageState();
+}
+
+/// Returns difficulty percentages based on user level
+/// Returns a map with 'easy', 'medium', 'hard' keys
+Map<String, int> getDifficultyForLevel(int level) {
+  if (level <= 3) {
+    return {'easy': 100, 'medium': 0, 'hard': 0};
+  } else if (level <= 6) {
+    return {'easy': 80, 'medium': 20, 'hard': 0};
+  } else if (level <= 9) {
+    return {'easy': 60, 'medium': 35, 'hard': 5};
+  } else if (level <= 12) {
+    return {'easy': 50, 'medium': 40, 'hard': 10};
+  } else if (level <= 15) {
+    return {'easy': 40, 'medium': 45, 'hard': 15};
+  } else if (level <= 18) {
+    return {'easy': 30, 'medium': 50, 'hard': 20};
+  } else if (level <= 21) {
+    return {'easy': 25, 'medium': 50, 'hard': 25};
+  } else if (level <= 24) {
+    return {'easy': 20, 'medium': 40, 'hard': 40};
+  } else if (level <= 27) {
+    return {'easy': 15, 'medium': 45, 'hard': 40};
+  } else if (level <= 30) {
+    return {'easy': 10, 'medium': 40, 'hard': 50};
+  } else {
+    return {'easy': 5, 'medium': 45, 'hard': 50};
+  }
 }
 
 class _QuizPageState extends State<QuizPage> {
@@ -39,10 +68,14 @@ class _QuizPageState extends State<QuizPage> {
   Future<void> loadQuestions() async {
     try {
       final languageCode = context.read<LanguageProvider>().currentLanguage;
+      final difficulty = getDifficultyForLevel(widget.userLevel);
       final result = await _repository.getQuestions(
         themeId: widget.theme.id,
         languageCode: languageCode,
         limit: 10,
+        easyPercent: difficulty['easy']!,
+        mediumPercent: difficulty['medium']!,
+        hardPercent: difficulty['hard']!,
       );
       final authRepo = AuthRepository();
       final profileRepo = ProfileRepository();
