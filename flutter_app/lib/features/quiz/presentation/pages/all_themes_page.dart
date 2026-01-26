@@ -20,7 +20,7 @@ class _AllThemesPageState extends State<AllThemesPage> {
   final _quizRepo = QuizRepository();
   final _authRepo = AuthRepository();
   final _profileRepo = ProfileRepository();
-  
+
   List<ThemeModel> themes = [];
   Map<String, Map<String, dynamic>> themeProgress = {};
   bool isLoading = true;
@@ -35,16 +35,16 @@ class _AllThemesPageState extends State<AllThemesPage> {
     try {
       final languageCode = context.read<LanguageProvider>().currentLanguage;
       final themesResult = await _quizRepo.getThemes(languageCode);
-      
+
       final userId = _authRepo.getCurrentUserId();
       if (userId != null) {
         final progress = await _profileRepo.getProgressByTheme(userId);
-        
+
         final progressMap = <String, Map<String, dynamic>>{};
         for (var p in progress) {
           progressMap[p['theme_id']] = p;
         }
-        
+
         setState(() {
           themes = themesResult;
           themeProgress = progressMap;
@@ -79,129 +79,256 @@ class _AllThemesPageState extends State<AllThemesPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('📚 ${l10n.allThemes}'),
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: themes.length,
-              itemBuilder: (context, index) {
-                final theme = themes[index];
-                final progress = themeProgress[theme.id];
-                final level = progress?['level'] ?? 1;
-                final xp = progress?['xp'] ?? 0;
-                final xpForNextLevel = progress?['xp_for_next_level'] ?? 100;
-                final themeColor = _getColorForLevel(level);
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Custom AppBar
+              _buildAppBar(l10n),
 
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ThemeDetailPage(theme: theme),
+              // Content
+              Expanded(
+                child: isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(color: AppColors.brainPurple),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: loadThemes,
+                        color: AppColors.brainPurple,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: themes.length,
+                          itemBuilder: (context, index) {
+                            final theme = themes[index];
+                            return _buildThemeCard(theme, l10n);
+                          },
                         ),
-                      );
-                    },
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppBar(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: AppColors.softShadow,
+                ),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: AppColors.brainPurple,
+                  size: 22,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.brainPurpleLight.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.grid_view_rounded, color: AppColors.brainPurple, size: 24),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            l10n.allThemes,
+            style: const TextStyle(
+              color: AppColors.brainPurple,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildThemeCard(ThemeModel theme, AppLocalizations l10n) {
+    final progress = themeProgress[theme.id];
+    final level = progress?['level'] ?? 1;
+    final xp = progress?['xp'] ?? 0;
+    final xpForNextLevel = progress?['xp_for_next_level'] ?? 100;
+    final themeColor = _getColorForLevel(level);
+    final progressPercent = xp / xpForNextLevel;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: AppColors.cardShadow,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ThemeDetailPage(theme: theme),
+              ),
+            );
+          },
+          mouseCursor: SystemMouseCursors.click,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Theme Icon
+                Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        themeColor.withOpacity(0.2),
+                        themeColor.withOpacity(0.1),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(16),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
+                    border: Border.all(
+                      color: themeColor.withOpacity(0.3),
+                      width: 2,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      theme.icon,
+                      style: const TextStyle(fontSize: 36),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+
+                // Theme Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: themeColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Center(
-                              child: Text(
-                                theme.icon,
-                                style: const TextStyle(fontSize: 32),
+                          Expanded(
+                            child: Text(
+                              theme.name,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        theme.name,
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: themeColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        '${l10n.level} $level',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: LinearProgressIndicator(
-                                    value: xp / xpForNextLevel,
-                                    minHeight: 6,
-                                    backgroundColor: Colors.grey.shade200,
-                                    valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '$xp / $xpForNextLevel ${l10n.xp}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey.shade600,
-                                  ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: themeColor,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: themeColor.withOpacity(0.4),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
                                 ),
                               ],
                             ),
-                          ),
-                          
-                          const SizedBox(width: 8),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.grey.shade400,
-                            size: 20,
+                            child: Text(
+                              '${l10n.level} $level',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                    ),
+                      const SizedBox(height: 12),
+
+                      // Progress Bar
+                      Stack(
+                        children: [
+                          Container(
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: themeColor.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          FractionallySizedBox(
+                            widthFactor: progressPercent.clamp(0.0, 1.0),
+                            child: Container(
+                              height: 8,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [themeColor, themeColor.withOpacity(0.7)],
+                                ),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+
+                      // XP Info
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '$xp / $xpForNextLevel ${l10n.xp}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          Text(
+                            '${(progressPercent * 100).toStringAsFixed(0)}%',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: themeColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                );
-              },
+                ),
+
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: AppColors.textLight,
+                  size: 18,
+                ),
+              ],
             ),
+          ),
+        ),
+      ),
     );
   }
 }

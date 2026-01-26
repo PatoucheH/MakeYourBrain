@@ -37,33 +37,155 @@ class MyApp extends StatelessWidget {
       builder: (context, languageProvider, child) {
         return MaterialApp(
           title: 'Make Your Brain',
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
               seedColor: AppColors.brainPurple,
               primary: AppColors.brainPurple,
               secondary: AppColors.brainLightPurple,
+              surface: AppColors.white,
+              background: AppColors.backgroundLight,
             ),
             useMaterial3: true,
             scaffoldBackgroundColor: AppColors.backgroundLight,
+
+            // AppBar Theme
             appBarTheme: AppBarTheme(
-              backgroundColor: AppColors.brainLightPurple.withOpacity(0.15),
+              backgroundColor: Colors.transparent,
               foregroundColor: AppColors.brainPurple,
               elevation: 0,
-            ),
-            cardTheme: CardThemeData(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+              centerTitle: true,
+              titleTextStyle: const TextStyle(
+                color: AppColors.brainPurple,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              iconTheme: const IconThemeData(
+                color: AppColors.brainPurple,
               ),
             ),
+
+            // Card Theme
+            cardTheme: CardThemeData(
+              elevation: 0,
+              color: AppColors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              shadowColor: AppColors.brainPurple.withOpacity(0.1),
+            ),
+
+            // Elevated Button Theme
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.brainPurple,
                 foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
+            ),
+
+            // Text Button Theme
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.brainPurple,
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+
+            // Outlined Button Theme
+            outlinedButtonTheme: OutlinedButtonThemeData(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.brainPurple,
+                side: const BorderSide(color: AppColors.brainPurple, width: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+
+            // Input Decoration Theme
+            inputDecorationTheme: InputDecorationTheme(
+              filled: true,
+              fillColor: AppColors.white,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: AppColors.brainPurple.withOpacity(0.2)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: AppColors.brainPurple.withOpacity(0.2)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(color: AppColors.brainPurple, width: 2),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(color: AppColors.error),
+              ),
+              labelStyle: const TextStyle(color: AppColors.textSecondary),
+              hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.7)),
+            ),
+
+            // Chip Theme
+            chipTheme: ChipThemeData(
+              backgroundColor: AppColors.brainPurpleLight,
+              labelStyle: const TextStyle(
+                color: AppColors.brainPurple,
+                fontWeight: FontWeight.w600,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+
+            // Dialog Theme
+            dialogTheme: DialogThemeData(
+              backgroundColor: AppColors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              titleTextStyle: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            // Snackbar Theme
+            snackBarTheme: SnackBarThemeData(
+              backgroundColor: AppColors.brainPurple,
+              contentTextStyle: const TextStyle(color: Colors.white),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              behavior: SnackBarBehavior.floating,
+            ),
+
+            // Progress Indicator Theme
+            progressIndicatorTheme: const ProgressIndicatorThemeData(
+              color: AppColors.brainPurple,
+              linearTrackColor: AppColors.brainPurpleLight,
+            ),
+
+            // Divider Theme
+            dividerTheme: DividerThemeData(
+              color: AppColors.brainPurple.withOpacity(0.1),
+              thickness: 1,
             ),
           ),
           localizationsDelegates: const [
@@ -108,12 +230,64 @@ class _AuthGateState extends State<AuthGate> {
   @override
   Widget build(BuildContext context) {
     if (!_isInitialized) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const SplashScreen();
     }
 
     return const AuthChecker();
+  }
+}
+
+// Splash Screen avec le branding
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: AppColors.backgroundGradient,
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Logo animé
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: AppColors.cardShadow,
+                ),
+                child: Image.asset(
+                  'assets/branding/logo/brainly_logo.png',
+                  height: 100,
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Make Your Brain',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.brainPurple,
+                ),
+              ),
+              const SizedBox(height: 32),
+              const SizedBox(
+                width: 40,
+                height: 40,
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.brainPurple),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -150,8 +324,8 @@ class _AuthCheckerState extends State<AuthChecker> {
       final hasCompletedOnboarding = await _prefsRepo.hasCompletedOnboarding(userId);
 
       setState(() {
-        _destination = hasCompletedOnboarding 
-            ? const HomePage() 
+        _destination = hasCompletedOnboarding
+            ? const HomePage()
             : const ThemePreferencesPage();
         _isChecking = false;
       });
@@ -166,9 +340,7 @@ class _AuthCheckerState extends State<AuthChecker> {
   @override
   Widget build(BuildContext context) {
     if (_isChecking) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const SplashScreen();
     }
 
     return _destination ?? const LoginPage();

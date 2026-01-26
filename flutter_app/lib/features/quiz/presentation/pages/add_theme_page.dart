@@ -125,6 +125,7 @@ class _AddThemePageState extends State<AddThemePage> {
                       ),
                       child: InkWell(
                         onTap: () => addThemeToPreferences(theme),
+                        mouseCursor: SystemMouseCursors.click,
                         borderRadius: BorderRadius.circular(16),
                         child: Padding(
                           padding: const EdgeInsets.all(16),

@@ -22,7 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _profileRepo = ProfileRepository();
   final _prefsRepo = ThemePreferencesRepository();
   final _quizRepo = QuizRepository();
-  
+
   UserModel? userStats;
   List<Map<String, dynamic>> progressByTheme = [];
   List<ThemeModel> favoriteThemes = [];
@@ -40,10 +40,10 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       final currentLang = context.read<LanguageProvider>().currentLanguage;
       final userId = _authRepo.getCurrentUserId()!;
-      
+
       final stats = await _authRepo.getUserStats();
       final progress = await _profileRepo.getProgressByTheme(userId);
-      
+
       final preferredIds = await _prefsRepo.getPreferences(userId);
       final allThemes = await _quizRepo.getThemes(currentLang);
       final preferred = allThemes
@@ -70,7 +70,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> updateLanguage(String newLanguage) async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     try {
       await context.read<LanguageProvider>().setLanguage(newLanguage);
       setState(() => selectedLanguage = newLanguage);
@@ -94,9 +94,9 @@ class _ProfilePageState extends State<ProfilePage> {
       final updatedPreferences = favoriteThemeIds
           .where((id) => id != themeId)
           .toList();
-      
+
       await _prefsRepo.savePreferences(userId, updatedPreferences);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('$themeName removed from favorites')),
@@ -123,305 +123,598 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     if (isLoading) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.profile)),
-        body: const Center(child: CircularProgressIndicator()),
+        body: Container(
+          decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+          child: const Center(
+            child: CircularProgressIndicator(color: AppColors.brainPurple),
+          ),
+        ),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.profile),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.email),
-                title: Text(userStats?.email ?? 'No email'),
-                subtitle: Text(l10n.email),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.language),
-                title: Text(l10n.preferredLanguage),
-                trailing: DropdownButton<String>(
-                  value: selectedLanguage,
-                  items: const [
-                    DropdownMenuItem(value: 'en', child: Text('🇬🇧 English')),
-                    DropdownMenuItem(value: 'fr', child: Text('🇫🇷 Français')),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) updateLanguage(value);
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            Text(
-              l10n.statistics,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-
-            Card(
-              color: Colors.orange.shade50,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    const Icon(Icons.local_fire_department, size: 40, color: Colors.orange),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${userStats?.currentStreak ?? 0} ${l10n.days}',
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                        Text(l10n.currentStreak),
-                        Text(
-                          '${l10n.bestStreak}: ${userStats?.bestStreak ?? 0} ${l10n.days}',
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            Row(
-              children: [
-                Expanded(
-                  child: Card(
-                    color: Colors.blue.shade50,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.quiz, size: 32),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${userStats?.totalQuestions ?? 0}',
-                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                          Text(l10n.questions),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Card(
-                    color: Colors.green.shade50,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.check_circle, size: 32),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${userStats?.accuracy.toStringAsFixed(0) ?? 0}%',
-                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                          Text(l10n.accuracy),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            Text(
-              l10n.progressByTheme,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-
-            if (progressByTheme.isEmpty)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(l10n.noProgressYet),
-                ),
-              )
-            else
-              ...progressByTheme.map((theme) {
-                final level = theme['level'] ?? 1;
-                final xp = theme['xp'] ?? 0;
-                final xpForNextLevel = theme['xp_for_next_level'] ?? 100;
-                final xpProgress = xp / xpForNextLevel;
-                final total = theme['total_questions'] ?? 0;
-                final correct = theme['correct_answers'] ?? 0;
-                final themeColor = _getColorForLevel(level);
-
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: Padding(
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildAppBar(l10n),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: loadProfile,
+                  color: AppColors.brainPurple,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              theme['icon'] ?? '❓',
-                              style: const TextStyle(fontSize: 40),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    theme['theme_name'] ?? 'Unknown',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '$correct / $total ${l10n.correct}',
-                                    style: const TextStyle(color: Colors.grey),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: themeColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                '${l10n.level} $level',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        // Profile Header Card
+                        _buildProfileHeader(l10n),
+                        const SizedBox(height: 24),
+
+                        // Statistics Section
+                        _buildSectionTitle(l10n.statistics),
                         const SizedBox(height: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '$xp / $xpForNextLevel ${l10n.xp}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  '${(xpProgress * 100).toStringAsFixed(0)}%',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
+                        _buildStatsCards(l10n),
+                        const SizedBox(height: 24),
+
+                        // Progress by Theme
+                        _buildSectionTitle(l10n.progressByTheme),
+                        const SizedBox(height: 12),
+                        _buildProgressSection(l10n),
+                        const SizedBox(height: 24),
+
+                        // Favorite Themes Management
+                        _buildSectionTitle(l10n.manageFavoriteThemes),
+                        const SizedBox(height: 12),
+                        _buildFavoriteThemesSection(l10n),
+                        const SizedBox(height: 32),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppBar(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: AppColors.softShadow,
+                ),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: AppColors.brainPurple,
+                  size: 22,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            l10n.profile,
+            style: const TextStyle(
+              color: AppColors.brainPurple,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: AppColors.buttonShadow,
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Image.asset(
+                  'assets/branding/mascot/brainly_happy.png',
+                  height: 60,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.email_outlined, color: Colors.white70, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            userStats?.email ?? 'No email',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
                             ),
-                            const SizedBox(height: 4),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: LinearProgressIndicator(
-                                value: xpProgress,
-                                minHeight: 10,
-                                backgroundColor: Colors.grey.shade200,
-                                valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                              ),
-                            ),
-                          ],
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.language, color: Colors.white, size: 18),
+                          const SizedBox(width: 8),
+                          DropdownButton<String>(
+                            value: selectedLanguage,
+                            dropdownColor: AppColors.brainPurple,
+                            underline: const SizedBox(),
+                            icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                            items: const [
+                              DropdownMenuItem(value: 'en', child: Text('English')),
+                              DropdownMenuItem(value: 'fr', child: Text('Francais')),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) updateLanguage(value);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textPrimary,
+      ),
+    );
+  }
+
+  Widget _buildStatsCards(AppLocalizations l10n) {
+    return Column(
+      children: [
+        // Streak Card
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: AppColors.cardShadow,
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Icons.local_fire_department, size: 32, color: Colors.white),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${userStats?.currentStreak ?? 0} ${l10n.days}',
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      l10n.currentStreak,
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  const Icon(Icons.emoji_events, color: Color(0xFFFFD700), size: 24),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${l10n.bestStreak}: ${userStats?.bestStreak ?? 0}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Stats Row
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                icon: Icons.quiz_outlined,
+                value: '${userStats?.totalQuestions ?? 0}',
+                label: l10n.questions,
+                color: AppColors.accentBlue,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildStatCard(
+                icon: Icons.check_circle_outline,
+                value: '${userStats?.accuracy.toStringAsFixed(0) ?? 0}%',
+                label: l10n.accuracy,
+                color: AppColors.success,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatCard({
+    required IconData icon,
+    required String value,
+    required String label,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: AppColors.cardShadow,
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: 28, color: color),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressSection(AppLocalizations l10n) {
+    if (progressByTheme.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: AppColors.cardShadow,
+        ),
+        child: Column(
+          children: [
+            Image.asset(
+              'assets/branding/mascot/brainly_thinking.png',
+              height: 80,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n.noProgressYet,
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: progressByTheme.map((theme) {
+        final level = theme['level'] ?? 1;
+        final xp = theme['xp'] ?? 0;
+        final xpForNextLevel = theme['xp_for_next_level'] ?? 100;
+        final xpProgress = xp / xpForNextLevel;
+        final total = theme['total_questions'] ?? 0;
+        final correct = theme['correct_answers'] ?? 0;
+        final themeColor = _getColorForLevel(level);
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: AppColors.cardShadow,
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          themeColor.withOpacity(0.2),
+                          themeColor.withOpacity(0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: themeColor.withOpacity(0.3)),
+                    ),
+                    child: Center(
+                      child: Text(
+                        theme['icon'] ?? '?',
+                        style: const TextStyle(fontSize: 28),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          theme['theme_name'] ?? 'Unknown',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '$correct / $total ${l10n.correct}',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                );
-              }).toList(),
-
-            const SizedBox(height: 24),
-
-            Text(
-              l10n.manageFavoriteThemes,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-
-            if (favoriteThemes.isEmpty)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(l10n.noFavoriteThemesProfile),
-                ),
-              )
-            else
-              ...favoriteThemes.map((theme) {
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: ListTile(
-                    leading: Text(
-                      theme.icon,
-                      style: const TextStyle(fontSize: 32),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: themeColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: themeColor.withOpacity(0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    title: Text(theme.name),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.remove_circle, color: Colors.red),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text(l10n.removeFromFavorites),
-                            content: Text('Remove ${theme.name} from your favorite themes?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text(l10n.cancel),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  removeThemeFromFavorites(context, theme.id, theme.name);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  foregroundColor: Colors.white,
-                                ),
-                                child: Text(l10n.remove),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                    child: Text(
+                      '${l10n.level} $level',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
-                );
-              }).toList(),
-          ],
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Text(
+                    '$xp / $xpForNextLevel ${l10n.xp}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${(xpProgress * 100).toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: themeColor,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Stack(
+                children: [
+                  Container(
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: themeColor.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: xpProgress.clamp(0.0, 1.0),
+                    child: Container(
+                      height: 8,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [themeColor, themeColor.withOpacity(0.7)],
+                        ),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildFavoriteThemesSection(AppLocalizations l10n) {
+    if (favoriteThemes.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: AppColors.cardShadow,
         ),
-      ),
+        child: Text(
+          l10n.noFavoriteThemesProfile,
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 16,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
+    return Column(
+      children: favoriteThemes.map((theme) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: AppColors.softShadow,
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            leading: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.brainPurpleLight.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  theme.icon,
+                  style: const TextStyle(fontSize: 24),
+                ),
+              ),
+            ),
+            title: Text(
+              theme.name,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            trailing: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.errorLight,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.remove, color: AppColors.error, size: 20),
+              ),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    title: Text(l10n.removeFromFavorites),
+                    content: Text('Remove ${theme.name} from your favorite themes?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(l10n.cancel),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          removeThemeFromFavorites(context, theme.id, theme.name);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.error,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: Text(l10n.remove),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }

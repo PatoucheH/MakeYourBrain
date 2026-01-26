@@ -9,6 +9,7 @@ import 'quiz_page.dart';
 import '../../../leaderboard/presentation/pages/leaderboard_page.dart';
 import '../../../lives/data/providers/lives_provider.dart';
 import '../../../lives/presentation/widgets/no_lives_dialog.dart';
+import '../../../lives/presentation/widgets/lives_indicator.dart';
 
 class ThemeDetailPage extends StatefulWidget {
   final ThemeModel theme;
@@ -22,7 +23,7 @@ class ThemeDetailPage extends StatefulWidget {
 class _ThemeDetailPageState extends State<ThemeDetailPage> {
   final _authRepo = AuthRepository();
   final _profileRepo = ProfileRepository();
-  
+
   int level = 1;
   int xp = 0;
   int xpForNextLevel = 100;
@@ -39,7 +40,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
       final userId = _authRepo.getCurrentUserId();
       if (userId != null) {
         final progress = await _profileRepo.getProgressByTheme(userId);
-        
+
         final themeProgress = progress.firstWhere(
           (p) => p['theme_id'] == widget.theme.id,
           orElse: () => {},
@@ -72,236 +73,367 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final themeColor = _getColorForLevel(level);
+    final progressPercent = xp / xpForNextLevel;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Text(widget.theme.icon, style: const TextStyle(fontSize: 24)),
-            const SizedBox(width: 12),
-            Expanded(child: Text(widget.theme.name)),
-          ],
-        ),
-        backgroundColor: themeColor.withOpacity(0.1),
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          themeColor.withOpacity(0.2),
-                          themeColor.withOpacity(0.05),
-                        ],
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: themeColor,
-                            borderRadius: BorderRadius.circular(25),
-                            boxShadow: [
-                              BoxShadow(
-                                color: themeColor.withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            '${l10n.level} $level',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        
-                        Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '$xp / $xpForNextLevel ${l10n.xp}',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  '${((xp / xpForNextLevel) * 100).toStringAsFixed(0)}%',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey.shade600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: LinearProgressIndicator(
-                                value: xp / xpForNextLevel,
-                                minHeight: 12,
-                                backgroundColor: Colors.grey.shade200,
-                                valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 32),
-                  
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final livesProvider = context.read<LivesProvider>();
-                          
-                          if (livesProvider.currentLives <= 0) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => const NoLivesDialog(),
-                            );
-                            return;
-                          }
-                          
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => QuizPage(theme: widget.theme),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: themeColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.all(20),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 4,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.play_arrow, size: 32),
-                            const SizedBox(width: 12),
-                            Text(
-                              l10n.startQuiz,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Custom AppBar
+              _buildAppBar(l10n),
 
-                  const SizedBox(height: 16),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LeaderboardPage(
-                                themeId: widget.theme.id,
-                                themeName: widget.theme.name,
-                              ),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.leaderboard, size: 24),
-                        label: Text(
-                          l10n.viewLeaderboard,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.all(16),
-                          side: BorderSide(color: themeColor, width: 2),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 24),
-                  
-                  Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
+              // Content
+              Expanded(
+                child: isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(color: AppColors.brainPurple),
+                      )
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              l10n.aboutThisTheme,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                            // Theme Hero Card
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [themeColor, themeColor.withOpacity(0.7)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(24),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: themeColor.withOpacity(0.4),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  // Theme Icon
+                                  Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        widget.theme.icon,
+                                        style: const TextStyle(fontSize: 56),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // Level Badge
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Text(
+                                      '${l10n.level} $level',
+                                      style: TextStyle(
+                                        color: themeColor,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+
+                                  // XP Progress
+                                  Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            '$xp / $xpForNextLevel ${l10n.xp}',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${(progressPercent * 100).toStringAsFixed(0)}%',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white.withOpacity(0.9),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Stack(
+                                        children: [
+                                          Container(
+                                            height: 12,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(0.3),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                          ),
+                                          FractionallySizedBox(
+                                            widthFactor: progressPercent.clamp(0.0, 1.0),
+                                            child: Container(
+                                              height: 12,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(6),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            Text(
-                              widget.theme.description,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey.shade700,
+                            const SizedBox(height: 24),
+
+                            // Start Quiz Button
+                            Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: AppColors.primaryGradient,
+                                boxShadow: AppColors.buttonShadow,
+                              ),
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  final livesProvider = context.read<LivesProvider>();
+
+                                  if (livesProvider.currentLives <= 0) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => const NoLivesDialog(),
+                                    );
+                                    return;
+                                  }
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => QuizPage(theme: widget.theme),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.all(20),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.play_arrow_rounded, size: 32, color: Colors.white),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      l10n.startQuiz,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
+                            const SizedBox(height: 16),
+
+                            // Leaderboard Button
+                            Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: AppColors.cardShadow,
+                                border: Border.all(
+                                  color: const Color(0xFFFFD700).withOpacity(0.3),
+                                  width: 2,
+                                ),
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LeaderboardPage(
+                                          themeId: widget.theme.id,
+                                          themeName: widget.theme.name,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  mouseCursor: SystemMouseCursors.click,
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(18),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                                            ),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: const Icon(Icons.leaderboard, color: Colors.white, size: 24),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          l10n.viewLeaderboard,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textPrimary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+
+                            // About Section
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: AppColors.cardShadow,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.brainPurpleLight.withOpacity(0.3),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: const Icon(
+                                          Icons.info_outline,
+                                          color: AppColors.brainPurple,
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        l10n.aboutThisTheme,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    widget.theme.description,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: AppColors.textSecondary,
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 32),
                           ],
                         ),
                       ),
-                    ),
-                  ),
-                  
-                  Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                      l10n.moreFeaturesComingSoon,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppBar(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: AppColors.softShadow,
+                ),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: AppColors.brainPurple,
+                  size: 22,
+                ),
               ),
             ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              widget.theme.name,
+              style: const TextStyle(
+                color: AppColors.brainPurple,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: AppColors.softShadow,
+            ),
+            child: const LivesIndicator(),
+          ),
+        ],
+      ),
     );
   }
 }
