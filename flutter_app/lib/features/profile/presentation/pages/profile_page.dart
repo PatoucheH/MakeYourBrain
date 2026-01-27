@@ -253,16 +253,54 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Username with edit button
                     Row(
                       children: [
-                        const Icon(Icons.email_outlined, color: Colors.white70, size: 18),
+                        const Icon(Icons.person, color: Colors.white, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            userStats?.displayName ?? 'Player',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () => _showChangeUsernameDialog(l10n),
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: AppColors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Email
+                    Row(
+                      children: [
+                        const Icon(Icons.email_outlined, color: Colors.white70, size: 16),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             userStats?.email ?? 'No email',
                             style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
+                              color: Colors.white70,
+                              fontSize: 13,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -304,6 +342,200 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  void _showChangeUsernameDialog(AppLocalizations l10n) {
+    final controller = TextEditingController(text: userStats?.username ?? '');
+    bool isChecking = false;
+    bool? isAvailable;
+    String? errorMessage;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          Future<void> checkUsername(String username) async {
+            if (username.isEmpty || username == userStats?.username) {
+              setDialogState(() {
+                isAvailable = null;
+                errorMessage = null;
+              });
+              return;
+            }
+
+            final normalized = username.toLowerCase().trim();
+
+            if (normalized.length < 3) {
+              setDialogState(() {
+                isAvailable = false;
+                errorMessage = l10n.usernameMinLength;
+              });
+              return;
+            }
+
+            if (normalized.length > 20) {
+              setDialogState(() {
+                isAvailable = false;
+                errorMessage = l10n.usernameMaxLength;
+              });
+              return;
+            }
+
+            final validPattern = RegExp(r'^[a-z0-9_]+$');
+            if (!validPattern.hasMatch(normalized)) {
+              setDialogState(() {
+                isAvailable = false;
+                errorMessage = l10n.usernameAllowedChars;
+              });
+              return;
+            }
+
+            setDialogState(() {
+              isChecking = true;
+              errorMessage = null;
+            });
+
+            try {
+              final available = await _authRepo.isUsernameAvailable(normalized);
+              setDialogState(() {
+                isAvailable = available;
+                isChecking = false;
+                errorMessage = available ? null : l10n.usernameTaken;
+              });
+            } catch (e) {
+              setDialogState(() {
+                isChecking = false;
+                errorMessage = 'Error checking username';
+              });
+            }
+          }
+
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: Row(
+              children: [
+                const Icon(Icons.edit, color: AppColors.brainPurple),
+                const SizedBox(width: 8),
+                Text(l10n.changeUsername),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (userStats?.username != null) ...[
+                  Text(
+                    '${l10n.currentUsername}: ${userStats!.username}',
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                TextField(
+                  controller: controller,
+                  onChanged: checkUsername,
+                  decoration: InputDecoration(
+                    labelText: l10n.newUsername,
+                    hintText: 'ex: brain_master42',
+                    prefixIcon: const Icon(Icons.person_outline, color: AppColors.brainPurple),
+                    suffixIcon: isChecking
+                        ? const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          )
+                        : isAvailable == true
+                            ? const Icon(Icons.check_circle, color: AppColors.success)
+                            : isAvailable == false
+                                ? const Icon(Icons.cancel, color: AppColors.error)
+                                : null,
+                    filled: true,
+                    fillColor: AppColors.brainPurpleLight.withOpacity(0.3),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: isAvailable == true
+                          ? const BorderSide(color: AppColors.success, width: 2)
+                          : isAvailable == false
+                              ? const BorderSide(color: AppColors.error, width: 2)
+                              : BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: isAvailable == false ? AppColors.error : AppColors.brainPurple,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+                if (errorMessage != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    errorMessage!,
+                    style: const TextStyle(color: AppColors.error, fontSize: 12),
+                  ),
+                ],
+                if (isAvailable == true) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.usernameAvailable,
+                    style: const TextStyle(color: AppColors.success, fontSize: 12),
+                  ),
+                ],
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.cancel),
+              ),
+              ElevatedButton(
+                onPressed: isAvailable == true
+                    ? () async {
+                        final newUsername = controller.text.trim();
+                        Navigator.pop(context);
+
+                        final success = await _authRepo.updateUsername(newUsername);
+                        if (mounted) {
+                          if (success) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(l10n.usernameUpdated),
+                                backgroundColor: AppColors.success,
+                              ),
+                            );
+                            loadProfile();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(l10n.usernameUpdateFailed),
+                                backgroundColor: AppColors.error,
+                              ),
+                            );
+                          }
+                        }
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.brainPurple,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(l10n.changeUsername),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

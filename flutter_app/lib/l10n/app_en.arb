@@ -96,5 +96,56 @@
     }
   },
   "maxThemesReached": "Maximum 3 themes allowed",
-  "maxThemesMessage": "You can only have 3 favorite themes. Remove one to add another."
+  "maxThemesMessage": "You can only have 3 favorite themes. Remove one to add another.",
+  "pvpArena": "PvP Arena",
+  "rating": "Rating",
+  "wins": "Wins",
+  "losses": "Losses",
+  "draws": "Draws",
+  "winRate": "Win Rate",
+  "findMatch": "Find Match",
+  "searchingMatch": "Searching...",
+  "matchHistory": "Match History",
+  "noMatchesYet": "No matches yet",
+  "startFirstMatch": "Start your first match to see your history",
+  "victory": "Victory",
+  "defeat": "Defeat",
+  "draw": "Draw",
+  "cancelled": "Cancelled",
+  "inProgress": "In Progress",
+  "score": "Score",
+  "waitingForOpponent": "Waiting for opponent...",
+  "opponentFinished": "Opponent finished!",
+  "roundComplete": "Round {round} Complete!",
+  "@roundComplete": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      }
+    }
+  },
+  "nextRoundStarting": "Next round starting...",
+  "finalResultsComing": "Final results coming...",
+  "backToMenu": "Back to Menu",
+  "you": "You",
+  "opponent": "Opponent",
+  "searchingOpponent": "Searching for opponent...",
+  "round": "Round",
+  "pvpRating": "PvP Rating",
+  "waitingForPlayer": "Waiting for another player...",
+  "noPlayerFoundYet": "No player found yet.\nKeep waiting...",
+  "searchTakingLong": "Search is taking a while.\nFew players are online right now.",
+  "username": "Username",
+  "usernameAvailable": "Username available!",
+  "usernameNotAvailable": "This username is not available",
+  "usernameTaken": "This username is already taken",
+  "usernameInvalid": "Invalid username",
+  "usernameMinLength": "Minimum 3 characters",
+  "usernameMaxLength": "Maximum 20 characters",
+  "usernameAllowedChars": "Letters, numbers and _ only",
+  "changeUsername": "Change username",
+  "currentUsername": "Current username",
+  "newUsername": "New username",
+  "usernameUpdated": "Username updated!",
+  "usernameUpdateFailed": "Failed to update username"
 }

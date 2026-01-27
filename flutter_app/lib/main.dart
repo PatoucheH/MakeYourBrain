@@ -11,6 +11,7 @@ import 'core/providers/language_provider.dart';
 import 'core/theme/app_colors.dart';
 import 'l10n/app_localizations.dart';
 import 'features/lives/data/providers/lives_provider.dart';
+import 'features/pvp/data/providers/pvp_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => LanguageProvider()),
         ChangeNotifierProvider(create: (context) => LivesProvider()),
+        ChangeNotifierProvider(create: (context) => PvPProvider()),
       ],
       child: const MyApp(),
     ),

@@ -7,12 +7,83 @@ import '../models/user_model.dart';
 class AuthRepository {
   final _supabase = SupabaseService().client;
 
-  // Inscription
-  Future<void> signUp(String email, String password) async {
-    await _supabase.auth.signUp(
+  // Inscription avec pseudo
+  Future<void> signUp(String email, String password, {String? username}) async {
+    // Vérifier que le pseudo est disponible avant l'inscription
+    if (username != null && username.isNotEmpty) {
+      final isAvailable = await isUsernameAvailable(username);
+      if (!isAvailable) {
+        throw Exception('Ce pseudo est déjà utilisé');
+      }
+    }
+
+    final response = await _supabase.auth.signUp(
       email: email,
       password: password,
     );
+
+    // Créer l'entrée user_stats avec le pseudo si l'inscription réussit
+    if (response.user != null && username != null && username.isNotEmpty) {
+      await _supabase.from('user_stats').insert({
+        'user_id': response.user!.id,
+        'username': username.toLowerCase().trim(),
+        'preferred_language': 'en',
+      });
+    }
+  }
+
+  // Vérifier si un pseudo est disponible
+  Future<bool> isUsernameAvailable(String username) async {
+    if (username.isEmpty) return false;
+
+    final normalizedUsername = username.toLowerCase().trim();
+
+    // Vérifier la longueur (3-20 caractères)
+    if (normalizedUsername.length < 3 || normalizedUsername.length > 20) {
+      return false;
+    }
+
+    // Vérifier les caractères autorisés (lettres, chiffres, underscore)
+    final validPattern = RegExp(r'^[a-z0-9_]+$');
+    if (!validPattern.hasMatch(normalizedUsername)) {
+      return false;
+    }
+
+    final response = await _supabase
+        .from('user_stats')
+        .select('user_id')
+        .eq('username', normalizedUsername)
+        .maybeSingle();
+
+    return response == null;
+  }
+
+  // Mettre à jour le pseudo
+  Future<bool> updateUsername(String newUsername) async {
+    final userId = getCurrentUserId();
+    if (userId == null) return false;
+
+    final normalizedUsername = newUsername.toLowerCase().trim();
+
+    // Vérifier que le pseudo est disponible
+    final response = await _supabase
+        .from('user_stats')
+        .select('user_id')
+        .eq('username', normalizedUsername)
+        .neq('user_id', userId)
+        .maybeSingle();
+
+    if (response != null) {
+      // Le pseudo est déjà pris par quelqu'un d'autre
+      return false;
+    }
+
+    await _supabase.from('user_stats').update({
+      'username': normalizedUsername,
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('user_id', userId);
+
+    return true;
   }
 
   // Connexion

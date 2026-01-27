@@ -12,21 +12,94 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _repository = AuthRepository();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isCheckingUsername = false;
+  bool? _isUsernameAvailable;
+  String? _usernameError;
+
+  Future<void> _checkUsername(String username) async {
+    if (username.isEmpty) {
+      setState(() {
+        _isUsernameAvailable = null;
+        _usernameError = null;
+      });
+      return;
+    }
+
+    final normalized = username.toLowerCase().trim();
+
+    // Validation locale
+    if (normalized.length < 3) {
+      setState(() {
+        _isUsernameAvailable = false;
+        _usernameError = 'Minimum 3 caractères';
+      });
+      return;
+    }
+
+    if (normalized.length > 20) {
+      setState(() {
+        _isUsernameAvailable = false;
+        _usernameError = 'Maximum 20 caractères';
+      });
+      return;
+    }
+
+    final validPattern = RegExp(r'^[a-z0-9_]+$');
+    if (!validPattern.hasMatch(normalized)) {
+      setState(() {
+        _isUsernameAvailable = false;
+        _usernameError = 'Lettres, chiffres et _ uniquement';
+      });
+      return;
+    }
+
+    setState(() {
+      _isCheckingUsername = true;
+      _usernameError = null;
+    });
+
+    try {
+      final isAvailable = await _repository.isUsernameAvailable(normalized);
+      if (mounted) {
+        setState(() {
+          _isUsernameAvailable = isAvailable;
+          _isCheckingUsername = false;
+          _usernameError = isAvailable ? null : 'Ce pseudo est déjà pris';
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isCheckingUsername = false;
+          _usernameError = 'Erreur de vérification';
+        });
+      }
+    }
+  }
 
   Future<void> _register() async {
     final l10n = AppLocalizations.of(context)!;
 
-    if (_emailController.text.isEmpty ||
+    if (_usernameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _confirmPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.pleaseFillAllFields)),
+      );
+      return;
+    }
+
+    if (_isUsernameAvailable != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_usernameError ?? l10n.usernameNotAvailable)),
       );
       return;
     }
@@ -44,6 +117,7 @@ class _RegisterPageState extends State<RegisterPage> {
       await _repository.signUp(
         _emailController.text.trim(),
         _passwordController.text,
+        username: _usernameController.text.trim(),
       );
 
       if (mounted) {
@@ -152,6 +226,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        // Username Field
+                        _buildUsernameField(l10n),
+                        const SizedBox(height: 16),
+
                         // Email Field
                         _buildTextField(
                           controller: _emailController,
@@ -272,6 +350,86 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  Widget _buildUsernameField(AppLocalizations l10n) {
+    Widget? suffixIcon;
+    Color? borderColor;
+
+    if (_isCheckingUsername) {
+      suffixIcon = const Padding(
+        padding: EdgeInsets.all(12),
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
+    } else if (_isUsernameAvailable == true) {
+      suffixIcon = const Icon(Icons.check_circle, color: AppColors.success);
+      borderColor = AppColors.success;
+    } else if (_isUsernameAvailable == false) {
+      suffixIcon = const Icon(Icons.cancel, color: AppColors.error);
+      borderColor = AppColors.error;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: _usernameController,
+          style: const TextStyle(fontSize: 16),
+          onChanged: (value) => _checkUsername(value),
+          decoration: InputDecoration(
+            labelText: l10n.username,
+            hintText: 'ex: brain_master42',
+            prefixIcon: const Icon(Icons.person_outline, color: AppColors.brainPurple),
+            suffixIcon: suffixIcon,
+            filled: true,
+            fillColor: AppColors.brainPurpleLight.withOpacity(0.3),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: borderColor != null
+                  ? BorderSide(color: borderColor, width: 2)
+                  : BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: borderColor ?? AppColors.brainPurple,
+                width: 2,
+              ),
+            ),
+          ),
+        ),
+        if (_usernameError != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4, left: 12),
+            child: Text(
+              _usernameError!,
+              style: const TextStyle(
+                color: AppColors.error,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        if (_isUsernameAvailable == true)
+          Padding(
+            padding: const EdgeInsets.only(top: 4, left: 12),
+            child: Text(
+              l10n.usernameAvailable,
+              style: const TextStyle(
+                color: AppColors.success,
+                fontSize: 12,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -309,6 +467,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();

@@ -283,4 +283,139 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get maxThemesMessage =>
       'You can only have 3 favorite themes. Remove one to add another.';
+
+  @override
+  String get pvpArena => 'PvP Arena';
+
+  @override
+  String get rating => 'Rating';
+
+  @override
+  String get wins => 'Wins';
+
+  @override
+  String get losses => 'Losses';
+
+  @override
+  String get draws => 'Draws';
+
+  @override
+  String get winRate => 'Win Rate';
+
+  @override
+  String get findMatch => 'Find Match';
+
+  @override
+  String get searchingMatch => 'Searching...';
+
+  @override
+  String get matchHistory => 'Match History';
+
+  @override
+  String get noMatchesYet => 'No matches yet';
+
+  @override
+  String get startFirstMatch => 'Start your first match to see your history';
+
+  @override
+  String get victory => 'Victory';
+
+  @override
+  String get defeat => 'Defeat';
+
+  @override
+  String get draw => 'Draw';
+
+  @override
+  String get cancelled => 'Cancelled';
+
+  @override
+  String get inProgress => 'In Progress';
+
+  @override
+  String get score => 'Score';
+
+  @override
+  String get waitingForOpponent => 'Waiting for opponent...';
+
+  @override
+  String get opponentFinished => 'Opponent finished!';
+
+  @override
+  String roundComplete(int round) {
+    return 'Round $round Complete!';
+  }
+
+  @override
+  String get nextRoundStarting => 'Next round starting...';
+
+  @override
+  String get finalResultsComing => 'Final results coming...';
+
+  @override
+  String get backToMenu => 'Back to Menu';
+
+  @override
+  String get you => 'You';
+
+  @override
+  String get opponent => 'Opponent';
+
+  @override
+  String get searchingOpponent => 'Searching for opponent...';
+
+  @override
+  String get round => 'Round';
+
+  @override
+  String get pvpRating => 'PvP Rating';
+
+  @override
+  String get waitingForPlayer => 'Waiting for another player...';
+
+  @override
+  String get noPlayerFoundYet => 'No player found yet.\nKeep waiting...';
+
+  @override
+  String get searchTakingLong =>
+      'Search is taking a while.\nFew players are online right now.';
+
+  @override
+  String get username => 'Username';
+
+  @override
+  String get usernameAvailable => 'Username available!';
+
+  @override
+  String get usernameNotAvailable => 'This username is not available';
+
+  @override
+  String get usernameTaken => 'This username is already taken';
+
+  @override
+  String get usernameInvalid => 'Invalid username';
+
+  @override
+  String get usernameMinLength => 'Minimum 3 characters';
+
+  @override
+  String get usernameMaxLength => 'Maximum 20 characters';
+
+  @override
+  String get usernameAllowedChars => 'Letters, numbers and _ only';
+
+  @override
+  String get changeUsername => 'Change username';
+
+  @override
+  String get currentUsername => 'Current username';
+
+  @override
+  String get newUsername => 'New username';
+
+  @override
+  String get usernameUpdated => 'Username updated!';
+
+  @override
+  String get usernameUpdateFailed => 'Failed to update username';
 }

@@ -283,4 +283,141 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get maxThemesMessage =>
       'Vous ne pouvez avoir que 3 thèmes favoris. Supprimez-en un pour en ajouter un autre.';
+
+  @override
+  String get pvpArena => 'Arène PvP';
+
+  @override
+  String get rating => 'Classement';
+
+  @override
+  String get wins => 'Victoires';
+
+  @override
+  String get losses => 'Défaites';
+
+  @override
+  String get draws => 'Nuls';
+
+  @override
+  String get winRate => 'Taux de victoire';
+
+  @override
+  String get findMatch => 'Trouver un Match';
+
+  @override
+  String get searchingMatch => 'Recherche...';
+
+  @override
+  String get matchHistory => 'Historique des Matchs';
+
+  @override
+  String get noMatchesYet => 'Aucun match pour le moment';
+
+  @override
+  String get startFirstMatch =>
+      'Lancez votre premier match pour voir votre historique';
+
+  @override
+  String get victory => 'Victoire';
+
+  @override
+  String get defeat => 'Défaite';
+
+  @override
+  String get draw => 'Nul';
+
+  @override
+  String get cancelled => 'Annulé';
+
+  @override
+  String get inProgress => 'En cours';
+
+  @override
+  String get score => 'Score';
+
+  @override
+  String get waitingForOpponent => 'En attente de l\'adversaire...';
+
+  @override
+  String get opponentFinished => 'L\'adversaire a terminé !';
+
+  @override
+  String roundComplete(int round) {
+    return 'Round $round Terminé !';
+  }
+
+  @override
+  String get nextRoundStarting => 'Prochain round...';
+
+  @override
+  String get finalResultsComing => 'Résultats finaux...';
+
+  @override
+  String get backToMenu => 'Retour au Menu';
+
+  @override
+  String get you => 'Vous';
+
+  @override
+  String get opponent => 'Adversaire';
+
+  @override
+  String get searchingOpponent => 'Recherche d\'un adversaire...';
+
+  @override
+  String get round => 'Round';
+
+  @override
+  String get pvpRating => 'Classement PvP';
+
+  @override
+  String get waitingForPlayer => 'En attente d\'un autre joueur...';
+
+  @override
+  String get noPlayerFoundYet =>
+      'Aucun joueur trouvé pour le moment.\nContinuez à patienter...';
+
+  @override
+  String get searchTakingLong =>
+      'La recherche prend du temps.\nPeu de joueurs sont en ligne actuellement.';
+
+  @override
+  String get username => 'Pseudo';
+
+  @override
+  String get usernameAvailable => 'Pseudo disponible !';
+
+  @override
+  String get usernameNotAvailable => 'Ce pseudo n\'est pas disponible';
+
+  @override
+  String get usernameTaken => 'Ce pseudo est déjà pris';
+
+  @override
+  String get usernameInvalid => 'Pseudo invalide';
+
+  @override
+  String get usernameMinLength => 'Minimum 3 caractères';
+
+  @override
+  String get usernameMaxLength => 'Maximum 20 caractères';
+
+  @override
+  String get usernameAllowedChars => 'Lettres, chiffres et _ uniquement';
+
+  @override
+  String get changeUsername => 'Changer de pseudo';
+
+  @override
+  String get currentUsername => 'Pseudo actuel';
+
+  @override
+  String get newUsername => 'Nouveau pseudo';
+
+  @override
+  String get usernameUpdated => 'Pseudo mis à jour !';
+
+  @override
+  String get usernameUpdateFailed => 'Échec de la mise à jour du pseudo';
 }

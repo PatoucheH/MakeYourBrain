@@ -631,6 +631,270 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You can only have 3 favorite themes. Remove one to add another.'**
   String get maxThemesMessage;
+
+  /// No description provided for @pvpArena.
+  ///
+  /// In en, this message translates to:
+  /// **'PvP Arena'**
+  String get pvpArena;
+
+  /// No description provided for @rating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get rating;
+
+  /// No description provided for @wins.
+  ///
+  /// In en, this message translates to:
+  /// **'Wins'**
+  String get wins;
+
+  /// No description provided for @losses.
+  ///
+  /// In en, this message translates to:
+  /// **'Losses'**
+  String get losses;
+
+  /// No description provided for @draws.
+  ///
+  /// In en, this message translates to:
+  /// **'Draws'**
+  String get draws;
+
+  /// No description provided for @winRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Win Rate'**
+  String get winRate;
+
+  /// No description provided for @findMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Find Match'**
+  String get findMatch;
+
+  /// No description provided for @searchingMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching...'**
+  String get searchingMatch;
+
+  /// No description provided for @matchHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Match History'**
+  String get matchHistory;
+
+  /// No description provided for @noMatchesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No matches yet'**
+  String get noMatchesYet;
+
+  /// No description provided for @startFirstMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Start your first match to see your history'**
+  String get startFirstMatch;
+
+  /// No description provided for @victory.
+  ///
+  /// In en, this message translates to:
+  /// **'Victory'**
+  String get victory;
+
+  /// No description provided for @defeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Defeat'**
+  String get defeat;
+
+  /// No description provided for @draw.
+  ///
+  /// In en, this message translates to:
+  /// **'Draw'**
+  String get draw;
+
+  /// No description provided for @cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get cancelled;
+
+  /// No description provided for @inProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get inProgress;
+
+  /// No description provided for @score.
+  ///
+  /// In en, this message translates to:
+  /// **'Score'**
+  String get score;
+
+  /// No description provided for @waitingForOpponent.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for opponent...'**
+  String get waitingForOpponent;
+
+  /// No description provided for @opponentFinished.
+  ///
+  /// In en, this message translates to:
+  /// **'Opponent finished!'**
+  String get opponentFinished;
+
+  /// No description provided for @roundComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Round {round} Complete!'**
+  String roundComplete(int round);
+
+  /// No description provided for @nextRoundStarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Next round starting...'**
+  String get nextRoundStarting;
+
+  /// No description provided for @finalResultsComing.
+  ///
+  /// In en, this message translates to:
+  /// **'Final results coming...'**
+  String get finalResultsComing;
+
+  /// No description provided for @backToMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Menu'**
+  String get backToMenu;
+
+  /// No description provided for @you.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get you;
+
+  /// No description provided for @opponent.
+  ///
+  /// In en, this message translates to:
+  /// **'Opponent'**
+  String get opponent;
+
+  /// No description provided for @searchingOpponent.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching for opponent...'**
+  String get searchingOpponent;
+
+  /// No description provided for @round.
+  ///
+  /// In en, this message translates to:
+  /// **'Round'**
+  String get round;
+
+  /// No description provided for @pvpRating.
+  ///
+  /// In en, this message translates to:
+  /// **'PvP Rating'**
+  String get pvpRating;
+
+  /// No description provided for @waitingForPlayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for another player...'**
+  String get waitingForPlayer;
+
+  /// No description provided for @noPlayerFoundYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No player found yet.\nKeep waiting...'**
+  String get noPlayerFoundYet;
+
+  /// No description provided for @searchTakingLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Search is taking a while.\nFew players are online right now.'**
+  String get searchTakingLong;
+
+  /// No description provided for @username.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get username;
+
+  /// No description provided for @usernameAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Username available!'**
+  String get usernameAvailable;
+
+  /// No description provided for @usernameNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This username is not available'**
+  String get usernameNotAvailable;
+
+  /// No description provided for @usernameTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'This username is already taken'**
+  String get usernameTaken;
+
+  /// No description provided for @usernameInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid username'**
+  String get usernameInvalid;
+
+  /// No description provided for @usernameMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum 3 characters'**
+  String get usernameMinLength;
+
+  /// No description provided for @usernameMaxLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum 20 characters'**
+  String get usernameMaxLength;
+
+  /// No description provided for @usernameAllowedChars.
+  ///
+  /// In en, this message translates to:
+  /// **'Letters, numbers and _ only'**
+  String get usernameAllowedChars;
+
+  /// No description provided for @changeUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Change username'**
+  String get changeUsername;
+
+  /// No description provided for @currentUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Current username'**
+  String get currentUsername;
+
+  /// No description provided for @newUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'New username'**
+  String get newUsername;
+
+  /// No description provided for @usernameUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Username updated!'**
+  String get usernameUpdated;
+
+  /// No description provided for @usernameUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update username'**
+  String get usernameUpdateFailed;
 }
 
 class _AppLocalizationsDelegate
