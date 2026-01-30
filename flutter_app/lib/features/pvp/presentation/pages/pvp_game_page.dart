@@ -495,7 +495,7 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                       children: [
                         Expanded(
                           child: Text(
-                            answer.answerText,
+                            answer.text,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,

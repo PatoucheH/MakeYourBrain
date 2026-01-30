@@ -383,6 +383,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'La recherche prend du temps.\nPeu de joueurs sont en ligne actuellement.';
 
   @override
+  String get matchFound => 'Match trouvé !';
+
+  @override
+  String matchStartingIn(int seconds) {
+    return 'Début dans ${seconds}s...';
+  }
+
+  @override
   String get username => 'Pseudo';
 
   @override

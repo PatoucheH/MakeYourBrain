@@ -121,6 +121,8 @@
   "waitingForPlayer": "En attente d'un autre joueur...",
   "noPlayerFoundYet": "Aucun joueur trouvé pour le moment.\nContinuez à patienter...",
   "searchTakingLong": "La recherche prend du temps.\nPeu de joueurs sont en ligne actuellement.",
+  "matchFound": "Match trouvé !",
+  "matchStartingIn": "Début dans {seconds}s...",
   "username": "Pseudo",
   "usernameAvailable": "Pseudo disponible !",
   "usernameNotAvailable": "Ce pseudo n'est pas disponible",

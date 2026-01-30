@@ -24,10 +24,17 @@ class PvPProvider extends ChangeNotifier {
   String? errorMessage;
   bool isLoading = false;
 
+  // États pour le matchmaking avec popup
+  bool matchFound = false;
+  int matchFoundCountdown = 5; // Compte à rebours avant de lancer le match
+  String? foundMatchId; // ID du match trouvé
+  bool isReadyToPlay = false; // Indique que le match est prêt à être joué
+
   // Streams
   StreamSubscription<PvPMatchModel?>? _matchSubscription;
   Timer? _searchTimer;
   Timer? _searchDurationTimer;
+  Timer? _matchFoundTimer;
 
   PvPProvider({
     PvPRepository? pvpRepository,
@@ -96,10 +103,9 @@ class PvPProvider extends ChangeNotifier {
       final result = await _pvpRepository.joinMatchmaking(userId, rating, language);
 
       if (result['matchFound'] == true && result['matchId'] != null) {
-        // Match trouvé immédiatement
-        await loadMatch(result['matchId']);
-        isSearchingMatch = false;
-        isInQueue = false;
+        // Match trouvé immédiatement - démarrer le countdown
+        foundMatchId = result['matchId'];
+        _startMatchFoundCountdown();
       } else {
         // En attente d'un adversaire, on poll régulièrement
         isInQueue = true;
@@ -150,14 +156,45 @@ class PvPProvider extends ChangeNotifier {
 
       if (waitingMatch != null) {
         _stopSearchTimers();
-        await loadMatch(waitingMatch.id);
-        isSearchingMatch = false;
-        isInQueue = false;
-        notifyListeners();
+        foundMatchId = waitingMatch.id;
+        _startMatchFoundCountdown();
       }
     } catch (e) {
       print('Error checking for match: $e');
     }
+  }
+
+  /// Démarre le compte à rebours quand un match est trouvé
+  void _startMatchFoundCountdown() {
+    matchFound = true;
+    matchFoundCountdown = 5;
+    isInQueue = false;
+    isReadyToPlay = false;
+    notifyListeners();
+
+    _matchFoundTimer?.cancel();
+    _matchFoundTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      matchFoundCountdown--;
+      notifyListeners();
+
+      if (matchFoundCountdown <= 0) {
+        timer.cancel();
+        // Charger le match et signaler que c'est prêt
+        if (foundMatchId != null) {
+          await loadMatch(foundMatchId!);
+          foundMatchId = null;
+        }
+        isSearchingMatch = false;
+        matchFound = false;
+        isReadyToPlay = true; // Le match est prêt à être joué
+        notifyListeners();
+      }
+    });
+  }
+
+  /// Réinitialise l'état isReadyToPlay après la navigation
+  void clearReadyToPlay() {
+    isReadyToPlay = false;
   }
 
   /// Quitte la file d'attente de matchmaking
@@ -167,10 +204,14 @@ class PvPProvider extends ChangeNotifier {
 
     try {
       _stopSearchTimers();
+      _matchFoundTimer?.cancel();
       await _pvpRepository.leaveMatchmaking(userId);
       isSearchingMatch = false;
       isInQueue = false;
       searchDuration = 0;
+      matchFound = false;
+      matchFoundCountdown = 5;
+      foundMatchId = null;
       errorMessage = null;
       notifyListeners();
     } catch (e) {
@@ -494,6 +535,7 @@ class PvPProvider extends ChangeNotifier {
   void reset() {
     _matchSubscription?.cancel();
     _stopSearchTimers();
+    _matchFoundTimer?.cancel();
 
     currentMatch = null;
     currentRound = null;
@@ -507,6 +549,10 @@ class PvPProvider extends ChangeNotifier {
     searchDuration = 0;
     errorMessage = null;
     isLoading = false;
+    matchFound = false;
+    matchFoundCountdown = 5;
+    foundMatchId = null;
+    isReadyToPlay = false;
 
     notifyListeners();
   }
@@ -541,6 +587,7 @@ class PvPProvider extends ChangeNotifier {
   void dispose() {
     _matchSubscription?.cancel();
     _stopSearchTimers();
+    _matchFoundTimer?.cancel();
     super.dispose();
   }
 }

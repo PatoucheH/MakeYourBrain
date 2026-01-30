@@ -381,6 +381,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Search is taking a while.\nFew players are online right now.';
 
   @override
+  String get matchFound => 'Match found!';
+
+  @override
+  String matchStartingIn(int seconds) {
+    return 'Starting in ${seconds}s...';
+  }
+
+  @override
   String get username => 'Username';
 
   @override

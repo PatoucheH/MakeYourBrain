@@ -135,6 +135,15 @@
   "waitingForPlayer": "Waiting for another player...",
   "noPlayerFoundYet": "No player found yet.\nKeep waiting...",
   "searchTakingLong": "Search is taking a while.\nFew players are online right now.",
+  "matchFound": "Match found!",
+  "matchStartingIn": "Starting in {seconds}s...",
+  "@matchStartingIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "username": "Username",
   "usernameAvailable": "Username available!",
   "usernameNotAvailable": "This username is not available",

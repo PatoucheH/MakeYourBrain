@@ -818,6 +818,18 @@ abstract class AppLocalizations {
   /// **'Search is taking a while.\nFew players are online right now.'**
   String get searchTakingLong;
 
+  /// No description provided for @matchFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Match found!'**
+  String get matchFound;
+
+  /// No description provided for @matchStartingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting in {seconds}s...'**
+  String matchStartingIn(int seconds);
+
   /// No description provided for @username.
   ///
   /// In en, this message translates to:

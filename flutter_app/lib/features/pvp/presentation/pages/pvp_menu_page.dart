@@ -6,6 +6,7 @@ import '../../../auth/data/repositories/auth_repository.dart';
 import '../../data/models/pvp_match_model.dart';
 import '../../data/providers/pvp_provider.dart';
 import '../../data/repositories/pvp_repository.dart';
+import 'pvp_game_page.dart';
 
 class PvPMenuPage extends StatefulWidget {
   const PvPMenuPage({super.key});
@@ -29,6 +30,33 @@ class _PvPMenuPageState extends State<PvPMenuPage> {
   void initState() {
     super.initState();
     _loadData();
+    // Écouter les changements du provider pour la navigation
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final pvpProvider = context.read<PvPProvider>();
+      pvpProvider.addListener(_onProviderChanged);
+    });
+  }
+
+  void _onProviderChanged() {
+    if (!mounted) return;
+    final pvpProvider = context.read<PvPProvider>();
+    // Si le match est prêt à être joué, naviguer
+    if (pvpProvider.isReadyToPlay && pvpProvider.currentMatch != null) {
+      pvpProvider.clearReadyToPlay(); // Éviter les navigations multiples
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const PvPGamePage()),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    // Retirer le listener
+    try {
+      context.read<PvPProvider>().removeListener(_onProviderChanged);
+    } catch (_) {}
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -74,43 +102,251 @@ class _PvPMenuPageState extends State<PvPMenuPage> {
       body: Container(
         decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
-          child: Column(
+          child: Stack(
             children: [
-              // Custom AppBar
-              _buildAppBar(l10n),
+              Column(
+                children: [
+                  // Custom AppBar
+                  _buildAppBar(l10n),
 
-              // Content
-              Expanded(
-                child: isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(color: AppColors.brainPurple),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: _loadData,
-                        color: AppColors.brainPurple,
-                        child: SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Stats Card
-                              _buildStatsCard(l10n),
-                              const SizedBox(height: 24),
+                  // Content
+                  Expanded(
+                    child: isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(color: AppColors.brainPurple),
+                          )
+                        : RefreshIndicator(
+                            onRefresh: _loadData,
+                            color: AppColors.brainPurple,
+                            child: SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Stats Card
+                                  _buildStatsCard(l10n),
+                                  const SizedBox(height: 24),
 
-                              // Find Match Button
-                              _buildFindMatchButton(l10n),
-                              const SizedBox(height: 32),
+                                  // Find Match Button
+                                  _buildFindMatchButton(l10n),
+                                  const SizedBox(height: 32),
 
-                              // Match History Section
-                              _buildMatchHistorySection(l10n),
-                            ],
+                                  // Match History Section
+                                  _buildMatchHistorySection(l10n),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                  ),
+                ],
               ),
+              // Matchmaking Overlay
+              _buildMatchmakingOverlay(l10n),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMatchmakingOverlay(AppLocalizations l10n) {
+    return Consumer<PvPProvider>(
+      builder: (context, pvpProvider, child) {
+        final isInQueue = pvpProvider.isInQueue;
+        final matchFound = pvpProvider.matchFound;
+        final searchDuration = pvpProvider.searchDuration;
+        final countdown = pvpProvider.matchFoundCountdown;
+
+        // Ne pas afficher si pas en recherche et pas de match trouvé
+        if (!isInQueue && !matchFound) {
+          return const SizedBox.shrink();
+        }
+
+        return Positioned(
+          top: 60,
+          right: 16,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: matchFound
+                ? _buildMatchFoundPopup(l10n, countdown, pvpProvider)
+                : _buildSearchingPopup(l10n, searchDuration, pvpProvider),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSearchingPopup(AppLocalizations l10n, int searchDuration, PvPProvider pvpProvider) {
+    final minutes = searchDuration ~/ 60;
+    final seconds = searchDuration % 60;
+    final timeStr = minutes > 0
+        ? '${minutes}m ${seconds.toString().padLeft(2, '0')}s'
+        : '${seconds}s';
+
+    return Material(
+      elevation: 8,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: 280,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.brainPurple.withOpacity(0.3),
+            width: 2,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                // Icône animée
+                SizedBox(
+                  width: 32,
+                  height: 32,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.brainPurple,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.searchingOpponent,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        timeStr,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.brainPurple,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Bouton annuler
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () => pvpProvider.leaveMatchmaking(),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  backgroundColor: AppColors.error.withOpacity(0.1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.close, color: AppColors.error, size: 18),
+                    const SizedBox(width: 6),
+                    Text(
+                      l10n.cancel,
+                      style: const TextStyle(
+                        color: AppColors.error,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMatchFoundPopup(AppLocalizations l10n, int countdown, PvPProvider pvpProvider) {
+    return Material(
+      elevation: 8,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: 280,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF10B981), Color(0xFF059669)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.matchFound,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.matchStartingIn(countdown),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Barre de progression
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: countdown / 5,
+                minHeight: 6,
+                backgroundColor: Colors.white.withOpacity(0.3),
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -294,14 +530,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> {
   Widget _buildFindMatchButton(AppLocalizations l10n) {
     return Consumer<PvPProvider>(
       builder: (context, pvpProvider, child) {
-        final isSearching = pvpProvider.isSearchingMatch;
-        final isInQueue = pvpProvider.isInQueue;
-        final searchDuration = pvpProvider.searchDuration;
-
-        if (isInQueue) {
-          // Afficher l'état de recherche avec le temps écoulé
-          return _buildSearchingState(l10n, pvpProvider, searchDuration);
-        }
+        final isSearching = pvpProvider.isSearchingMatch || pvpProvider.isInQueue || pvpProvider.matchFound;
 
         return Container(
           width: double.infinity,
@@ -357,147 +586,8 @@ class _PvPMenuPageState extends State<PvPMenuPage> {
     );
   }
 
-  Widget _buildSearchingState(AppLocalizations l10n, PvPProvider pvpProvider, int searchDuration) {
-    final minutes = searchDuration ~/ 60;
-    final seconds = searchDuration % 60;
-    final timeStr = minutes > 0
-        ? '${minutes}m ${seconds.toString().padLeft(2, '0')}s'
-        : '${seconds}s';
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: AppColors.cardShadow,
-        border: Border.all(
-          color: AppColors.brainPurple.withOpacity(0.3),
-          width: 2,
-        ),
-      ),
-      child: Column(
-        children: [
-          // Animation de recherche
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: 80,
-                height: 80,
-                child: CircularProgressIndicator(
-                  strokeWidth: 4,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    AppColors.brainPurple.withOpacity(0.3),
-                  ),
-                ),
-              ),
-              const Icon(
-                Icons.person_search,
-                size: 36,
-                color: AppColors.brainPurple,
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-
-          // Texte de recherche
-          Text(
-            l10n.searchingOpponent,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Temps écoulé
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.brainPurpleLight.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.timer,
-                  size: 18,
-                  color: AppColors.brainPurple,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  timeStr,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.brainPurple,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Message d'attente
-          Text(
-            _getWaitingMessage(l10n, searchDuration),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Bouton annuler
-          TextButton.icon(
-            onPressed: () => pvpProvider.leaveMatchmaking(),
-            icon: const Icon(Icons.close, color: AppColors.error),
-            label: Text(
-              l10n.cancel,
-              style: const TextStyle(
-                color: AppColors.error,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              backgroundColor: AppColors.error.withOpacity(0.1),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _getWaitingMessage(AppLocalizations l10n, int searchDuration) {
-    if (searchDuration < 10) {
-      return l10n.searchingOpponent;
-    } else if (searchDuration < 30) {
-      return l10n.waitingForPlayer;
-    } else if (searchDuration < 60) {
-      return l10n.noPlayerFoundYet;
-    } else {
-      return l10n.searchTakingLong;
-    }
-  }
-
   Future<void> _startMatchmaking(BuildContext context, PvPProvider pvpProvider) async {
     await pvpProvider.joinMatchmaking();
-
-    if (pvpProvider.currentMatch != null) {
-      // Match found, navigate to match screen
-      // TODO: Navigate to PvP match screen
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Match found!')),
-      );
-    }
   }
 
   Widget _buildMatchHistorySection(AppLocalizations l10n) {
