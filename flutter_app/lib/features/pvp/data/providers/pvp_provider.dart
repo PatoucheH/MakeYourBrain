@@ -58,17 +58,21 @@ class PvPProvider extends ChangeNotifier {
     return currentMatch!.getPlayerScore(opponentId);
   }
 
+  int consecutiveWrong = 0;
+
   int get myRoundScore {
     int total = 0;
     for (final answer in myAnswers) {
-      if (answer.isCorrect) {
-        total += answer.points;
-      }
+      total += answer.points;
     }
-    return total;
+    return total < 0 ? 0 : total;
   }
 
-  bool get hasAnsweredAllQuestions => currentQuestions.isNotEmpty && myAnswers.length >= currentQuestions.length;
+  bool roundSubmitted = false;
+
+  bool get hasAnsweredAllQuestions =>
+      roundSubmitted ||
+      (currentQuestions.isNotEmpty && myAnswers.length >= currentQuestions.length);
 
   QuestionModel? get currentQuestion {
     if (currentQuestionIndex >= currentQuestions.length) return null;
@@ -315,6 +319,8 @@ class PvPProvider extends ChangeNotifier {
       myAnswers = [];
       currentQuestionIndex = 0;
       timeSpent = 0;
+      roundSubmitted = false;
+      consecutiveWrong = 0;
 
       if (currentRound == null) {
         // Nouveau round, le premier joueur doit le créer
@@ -367,8 +373,8 @@ class PvPProvider extends ChangeNotifier {
       final userStats = await _authRepository.getUserStats();
       final language = userStats?.preferredLanguage ?? 'en';
 
-      // Générer 10 questions aléatoires
-      currentQuestions = await _pvpRepository.getQuestionsForRound(language, 10);
+      // Générer un large pool de questions
+      currentQuestions = await _pvpRepository.getQuestionsForRound(language, 150);
       print('[PvP] startRound - got ${currentQuestions.length} questions');
 
       // Extraire les IDs des questions
@@ -391,6 +397,8 @@ class PvPProvider extends ChangeNotifier {
       myAnswers = [];
       currentQuestionIndex = 0;
       timeSpent = 0;
+      roundSubmitted = false;
+      consecutiveWrong = 0;
 
       isLoading = false;
       notifyListeners();
@@ -409,9 +417,9 @@ class PvPProvider extends ChangeNotifier {
     bool isCorrect,
     String difficulty,
   ) {
-    // Calculer les points selon la difficulté
     int points = 0;
     if (isCorrect) {
+      // Points selon la difficulté
       switch (difficulty.toLowerCase()) {
         case 'easy':
           points = 1;
@@ -425,6 +433,10 @@ class PvPProvider extends ChangeNotifier {
         default:
           points = 1;
       }
+      consecutiveWrong = 0;
+    } else {
+      consecutiveWrong++;
+      points = -1;
     }
 
     // Ajouter la réponse
@@ -470,6 +482,14 @@ class PvPProvider extends ChangeNotifier {
     if (hasAnsweredAllQuestions) {
       submitRound();
     }
+  }
+
+  /// Termine le round (temps écoulé) — soumet les réponses données sans skip
+  void finishRound() {
+    if (roundSubmitted) return;
+    roundSubmitted = true;
+    notifyListeners();
+    submitRound();
   }
 
   /// Met à jour le temps écoulé
@@ -573,6 +593,8 @@ class PvPProvider extends ChangeNotifier {
     currentQuestions = [];
     currentQuestionIndex = 0;
     myAnswers = [];
+    roundSubmitted = false;
+    consecutiveWrong = 0;
     isSearchingMatch = false;
     isInQueue = false;
     isMyTurn = false;

@@ -20,7 +20,9 @@ class _PvPGamePageState extends State<PvPGamePage>
   Timer? _timer;
   int _secondsRemaining = roundDurationSeconds;
   int _displayedScore = 0;
-  bool _scoreJustChanged = false;
+  bool _scoreJustIncreased = false;
+  bool _scoreJustDecreased = false;
+  bool _answersVisible = false;
   late AnimationController _pulseController;
   bool _timerActive = false;
   bool _hasShownFinalResults = false;
@@ -40,9 +42,23 @@ class _PvPGamePageState extends State<PvPGamePage>
     });
   }
 
+  int _lastQuestionIndex = -1;
+
   void _onProviderChanged() {
     if (!mounted) return;
     _checkAndStartTimer();
+
+    // Detect new question → hide answers then reveal after delay
+    final pvp = context.read<PvPProvider>();
+    if (pvp.currentQuestionIndex != _lastQuestionIndex) {
+      _lastQuestionIndex = pvp.currentQuestionIndex;
+      _answersVisible = false;
+      if (mounted) setState(() {});
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (!mounted) return;
+        setState(() => _answersVisible = true);
+      });
+    }
   }
 
   /// Starts the timer only when it's our turn, questions are loaded,
@@ -54,6 +70,12 @@ class _PvPGamePageState extends State<PvPGamePage>
         !pvpProvider.hasAnsweredAllQuestions &&
         !_timerActive) {
       _displayedScore = 0;
+      _lastQuestionIndex = 0;
+      _answersVisible = false;
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (!mounted) return;
+        setState(() => _answersVisible = true);
+      });
       _startTimer();
     }
   }
@@ -87,14 +109,13 @@ class _PvPGamePageState extends State<PvPGamePage>
   }
 
   void _onTimeUp() {
-    final pvpProvider = context.read<PvPProvider>();
-    while (!pvpProvider.hasAnsweredAllQuestions) {
-      pvpProvider.skipQuestion();
-    }
+    context.read<PvPProvider>().finishRound();
   }
 
   void _selectAnswer(
       QuestionModel question, String answerId, bool isCorrect) {
+    if (!_answersVisible) return; // Answers not yet revealed
+
     context.read<PvPProvider>().selectAnswer(
           question.id,
           answerId,
@@ -103,14 +124,21 @@ class _PvPGamePageState extends State<PvPGamePage>
         );
 
     final newScore = context.read<PvPProvider>().myRoundScore;
-    if (newScore != _displayedScore) {
+    final increased = newScore > _displayedScore;
+    final decreased = newScore < _displayedScore;
+    _displayedScore = newScore;
+
+    if (increased || decreased) {
       setState(() {
-        _displayedScore = newScore;
-        _scoreJustChanged = true;
+        _scoreJustIncreased = increased;
+        _scoreJustDecreased = decreased;
       });
       Future.delayed(const Duration(milliseconds: 600), () {
         if (!mounted) return;
-        setState(() => _scoreJustChanged = false);
+        setState(() {
+          _scoreJustIncreased = false;
+          _scoreJustDecreased = false;
+        });
       });
     }
   }
@@ -462,42 +490,28 @@ class _PvPGamePageState extends State<PvPGamePage>
     final timerColor = _getTimerColor();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Center(
         child: SizedBox(
-          width: 100,
-          height: 100,
+          width: 40,
+          height: 40,
           child: Stack(
             fit: StackFit.expand,
             children: [
               CircularProgressIndicator(
-                value: 1,
-                strokeWidth: 8,
-                backgroundColor: Colors.grey.shade200,
-                valueColor:
-                    AlwaysStoppedAnimation<Color>(Colors.grey.shade200),
-              ),
-              CircularProgressIndicator(
                 value: progress,
-                strokeWidth: 8,
-                backgroundColor: Colors.transparent,
+                strokeWidth: 4,
+                backgroundColor: Colors.grey.shade200,
                 valueColor: AlwaysStoppedAnimation<Color>(timerColor),
               ),
               Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.timer, color: timerColor, size: 20),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${_secondsRemaining}s',
-                      style: TextStyle(
-                        color: timerColor,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  '${_secondsRemaining}s',
+                  style: TextStyle(
+                    color: timerColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -509,48 +523,17 @@ class _PvPGamePageState extends State<PvPGamePage>
 
   Widget _buildProgressIndicator(
       PvPProvider pvpProvider, AppLocalizations l10n) {
-    final currentIndex = pvpProvider.currentQuestionIndex;
-    final totalQuestions = pvpProvider.currentQuestions.length;
-    final progress =
-        totalQuestions > 0 ? (currentIndex / totalQuestions) : 0.0;
+    final answered = pvpProvider.currentQuestionIndex;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Question ${currentIndex + 1}/$totalQuestions',
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                '${(progress * 100).toInt()}%',
-                style: const TextStyle(
-                  color: AppColors.brainPurple,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 6,
-              backgroundColor: Colors.grey.shade200,
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.brainPurple),
-            ),
-          ),
-        ],
+      child: Text(
+        'Question ${answered + 1}',
+        style: const TextStyle(
+          color: AppColors.textSecondary,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
@@ -569,14 +552,18 @@ class _PvPGamePageState extends State<PvPGamePage>
             duration: const Duration(milliseconds: 300),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
-              color: _scoreJustChanged
+              color: _scoreJustIncreased
                   ? AppColors.success.withOpacity(0.15)
-                  : AppColors.white,
+                  : _scoreJustDecreased
+                      ? AppColors.error.withOpacity(0.15)
+                      : AppColors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: _scoreJustChanged
+                color: _scoreJustIncreased
                     ? AppColors.success
-                    : AppColors.brainPurple.withOpacity(0.3),
+                    : _scoreJustDecreased
+                        ? AppColors.error
+                        : AppColors.brainPurple.withOpacity(0.3),
                 width: 2,
               ),
               boxShadow: AppColors.softShadow,
@@ -585,10 +572,12 @@ class _PvPGamePageState extends State<PvPGamePage>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.star,
-                  color: _scoreJustChanged
+                  _scoreJustDecreased ? Icons.trending_down : Icons.star,
+                  color: _scoreJustIncreased
                       ? AppColors.success
-                      : AppColors.brainPurple,
+                      : _scoreJustDecreased
+                          ? AppColors.error
+                          : AppColors.brainPurple,
                   size: 22,
                 ),
                 const SizedBox(width: 8),
@@ -604,9 +593,11 @@ class _PvPGamePageState extends State<PvPGamePage>
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: _scoreJustChanged
+                      color: _scoreJustIncreased
                           ? AppColors.success
-                          : AppColors.brainPurple,
+                          : _scoreJustDecreased
+                              ? AppColors.error
+                              : AppColors.brainPurple,
                     ),
                   ),
                 ),
@@ -675,29 +666,37 @@ class _PvPGamePageState extends State<PvPGamePage>
           ),
           const SizedBox(height: 20),
           ...question.answers.map((answer) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: () => _selectAnswer(
-                      question, answer.id, answer.isCorrect),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                          color: Colors.grey.shade300, width: 2),
-                      boxShadow: AppColors.softShadow,
-                    ),
-                    child: Text(
-                      answer.text,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
+            return AnimatedOpacity(
+              opacity: _answersVisible ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 300),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: MouseRegion(
+                  cursor: _answersVisible
+                      ? SystemMouseCursors.click
+                      : SystemMouseCursors.basic,
+                  child: GestureDetector(
+                    onTap: _answersVisible
+                        ? () => _selectAnswer(
+                            question, answer.id, answer.isCorrect)
+                        : null,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                            color: Colors.grey.shade300, width: 2),
+                        boxShadow: AppColors.softShadow,
+                      ),
+                      child: Text(
+                        answer.text,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
                   ),
@@ -717,6 +716,7 @@ class _PvPGamePageState extends State<PvPGamePage>
     final currentRound = pvpProvider.currentRound;
     final isRoundComplete = currentRound?.isRoundCompleted ?? false;
     final myRoundScore = pvpProvider.myRoundScore;
+    final answeredCount = pvpProvider.myAnswers.length;
 
     final isPlayer1 = pvpProvider.isPlayer1;
     final opponentFinished = isPlayer1
@@ -778,6 +778,14 @@ class _PvPGamePageState extends State<PvPGamePage>
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                         color: AppColors.brainPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '$answeredCount ${l10n.questionsAnswered}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 24),
