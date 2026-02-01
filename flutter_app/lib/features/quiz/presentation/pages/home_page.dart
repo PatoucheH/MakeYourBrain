@@ -34,6 +34,8 @@ class _HomePageState extends State<HomePage> {
   List<String> favoriteThemeIds = [];
   Map<String, Map<String, dynamic>> themeProgress = {};
   bool isLoading = true;
+  int currentStreak = 0;
+  int pvpRating = 1000;
 
   @override
   void initState() {
@@ -59,10 +61,14 @@ class _HomePageState extends State<HomePage> {
         progressMap[p['theme_id']] = p;
       }
 
+      final stats = await _authRepo.getUserStats();
+
       setState(() {
         favoriteThemes = preferred;
         favoriteThemeIds = preferredIds;
         themeProgress = progressMap;
+        currentStreak = stats?.currentStreak ?? 0;
+        pvpRating = stats?.pvpRating ?? 1000;
         isLoading = false;
       });
     } catch (e) {
@@ -187,6 +193,36 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
+          // Streak
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: AppColors.softShadow,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.local_fire_department,
+                  color: Color(0xFFFF6B6B),
+                  size: 18,
+                ),
+                const SizedBox(width: 2),
+                Text(
+                  '$currentStreak',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 6),
+
           // Lives Indicator
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -304,100 +340,138 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Welcome Card with Mascot
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: AppColors.buttonShadow,
-            ),
-            child: Row(
+          // Mascot Welcome Card
+          _buildMascotCard(l10n),
+          const SizedBox(height: 16),
+
+          // PvP Arena Button
+          _buildPvPButton(l10n),
+          const SizedBox(height: 16),
+
+          // Themes Section Header
+          _buildThemesHeader(l10n),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMascotCard(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: AppColors.buttonShadow,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.myFavoriteThemes,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '${favoriteThemes.length}/3',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
+                Text(
+                  l10n.welcome,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                Image.asset(
-                  'assets/branding/mascot/brainly_happy.png',
-                  height: 80,
+                const SizedBox(height: 6),
+                Text(
+                  l10n.moreFeaturesComingSoon.split('\n').first,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.85),
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
-
-          // Action Buttons
-          Row(
-            children: [
-              Expanded(
-                child: _buildActionButton(
-                  icon: favoriteThemes.length >= 3 ? Icons.block : Icons.add_circle_outline,
-                  label: l10n.addTheme,
-                  color: favoriteThemes.length >= 3 ? AppColors.textLight : AppColors.success,
-                  onTap: favoriteThemes.length >= 3
-                      ? () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.maxThemesMessage),
-                              backgroundColor: AppColors.warning,
-                            ),
-                          );
-                        }
-                      : navigateToAddTheme,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildActionButton(
-                  icon: Icons.grid_view_rounded,
-                  label: l10n.allThemes,
-                  color: AppColors.accentBlue,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AllThemesPage(),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
+          Image.asset(
+            'assets/branding/mascot/brainly_happy.png',
+            height: 70,
           ),
-          const SizedBox(height: 12),
-
-          // PvP Arena Button
-          _buildPvPButton(l10n),
         ],
       ),
+    );
+  }
+
+  Widget _buildThemesHeader(AppLocalizations l10n) {
+    return Column(
+      children: [
+        // Title row
+        Row(
+          children: [
+            const Icon(Icons.star, color: AppColors.brainPurple, size: 22),
+            const SizedBox(width: 8),
+            Text(
+              l10n.myFavoriteThemes,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.brainPurple.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${favoriteThemes.length}/3',
+                style: const TextStyle(
+                  color: AppColors.brainPurple,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        // Action Buttons
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionButton(
+                icon: favoriteThemes.length >= 3 ? Icons.block : Icons.add_circle_outline,
+                label: l10n.addTheme,
+                color: favoriteThemes.length >= 3 ? AppColors.textLight : AppColors.success,
+                onTap: favoriteThemes.length >= 3
+                    ? () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.maxThemesMessage),
+                            backgroundColor: AppColors.warning,
+                          ),
+                        );
+                      }
+                    : navigateToAddTheme,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildActionButton(
+                icon: Icons.grid_view_rounded,
+                label: l10n.allThemes,
+                color: AppColors.accentBlue,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AllThemesPage(),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -462,16 +536,16 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.emoji_events, color: Colors.white, size: 16),
-                    SizedBox(width: 4),
+                    const Icon(Icons.emoji_events, color: Color(0xFFFFD700), size: 16),
+                    const SizedBox(width: 4),
                     Text(
-                      'PvP',
-                      style: TextStyle(
+                      '$pvpRating',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 12,
+                        fontSize: 13,
                       ),
                     ),
                   ],
