@@ -675,7 +675,10 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                           children: [
                             Text(
                               widget.theme.icon,
-                              style: const TextStyle(fontSize: 40),
+                              style: const TextStyle(
+                                fontSize: 40,
+                                fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
+                              ),
                             ),
                             const SizedBox(height: 16),
                             Text(

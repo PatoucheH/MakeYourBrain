@@ -12,6 +12,9 @@ import 'core/theme/app_colors.dart';
 import 'l10n/app_localizations.dart';
 import 'features/lives/data/providers/lives_provider.dart';
 import 'features/pvp/data/providers/pvp_provider.dart';
+import 'features/pvp/presentation/widgets/matchmaking_overlay.dart';
+
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -201,6 +204,15 @@ class MyApp extends StatelessWidget {
             Locale('fr'),
           ],
           locale: Locale(languageProvider.currentLanguage),
+          navigatorObservers: [routeObserver],
+          builder: (context, child) {
+            return Stack(
+              children: [
+                child!,
+                const MatchmakingOverlay(),
+              ],
+            );
+          },
           home: const AuthGate(),
         );
       },

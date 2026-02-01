@@ -68,7 +68,7 @@ class PvPProvider extends ChangeNotifier {
     return total;
   }
 
-  bool get hasAnsweredAllQuestions => myAnswers.length >= currentQuestions.length;
+  bool get hasAnsweredAllQuestions => currentQuestions.isNotEmpty && myAnswers.length >= currentQuestions.length;
 
   QuestionModel? get currentQuestion {
     if (currentQuestionIndex >= currentQuestions.length) return null;
@@ -227,16 +227,21 @@ class PvPProvider extends ChangeNotifier {
       errorMessage = null;
       notifyListeners();
 
+      print('[PvP] loadMatch($matchId)');
       currentMatch = await _pvpRepository.getMatch(matchId);
       if (currentMatch == null) {
+        print('[PvP] loadMatch - match not found');
         errorMessage = 'Match not found';
         isLoading = false;
         notifyListeners();
         return;
       }
 
+      print('[PvP] loadMatch - status=${currentMatch!.status}, currentRound=${currentMatch!.currentRound}, player1=${currentMatch!.player1Id}, player2=${currentMatch!.player2Id}');
+
       // Déterminer si c'est notre tour
       _updateIsMyTurn();
+      print('[PvP] loadMatch - isMyTurn=$isMyTurn, currentUserId=$currentUserId');
 
       // Charger le round actuel
       await loadRound(currentMatch!.currentRound);
@@ -247,6 +252,7 @@ class PvPProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     } catch (e) {
+      print('[PvP] ERROR loadMatch: $e');
       errorMessage = 'Error loading match: $e';
       isLoading = false;
       notifyListeners();
@@ -264,14 +270,27 @@ class PvPProvider extends ChangeNotifier {
   void _watchMatch(String matchId) {
     _matchSubscription?.cancel();
     _matchSubscription = _pvpRepository.watchMatch(matchId).listen(
-      (match) {
+      (match) async {
         if (match != null) {
+          final previousMatchRound = currentMatch?.currentRound;
           currentMatch = match;
           _updateIsMyTurn();
 
-          // Recharger le round si nécessaire
-          if (currentRound?.roundNumber != match.currentRound) {
-            loadRound(match.currentRound);
+          final roundChanged = previousMatchRound != null &&
+              previousMatchRound != match.currentRound;
+
+          if (roundChanged && hasAnsweredAllQuestions) {
+            // Le backend a avancé le round pendant qu'on attendait l'adversaire.
+            // Recharger NOTRE round (celui qu'on vient de jouer) pour voir les résultats.
+            // La transition vers le round suivant sera gérée par l'UI après affichage des résultats.
+            currentRound = await _pvpRepository.getRound(matchId, previousMatchRound);
+          } else if (currentRound == null && isMyTurn) {
+            // C'est devenu notre tour et le round n'est pas chargé
+            await loadRound(match.currentRound);
+          } else if (currentRound != null &&
+              currentRound!.roundNumber == match.currentRound) {
+            // Même round - rafraîchir pour voir les données de l'adversaire
+            currentRound = await _pvpRepository.getRound(matchId, match.currentRound);
           }
 
           notifyListeners();
@@ -288,7 +307,9 @@ class PvPProvider extends ChangeNotifier {
     if (currentMatch == null) return;
 
     try {
+      print('[PvP] loadRound($roundNumber) - isMyTurn=$isMyTurn');
       currentRound = await _pvpRepository.getRound(currentMatch!.id, roundNumber);
+      print('[PvP] loadRound - round=${currentRound != null ? 'found (${currentRound!.questionIds.length} questionIds)' : 'null'}');
 
       // Réinitialiser les réponses locales pour ce round
       myAnswers = [];
@@ -298,32 +319,39 @@ class PvPProvider extends ChangeNotifier {
       if (currentRound == null) {
         // Nouveau round, le premier joueur doit le créer
         if (isMyTurn) {
+          print('[PvP] loadRound - creating new round (startRound)');
           await startRound();
+        } else {
+          print('[PvP] loadRound - round null and not my turn, waiting');
         }
       } else {
         // Round existant, charger les questions
+        print('[PvP] loadRound - loading questions from existing round');
         await _loadQuestionsFromRound();
       }
 
+      print('[PvP] loadRound done - ${currentQuestions.length} questions loaded');
       notifyListeners();
     } catch (e) {
+      print('[PvP] ERROR loadRound: $e');
       errorMessage = 'Error loading round: $e';
       notifyListeners();
     }
   }
 
   Future<void> _loadQuestionsFromRound() async {
-    if (currentRound == null || currentRound!.questionIds.isEmpty) return;
+    if (currentRound == null || currentRound!.questionIds.isEmpty) {
+      print('[PvP] _loadQuestionsFromRound - skipped (round=${currentRound == null ? 'null' : 'empty questionIds'})');
+      return;
+    }
 
     final userStats = await _authRepository.getUserStats();
     final language = userStats?.preferredLanguage ?? 'en';
+    print('[PvP] _loadQuestionsFromRound - fetching ${currentRound!.questionIds.length} questions (lang=$language)');
 
-    // Note: Les questions sont stockées par ID, on doit les récupérer
-    // Pour simplifier, on génère de nouvelles questions avec les mêmes IDs
-    // En production, vous pourriez avoir une RPC pour récupérer des questions par ID
-    currentQuestions = await _pvpRepository.getQuestionsForRound(
+    currentQuestions = await _pvpRepository.getQuestionsByIds(
+      currentRound!.questionIds,
       language,
-      currentRound!.questionIds.length,
     );
   }
 
@@ -335,11 +363,13 @@ class PvPProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
+      print('[PvP] startRound - generating questions');
       final userStats = await _authRepository.getUserStats();
       final language = userStats?.preferredLanguage ?? 'en';
 
       // Générer 10 questions aléatoires
       currentQuestions = await _pvpRepository.getQuestionsForRound(language, 10);
+      print('[PvP] startRound - got ${currentQuestions.length} questions');
 
       // Extraire les IDs des questions
       final questionIds = currentQuestions.map((q) => q.id).toList();
@@ -365,6 +395,7 @@ class PvPProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     } catch (e) {
+      print('[PvP] ERROR startRound: $e');
       errorMessage = 'Error starting round: $e';
       isLoading = false;
       notifyListeners();

@@ -144,6 +144,11 @@
       }
     }
   },
+  "opponentsTurn": "Opponent's turn",
+  "yourTurn": "Your turn",
+  "waitingOpponentTurn": "Waiting for opponent to play...",
+  "activeMatches": "Active Matches",
+  "resumeMatch": "Resume",
   "username": "Username",
   "usernameAvailable": "Username available!",
   "usernameNotAvailable": "This username is not available",

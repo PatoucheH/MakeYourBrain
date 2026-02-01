@@ -120,7 +120,10 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                         child: ListTile(
                           leading: Text(
                             theme.icon,
-                            style: const TextStyle(fontSize: 40),
+                            style: const TextStyle(
+                              fontSize: 40,
+                              fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
+                            ),
                           ),
                           title: Text(
                             theme.name,

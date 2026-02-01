@@ -389,6 +389,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get opponentsTurn => 'Opponent\'s turn';
+
+  @override
+  String get yourTurn => 'Your turn';
+
+  @override
+  String get waitingOpponentTurn => 'Waiting for opponent to play...';
+
+  @override
+  String get activeMatches => 'Active Matches';
+
+  @override
+  String get resumeMatch => 'Resume';
+
+  @override
   String get username => 'Username';
 
   @override

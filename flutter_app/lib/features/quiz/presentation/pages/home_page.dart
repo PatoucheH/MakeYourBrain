@@ -132,6 +132,7 @@ class _HomePageState extends State<HomePage> {
                             // Themes Grid/List
                             favoriteThemes.isEmpty
                                 ? SliverFillRemaining(
+                                    hasScrollBody: false,
                                     child: _buildEmptyState(l10n),
                                   )
                                 : SliverPadding(
@@ -643,7 +644,10 @@ class _HomePageState extends State<HomePage> {
                   child: Center(
                     child: Text(
                       theme.icon,
-                      style: const TextStyle(fontSize: 36),
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
+                      ),
                     ),
                   ),
                 ),

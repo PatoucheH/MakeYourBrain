@@ -903,7 +903,10 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Center(
                 child: Text(
                   theme.icon,
-                  style: const TextStyle(fontSize: 24),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
+                  ),
                 ),
               ),
             ),

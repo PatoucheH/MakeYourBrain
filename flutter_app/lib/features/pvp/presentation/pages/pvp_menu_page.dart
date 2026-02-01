@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../main.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../data/models/pvp_match_model.dart';
 import '../../data/providers/pvp_provider.dart';
@@ -15,7 +16,7 @@ class PvPMenuPage extends StatefulWidget {
   State<PvPMenuPage> createState() => _PvPMenuPageState();
 }
 
-class _PvPMenuPageState extends State<PvPMenuPage> {
+class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
   final _authRepo = AuthRepository();
   final _pvpRepo = PvPRepository();
 
@@ -25,38 +26,30 @@ class _PvPMenuPageState extends State<PvPMenuPage> {
   int losses = 0;
   int draws = 0;
   List<PvPMatchModel> matchHistory = [];
+  List<PvPMatchModel> activeMatches = [];
 
   @override
   void initState() {
     super.initState();
     _loadData();
-    // Écouter les changements du provider pour la navigation
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final pvpProvider = context.read<PvPProvider>();
-      pvpProvider.addListener(_onProviderChanged);
-    });
   }
 
-  void _onProviderChanged() {
-    if (!mounted) return;
-    final pvpProvider = context.read<PvPProvider>();
-    // Si le match est prêt à être joué, naviguer
-    if (pvpProvider.isReadyToPlay && pvpProvider.currentMatch != null) {
-      pvpProvider.clearReadyToPlay(); // Éviter les navigations multiples
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const PvPGamePage()),
-      );
-    }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
   }
 
   @override
   void dispose() {
-    // Retirer le listener
-    try {
-      context.read<PvPProvider>().removeListener(_onProviderChanged);
-    } catch (_) {}
+    routeObserver.unsubscribe(this);
     super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when a page pushed on top of this one is popped
+    _loadData();
   }
 
   Future<void> _loadData() async {
@@ -68,10 +61,12 @@ class _PvPMenuPageState extends State<PvPMenuPage> {
       final results = await Future.wait([
         _pvpRepo.getPlayerPvPStats(userId),
         _pvpRepo.getMyMatches(userId, limit: 10),
+        _pvpRepo.getActiveMatches(userId),
       ]);
 
       final stats = results[0] as Map<String, dynamic>;
       final history = results[1] as List<PvPMatchModel>;
+      final active = results[2] as List<PvPMatchModel>;
 
       setState(() {
         rating = stats['rating'] ?? 1000;
@@ -79,6 +74,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> {
         losses = stats['losses'] ?? 0;
         draws = stats['draws'] ?? 0;
         matchHistory = history;
+        activeMatches = active;
         isLoading = false;
       });
     } catch (e) {
@@ -102,47 +98,47 @@ class _PvPMenuPageState extends State<PvPMenuPage> {
       body: Container(
         decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
-          child: Stack(
+          child: Column(
             children: [
-              Column(
-                children: [
-                  // Custom AppBar
-                  _buildAppBar(l10n),
+              // Custom AppBar
+              _buildAppBar(l10n),
 
-                  // Content
-                  Expanded(
-                    child: isLoading
-                        ? const Center(
-                            child: CircularProgressIndicator(color: AppColors.brainPurple),
-                          )
-                        : RefreshIndicator(
-                            onRefresh: _loadData,
-                            color: AppColors.brainPurple,
-                            child: SingleChildScrollView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Stats Card
-                                  _buildStatsCard(l10n),
-                                  const SizedBox(height: 24),
+              // Content
+              Expanded(
+                child: isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(color: AppColors.brainPurple),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _loadData,
+                        color: AppColors.brainPurple,
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Stats Card
+                              _buildStatsCard(l10n),
+                              const SizedBox(height: 24),
 
-                                  // Find Match Button
-                                  _buildFindMatchButton(l10n),
-                                  const SizedBox(height: 32),
+                              // Find Match Button
+                              _buildFindMatchButton(l10n),
+                              const SizedBox(height: 24),
 
-                                  // Match History Section
-                                  _buildMatchHistorySection(l10n),
-                                ],
-                              ),
-                            ),
+                              // Active Matches Section
+                              if (activeMatches.isNotEmpty) ...[
+                                _buildActiveMatchesSection(l10n),
+                                const SizedBox(height: 24),
+                              ],
+
+                              // Match History Section
+                              _buildMatchHistorySection(l10n),
+                            ],
                           ),
-                  ),
-                ],
+                        ),
+                      ),
               ),
-              // Matchmaking Overlay
-              _buildMatchmakingOverlay(l10n),
             ],
           ),
         ),
@@ -150,205 +146,116 @@ class _PvPMenuPageState extends State<PvPMenuPage> {
     );
   }
 
-  Widget _buildMatchmakingOverlay(AppLocalizations l10n) {
-    return Consumer<PvPProvider>(
-      builder: (context, pvpProvider, child) {
-        final isInQueue = pvpProvider.isInQueue;
-        final matchFound = pvpProvider.matchFound;
-        final searchDuration = pvpProvider.searchDuration;
-        final countdown = pvpProvider.matchFoundCountdown;
+  Widget _buildActiveMatchesSection(AppLocalizations l10n) {
+    final userId = _authRepo.getCurrentUserId();
 
-        // Ne pas afficher si pas en recherche et pas de match trouvé
-        if (!isInQueue && !matchFound) {
-          return const SizedBox.shrink();
-        }
-
-        return Positioned(
-          top: 60,
-          right: 16,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: matchFound
-                ? _buildMatchFoundPopup(l10n, countdown, pvpProvider)
-                : _buildSearchingPopup(l10n, searchDuration, pvpProvider),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildSearchingPopup(AppLocalizations l10n, int searchDuration, PvPProvider pvpProvider) {
-    final minutes = searchDuration ~/ 60;
-    final seconds = searchDuration % 60;
-    final timeStr = minutes > 0
-        ? '${minutes}m ${seconds.toString().padLeft(2, '0')}s'
-        : '${seconds}s';
-
-    return Material(
-      elevation: 8,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        width: 280,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: AppColors.brainPurple.withOpacity(0.3),
-            width: 2,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Row(
-              children: [
-                // Icône animée
-                SizedBox(
-                  width: 32,
-                  height: 32,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.brainPurple,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.searchingOpponent,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        timeStr,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.brainPurple,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.play_circle,
+                color: AppColors.warning,
+                size: 20,
+              ),
             ),
-            const SizedBox(height: 12),
-            // Bouton annuler
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () => pvpProvider.leaveMatchmaking(),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  backgroundColor: AppColors.error.withOpacity(0.1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.close, color: AppColors.error, size: 18),
-                    const SizedBox(width: 6),
-                    Text(
-                      l10n.cancel,
-                      style: const TextStyle(
-                        color: AppColors.error,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
+            const SizedBox(width: 12),
+            Text(
+              l10n.activeMatches,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
+        const SizedBox(height: 12),
+        ...activeMatches.map((match) {
+          final isMyTurn = match.isPlayerTurn(userId ?? '');
+          final statusColor = isMyTurn ? AppColors.success : AppColors.warning;
+          final statusText = isMyTurn ? l10n.yourTurn : l10n.opponentsTurn;
+          final statusIcon = isMyTurn ? Icons.play_arrow : Icons.hourglass_top;
 
-  Widget _buildMatchFoundPopup(AppLocalizations l10n, int countdown, PvPProvider pvpProvider) {
-    return Material(
-      elevation: 8,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        width: 280,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF10B981), Color(0xFF059669)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: AppColors.cardShadow,
+              border: Border.all(color: statusColor.withOpacity(0.3), width: 2),
+            ),
+            child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: statusColor.withOpacity(0.15),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.check_circle,
-                    color: Colors.white,
-                    size: 24,
-                  ),
+                  child: Icon(statusIcon, color: statusColor, size: 24),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        l10n.matchFound,
-                        style: const TextStyle(
+                        statusText,
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: statusColor,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
-                        l10n.matchStartingIn(countdown),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white.withOpacity(0.9),
+                        'Round ${match.currentRound}/3 - ${l10n.score}: ${match.getPlayerScore(userId ?? '')} - ${userId == match.player1Id ? match.player2TotalScore : match.player1TotalScore}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
                   ),
                 ),
+                ElevatedButton(
+                  onPressed: () {
+                    final pvpProvider = context.read<PvPProvider>();
+                    pvpProvider.loadMatch(match.id);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const PvPGamePage()),
+                    ).then((_) => _loadData());
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: statusColor,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    l10n.resumeMatch,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 12),
-            // Barre de progression
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: countdown / 5,
-                minHeight: 6,
-                backgroundColor: Colors.white.withOpacity(0.3),
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ),
+          );
+        }),
+      ],
     );
   }
 
@@ -588,6 +495,16 @@ class _PvPMenuPageState extends State<PvPMenuPage> {
 
   Future<void> _startMatchmaking(BuildContext context, PvPProvider pvpProvider) async {
     await pvpProvider.joinMatchmaking();
+    if (mounted && pvpProvider.errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(pvpProvider.errorMessage!),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+    }
   }
 
   Widget _buildMatchHistorySection(AppLocalizations l10n) {

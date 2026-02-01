@@ -19,7 +19,7 @@ class PvPRepository {
       'p_language': language,
     });
 
-    if (response == null) {
+    if (response == null || (response is List && response.isEmpty)) {
       return {
         'matchFound': false,
         'matchId': null,
@@ -27,10 +27,12 @@ class PvPRepository {
       };
     }
 
+    final data = response is List ? response.first : response;
+
     return {
-      'matchFound': response['match_found'] ?? false,
-      'matchId': response['match_id'],
-      'opponentId': response['opponent_id'],
+      'matchFound': data['match_found'] ?? false,
+      'matchId': data['match_id'],
+      'opponentId': data['opponent_id'],
     };
   }
 
@@ -61,6 +63,21 @@ class PvPRepository {
     final response = await _supabase.rpc('pvp_get_random_questions', params: {
       'p_language_code': language,
       'p_limit': limit,
+    });
+
+    return (response as List)
+        .map((json) => QuestionModel.fromJson(json))
+        .toList();
+  }
+
+  /// Récupère des questions par leurs IDs pour un round PvP
+  Future<List<QuestionModel>> getQuestionsByIds(
+    List<String> questionIds,
+    String language,
+  ) async {
+    final response = await _supabase.rpc('pvp_get_questions_by_ids', params: {
+      'p_question_ids': questionIds,
+      'p_language_code': language,
     });
 
     return (response as List)
@@ -240,10 +257,10 @@ class PvPRepository {
       }
 
       return {
-        'rating': response['pvp_rating'] ?? 1000,
-        'wins': response['pvp_wins'] ?? 0,
-        'losses': response['pvp_losses'] ?? 0,
-        'draws': response['pvp_draws'] ?? 0,
+        'rating': _toInt(response['pvp_rating'], 1000),
+        'wins': _toInt(response['pvp_wins'], 0),
+        'losses': _toInt(response['pvp_losses'], 0),
+        'draws': _toInt(response['pvp_draws'], 0),
       };
     } catch (e) {
       // Si les colonnes PvP n'existent pas encore, retourner les valeurs par défaut
@@ -272,5 +289,11 @@ class PvPRepository {
       print('Error getting PvP leaderboard: $e');
       return [];
     }
+  }
+
+  static int _toInt(dynamic value, int fallback) {
+    if (value == null) return fallback;
+    if (value is int) return value;
+    return int.tryParse(value.toString()) ?? fallback;
   }
 }

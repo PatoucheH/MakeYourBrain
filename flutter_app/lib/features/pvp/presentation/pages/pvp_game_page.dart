@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -14,43 +13,67 @@ class PvPGamePage extends StatefulWidget {
   State<PvPGamePage> createState() => _PvPGamePageState();
 }
 
-class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin {
+class _PvPGamePageState extends State<PvPGamePage>
+    with TickerProviderStateMixin {
   static const int roundDurationSeconds = 90;
 
   Timer? _timer;
   int _secondsRemaining = roundDurationSeconds;
-  String? _selectedAnswerId;
-  bool _showingFeedback = false;
-  bool _isCorrectAnswer = false;
+  int _displayedScore = 0;
+  bool _scoreJustChanged = false;
   late AnimationController _pulseController;
+  bool _timerActive = false;
+  bool _hasShownFinalResults = false;
+  int _lastScheduledTransitionRound = 0;
 
   @override
   void initState() {
     super.initState();
-    _startTimer();
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     )..repeat(reverse: true);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<PvPProvider>().addListener(_onProviderChanged);
+      _checkAndStartTimer();
+    });
+  }
+
+  void _onProviderChanged() {
+    if (!mounted) return;
+    _checkAndStartTimer();
+  }
+
+  /// Starts the timer only when it's our turn, questions are loaded,
+  /// and we haven't answered everything yet.
+  void _checkAndStartTimer() {
+    final pvpProvider = context.read<PvPProvider>();
+    if (pvpProvider.isMyTurn &&
+        pvpProvider.currentQuestions.isNotEmpty &&
+        !pvpProvider.hasAnsweredAllQuestions &&
+        !_timerActive) {
+      _displayedScore = 0;
+      _startTimer();
+    }
   }
 
   void _startTimer() {
     _timer?.cancel();
+    _timerActive = true;
     _secondsRemaining = roundDurationSeconds;
+    if (mounted) setState(() {});
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
       }
-
       setState(() {
         _secondsRemaining--;
       });
-
-      // Update time spent in provider
-      final pvpProvider = context.read<PvPProvider>();
-      pvpProvider.updateTimeSpent(roundDurationSeconds - _secondsRemaining);
-
+      context
+          .read<PvPProvider>()
+          .updateTimeSpent(roundDurationSeconds - _secondsRemaining);
       if (_secondsRemaining <= 0) {
         timer.cancel();
         _onTimeUp();
@@ -58,41 +81,38 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
     });
   }
 
+  void _stopTimer() {
+    _timer?.cancel();
+    _timerActive = false;
+  }
+
   void _onTimeUp() {
     final pvpProvider = context.read<PvPProvider>();
-
-    // Skip remaining questions
     while (!pvpProvider.hasAnsweredAllQuestions) {
       pvpProvider.skipQuestion();
     }
   }
 
-  void _selectAnswer(QuestionModel question, String answerId, bool isCorrect) {
-    if (_showingFeedback) return;
+  void _selectAnswer(
+      QuestionModel question, String answerId, bool isCorrect) {
+    context.read<PvPProvider>().selectAnswer(
+          question.id,
+          answerId,
+          isCorrect,
+          question.difficulty,
+        );
 
-    setState(() {
-      _selectedAnswerId = answerId;
-      _showingFeedback = true;
-      _isCorrectAnswer = isCorrect;
-    });
-
-    // Record the answer
-    final pvpProvider = context.read<PvPProvider>();
-    pvpProvider.selectAnswer(
-      question.id,
-      answerId,
-      isCorrect,
-      question.difficulty,
-    );
-
-    // Wait 1 second then move to next question
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      if (!mounted) return;
+    final newScore = context.read<PvPProvider>().myRoundScore;
+    if (newScore != _displayedScore) {
       setState(() {
-        _selectedAnswerId = null;
-        _showingFeedback = false;
+        _displayedScore = newScore;
+        _scoreJustChanged = true;
       });
-    });
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (!mounted) return;
+        setState(() => _scoreJustChanged = false);
+      });
+    }
   }
 
   Color _getTimerColor() {
@@ -127,9 +147,25 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
     }
   }
 
+  String _getPointsForDifficulty(String difficulty) {
+    switch (difficulty.toLowerCase()) {
+      case 'easy':
+        return '+1 pt';
+      case 'medium':
+        return '+2 pts';
+      case 'hard':
+        return '+3 pts';
+      default:
+        return '+1 pt';
+    }
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
+    try {
+      context.read<PvPProvider>().removeListener(_onProviderChanged);
+    } catch (_) {}
     _pulseController.dispose();
     super.dispose();
   }
@@ -141,45 +177,49 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
     return Consumer<PvPProvider>(
       builder: (context, pvpProvider, child) {
         final currentMatch = pvpProvider.currentMatch;
-        final currentRound = pvpProvider.currentRound;
-        final currentQuestion = pvpProvider.currentQuestion;
 
-        // Check if round is complete
-        if (pvpProvider.hasAnsweredAllQuestions && currentRound != null) {
-          return _buildRoundEndScreen(pvpProvider, l10n);
-        }
-
-        // Check if match is complete
-        if (currentMatch?.isCompleted == true) {
+        // Match completed → show final results dialog once
+        if (currentMatch?.isCompleted == true && !_hasShownFinalResults) {
+          _hasShownFinalResults = true;
+          _stopTimer();
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            _showFinalResultsDialog(pvpProvider, l10n);
+            if (mounted) _showFinalResultsDialog(pvpProvider, l10n);
           });
         }
 
+        // All questions answered → round end screen
+        if (pvpProvider.hasAnsweredAllQuestions &&
+            pvpProvider.currentRound != null) {
+          _stopTimer();
+          return _buildRoundEndScreen(pvpProvider, l10n);
+        }
+
+        // Not my turn → waiting for opponent screen
+        if (!pvpProvider.isMyTurn) {
+          _stopTimer();
+          return _buildWaitingForTurnScreen(pvpProvider, l10n);
+        }
+
+        // My turn but questions still loading
+        if (pvpProvider.currentQuestions.isEmpty ||
+            pvpProvider.currentQuestion == null) {
+          return _buildLoadingScreen();
+        }
+
+        // My turn, questions loaded → quiz UI
         return Scaffold(
           body: Container(
-            decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+            decoration:
+                const BoxDecoration(gradient: AppColors.backgroundGradient),
             child: SafeArea(
               child: Column(
                 children: [
-                  // AppBar with round and score
                   _buildAppBar(pvpProvider, l10n),
-
-                  // Timer
                   _buildTimer(),
-
-                  // Progress indicator
                   _buildProgressIndicator(pvpProvider, l10n),
-
-                  // Question card
                   Expanded(
-                    child: currentQuestion != null
-                        ? _buildQuestionCard(currentQuestion, l10n)
-                        : const Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.brainPurple,
-                            ),
-                          ),
+                    child:
+                        _buildQuestionCard(pvpProvider.currentQuestion!, l10n),
                   ),
                 ],
               ),
@@ -189,6 +229,157 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
       },
     );
   }
+
+  // ===================== SCREENS =====================
+
+  Widget _buildWaitingForTurnScreen(
+      PvPProvider pvpProvider, AppLocalizations l10n) {
+    return Scaffold(
+      body: Container(
+        decoration:
+            const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildAppBar(pvpProvider, l10n),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Center(
+                    child: Container(
+                      margin: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(32),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: AppColors.cardShadow,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedBuilder(
+                          animation: _pulseController,
+                          builder: (context, child) {
+                            return Transform.scale(
+                              scale:
+                                  1.0 + (_pulseController.value * 0.1),
+                              child: Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: AppColors.brainPurple
+                                      .withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.hourglass_top,
+                                  color: AppColors.brainPurple,
+                                  size: 56,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          l10n.opponentsTurn,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          l10n.waitingOpponentTurn,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        const SizedBox(
+                          width: 32,
+                          height: 32,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3,
+                            color: AppColors.brainPurple,
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () => Navigator.of(context).pop(),
+                            icon: const Icon(Icons.arrow_back),
+                            label: Text(l10n.backToMenu),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingScreen() {
+    final pvpProvider = context.read<PvPProvider>();
+    final error = pvpProvider.errorMessage;
+
+    return Scaffold(
+      body: Container(
+        decoration:
+            const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (error != null) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.error.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.error.withOpacity(0.3)),
+                      ),
+                      child: Text(
+                        error,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: AppColors.error, fontSize: 14),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  OutlinedButton.icon(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text('Back'),
+                  ),
+                ] else ...[
+                  const CircularProgressIndicator(color: AppColors.brainPurple),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Loading questions...',
+                    style: TextStyle(color: AppColors.textSecondary),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ===================== COMPONENTS =====================
 
   Widget _buildAppBar(PvPProvider pvpProvider, AppLocalizations l10n) {
     final currentMatch = pvpProvider.currentMatch;
@@ -200,9 +391,9 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          // Round indicator
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               color: AppColors.white,
               borderRadius: BorderRadius.circular(20),
@@ -217,12 +408,10 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
               ),
             ),
           ),
-
           const Spacer(),
-
-          // Score
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               gradient: AppColors.primaryGradient,
               borderRadius: BorderRadius.circular(20),
@@ -281,30 +470,24 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Background circle
               CircularProgressIndicator(
                 value: 1,
                 strokeWidth: 8,
                 backgroundColor: Colors.grey.shade200,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.grey.shade200),
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(Colors.grey.shade200),
               ),
-              // Progress circle
               CircularProgressIndicator(
                 value: progress,
                 strokeWidth: 8,
                 backgroundColor: Colors.transparent,
                 valueColor: AlwaysStoppedAnimation<Color>(timerColor),
               ),
-              // Time text
               Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.timer,
-                      color: timerColor,
-                      size: 20,
-                    ),
+                    Icon(Icons.timer, color: timerColor, size: 20),
                     const SizedBox(height: 4),
                     Text(
                       '${_secondsRemaining}s',
@@ -324,10 +507,12 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
     );
   }
 
-  Widget _buildProgressIndicator(PvPProvider pvpProvider, AppLocalizations l10n) {
+  Widget _buildProgressIndicator(
+      PvPProvider pvpProvider, AppLocalizations l10n) {
     final currentIndex = pvpProvider.currentQuestionIndex;
     final totalQuestions = pvpProvider.currentQuestions.length;
-    final progress = totalQuestions > 0 ? (currentIndex / totalQuestions) : 0.0;
+    final progress =
+        totalQuestions > 0 ? (currentIndex / totalQuestions) : 0.0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -361,7 +546,8 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
               value: progress,
               minHeight: 6,
               backgroundColor: Colors.grey.shade200,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.brainPurple),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                  AppColors.brainPurple),
             ),
           ),
         ],
@@ -371,13 +557,63 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
 
   Widget _buildQuestionCard(QuestionModel question, AppLocalizations l10n) {
     final difficultyColor = _getDifficultyColor(question.difficulty);
-    final difficultyLabel = _getDifficultyLabel(question.difficulty, l10n);
+    final difficultyLabel =
+        _getDifficultyLabel(question.difficulty, l10n);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          // Question card
+          // Score display
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            decoration: BoxDecoration(
+              color: _scoreJustChanged
+                  ? AppColors.success.withOpacity(0.15)
+                  : AppColors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: _scoreJustChanged
+                    ? AppColors.success
+                    : AppColors.brainPurple.withOpacity(0.3),
+                width: 2,
+              ),
+              boxShadow: AppColors.softShadow,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.star,
+                  color: _scoreJustChanged
+                      ? AppColors.success
+                      : AppColors.brainPurple,
+                  size: 22,
+                ),
+                const SizedBox(width: 8),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) => ScaleTransition(
+                    scale: animation,
+                    child: child,
+                  ),
+                  child: Text(
+                    '$_displayedScore ${l10n.points}',
+                    key: ValueKey<int>(_displayedScore),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: _scoreJustChanged
+                          ? AppColors.success
+                          : AppColors.brainPurple,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(24),
@@ -389,22 +625,20 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Difficulty badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: difficultyColor.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: difficultyColor.withOpacity(0.3)),
+                    border: Border.all(
+                        color: difficultyColor.withOpacity(0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.signal_cellular_alt,
-                        color: difficultyColor,
-                        size: 16,
-                      ),
+                      Icon(Icons.signal_cellular_alt,
+                          color: difficultyColor, size: 16),
                       const SizedBox(width: 6),
                       Text(
                         difficultyLabel,
@@ -427,8 +661,6 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Question text
                 Text(
                   question.questionText,
                   style: const TextStyle(
@@ -442,72 +674,31 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
             ),
           ),
           const SizedBox(height: 20),
-
-          // Answer buttons
           ...question.answers.map((answer) {
-            final isSelected = _selectedAnswerId == answer.id;
-            final showCorrect = _showingFeedback && answer.isCorrect;
-            final showIncorrect = _showingFeedback && isSelected && !answer.isCorrect;
-
-            Color buttonColor = AppColors.white;
-            Color borderColor = Colors.grey.shade300;
-            Color textColor = AppColors.textPrimary;
-
-            if (showCorrect) {
-              buttonColor = AppColors.success.withOpacity(0.15);
-              borderColor = AppColors.success;
-              textColor = AppColors.success;
-            } else if (showIncorrect) {
-              buttonColor = AppColors.error.withOpacity(0.15);
-              borderColor = AppColors.error;
-              textColor = AppColors.error;
-            }
-
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: MouseRegion(
-                cursor: _showingFeedback
-                    ? SystemMouseCursors.basic
-                    : SystemMouseCursors.click,
+                cursor: SystemMouseCursors.click,
                 child: GestureDetector(
-                  onTap: _showingFeedback
-                      ? null
-                      : () => _selectAnswer(question, answer.id, answer.isCorrect),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
+                  onTap: () => _selectAnswer(
+                      question, answer.id, answer.isCorrect),
+                  child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: buttonColor,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: borderColor, width: 2),
-                      boxShadow: isSelected || showCorrect || showIncorrect
-                          ? [
-                              BoxShadow(
-                                color: borderColor.withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ]
-                          : AppColors.softShadow,
+                      border: Border.all(
+                          color: Colors.grey.shade300, width: 2),
+                      boxShadow: AppColors.softShadow,
                     ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            answer.text,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: textColor,
-                            ),
-                          ),
-                        ),
-                        if (showCorrect)
-                          const Icon(Icons.check_circle, color: AppColors.success, size: 24)
-                        else if (showIncorrect)
-                          const Icon(Icons.cancel, color: AppColors.error, size: 24),
-                      ],
+                    child: Text(
+                      answer.text,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   ),
                 ),
@@ -519,35 +710,25 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
     );
   }
 
-  String _getPointsForDifficulty(String difficulty) {
-    switch (difficulty.toLowerCase()) {
-      case 'easy':
-        return '+1 pt';
-      case 'medium':
-        return '+2 pts';
-      case 'hard':
-        return '+3 pts';
-      default:
-        return '+1 pt';
-    }
-  }
+  // ===================== ROUND END =====================
 
-  Widget _buildRoundEndScreen(PvPProvider pvpProvider, AppLocalizations l10n) {
+  Widget _buildRoundEndScreen(
+      PvPProvider pvpProvider, AppLocalizations l10n) {
     final currentRound = pvpProvider.currentRound;
     final isRoundComplete = currentRound?.isRoundCompleted ?? false;
     final myRoundScore = pvpProvider.myRoundScore;
 
-    // Check if opponent finished
     final isPlayer1 = pvpProvider.isPlayer1;
     final opponentFinished = isPlayer1
         ? currentRound?.isPlayer2Completed ?? false
         : currentRound?.isPlayer1Completed ?? false;
 
     if (!isRoundComplete) {
-      // Waiting for opponent
+      // Waiting for opponent to finish
       return Scaffold(
         body: Container(
-          decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+          decoration: const BoxDecoration(
+              gradient: AppColors.backgroundGradient),
           child: SafeArea(
             child: Center(
               child: Container(
@@ -561,16 +742,17 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Animated waiting icon
                     AnimatedBuilder(
                       animation: _pulseController,
                       builder: (context, child) {
                         return Transform.scale(
-                          scale: 1.0 + (_pulseController.value * 0.1),
+                          scale: 1.0 +
+                              (_pulseController.value * 0.1),
                           child: Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: AppColors.brainPurple.withOpacity(0.1),
+                              color: AppColors.brainPurple
+                                  .withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -583,7 +765,6 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                       },
                     ),
                     const SizedBox(height: 24),
-
                     Text(
                       l10n.score,
                       style: const TextStyle(
@@ -600,7 +781,6 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                       ),
                     ),
                     const SizedBox(height: 24),
-
                     Text(
                       opponentFinished
                           ? l10n.opponentFinished
@@ -614,7 +794,6 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                       ),
                     ),
                     const SizedBox(height: 16),
-
                     if (!opponentFinished)
                       const SizedBox(
                         width: 24,
@@ -624,6 +803,15 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                           color: AppColors.brainPurple,
                         ),
                       ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.arrow_back),
+                        label: Text(l10n.backToMenu),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -633,13 +821,12 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
       );
     }
 
-    // Round complete - show results
     return _buildRoundResultsScreen(pvpProvider, l10n);
   }
 
-  Widget _buildRoundResultsScreen(PvPProvider pvpProvider, AppLocalizations l10n) {
+  Widget _buildRoundResultsScreen(
+      PvPProvider pvpProvider, AppLocalizations l10n) {
     final currentRound = pvpProvider.currentRound;
-    final currentMatch = pvpProvider.currentMatch;
     final isPlayer1 = pvpProvider.isPlayer1;
 
     final myScore = isPlayer1
@@ -652,7 +839,6 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
     final roundNumber = currentRound?.roundNumber ?? 1;
     final isLastRound = roundNumber >= 3;
 
-    // Determine round result
     String resultText;
     Color resultColor;
     IconData resultIcon;
@@ -671,16 +857,17 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
       resultIcon = Icons.handshake;
     }
 
-    // Auto transition after 3 seconds (if not last round)
-    if (!isLastRound) {
+    // Schedule transition to next round (only once per round)
+    if (!isLastRound && _lastScheduledTransitionRound != roundNumber) {
+      _lastScheduledTransitionRound = roundNumber;
       Future.delayed(const Duration(seconds: 3), () {
         if (!mounted) return;
-        // Move to next round
+        _stopTimer();
         pvpProvider.loadRound(roundNumber + 1);
-        _startTimer();
+        // Timer will restart via _onProviderChanged when it becomes our turn
       });
-    } else {
-      // Show final results dialog
+    } else if (isLastRound && !_hasShownFinalResults) {
+      _hasShownFinalResults = true;
       Future.delayed(const Duration(seconds: 2), () {
         if (!mounted) return;
         _showFinalResultsDialog(pvpProvider, l10n);
@@ -689,7 +876,8 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: const BoxDecoration(
+            gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Center(
             child: Container(
@@ -712,22 +900,16 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Result icon
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: resultColor.withOpacity(0.15),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      resultIcon,
-                      color: resultColor,
-                      size: 48,
-                    ),
+                    child: Icon(resultIcon,
+                        color: resultColor, size: 48),
                   ),
                   const SizedBox(height: 16),
-
                   Text(
                     resultText,
                     style: TextStyle(
@@ -737,14 +919,14 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Score comparison
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildScoreColumn(l10n.you, myScore, AppColors.brainPurple),
+                      _buildScoreColumn(
+                          l10n.you, myScore, AppColors.brainPurple),
                       Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 24),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 24),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade100,
@@ -758,12 +940,11 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                           ),
                         ),
                       ),
-                      _buildScoreColumn(l10n.opponent, opponentScore, Colors.grey),
+                      _buildScoreColumn(
+                          l10n.opponent, opponentScore, Colors.grey),
                     ],
                   ),
                   const SizedBox(height: 32),
-
-                  // Next round info
                   if (!isLastRound) ...[
                     Text(
                       l10n.nextRoundStarting,
@@ -804,14 +985,12 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey.shade600,
-          ),
+          style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
         ),
         const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           decoration: BoxDecoration(
             color: color.withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
@@ -830,7 +1009,10 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
     );
   }
 
-  void _showFinalResultsDialog(PvPProvider pvpProvider, AppLocalizations l10n) {
+  // ===================== FINAL RESULTS =====================
+
+  void _showFinalResultsDialog(
+      PvPProvider pvpProvider, AppLocalizations l10n) {
     final currentMatch = pvpProvider.currentMatch;
     if (currentMatch == null) return;
 
@@ -839,7 +1021,6 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
     final opponentScore = pvpProvider.opponentTotalScore;
     final ratingChange = pvpProvider.myRatingChange ?? 0;
 
-    // Determine result
     String resultText;
     Color resultColor;
     IconData resultIcon;
@@ -862,7 +1043,8 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24)),
         child: Container(
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
@@ -872,7 +1054,6 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Trophy/Result Icon with animation
               TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0, end: 1),
                 duration: const Duration(milliseconds: 800),
@@ -900,18 +1081,13 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                           ),
                         ],
                       ),
-                      child: Icon(
-                        resultIcon,
-                        color: resultColor,
-                        size: 64,
-                      ),
+                      child: Icon(resultIcon,
+                          color: resultColor, size: 64),
                     ),
                   );
                 },
               ),
               const SizedBox(height: 24),
-
-              // Result text
               TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0, end: 1),
                 duration: const Duration(milliseconds: 500),
@@ -931,8 +1107,6 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                 },
               ),
               const SizedBox(height: 32),
-
-              // Score
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -962,7 +1136,8 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                       ],
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 24),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 24),
                       child: const Text(
                         '-',
                         style: TextStyle(
@@ -994,10 +1169,9 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Rating change
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24, vertical: 16),
                 decoration: BoxDecoration(
                   color: ratingChange >= 0
                       ? AppColors.success.withOpacity(0.1)
@@ -1013,8 +1187,12 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      ratingChange >= 0 ? Icons.trending_up : Icons.trending_down,
-                      color: ratingChange >= 0 ? AppColors.success : AppColors.error,
+                      ratingChange >= 0
+                          ? Icons.trending_up
+                          : Icons.trending_down,
+                      color: ratingChange >= 0
+                          ? AppColors.success
+                          : AppColors.error,
                       size: 28,
                     ),
                     const SizedBox(width: 12),
@@ -1023,15 +1201,15 @@ class _PvPGamePageState extends State<PvPGamePage> with TickerProviderStateMixin
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: ratingChange >= 0 ? AppColors.success : AppColors.error,
+                        color: ratingChange >= 0
+                            ? AppColors.success
+                            : AppColors.error,
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 32),
-
-              // Back button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

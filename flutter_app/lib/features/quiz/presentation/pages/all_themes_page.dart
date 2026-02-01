@@ -214,7 +214,10 @@ class _AllThemesPageState extends State<AllThemesPage> {
                   child: Center(
                     child: Text(
                       theme.icon,
-                      style: const TextStyle(fontSize: 36),
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
+                      ),
                     ),
                   ),
                 ),

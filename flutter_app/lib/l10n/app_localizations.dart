@@ -830,6 +830,36 @@ abstract class AppLocalizations {
   /// **'Starting in {seconds}s...'**
   String matchStartingIn(int seconds);
 
+  /// No description provided for @opponentsTurn.
+  ///
+  /// In en, this message translates to:
+  /// **'Opponent\'s turn'**
+  String get opponentsTurn;
+
+  /// No description provided for @yourTurn.
+  ///
+  /// In en, this message translates to:
+  /// **'Your turn'**
+  String get yourTurn;
+
+  /// No description provided for @waitingOpponentTurn.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for opponent to play...'**
+  String get waitingOpponentTurn;
+
+  /// No description provided for @activeMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Matches'**
+  String get activeMatches;
+
+  /// No description provided for @resumeMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get resumeMatch;
+
   /// No description provided for @username.
   ///
   /// In en, this message translates to:

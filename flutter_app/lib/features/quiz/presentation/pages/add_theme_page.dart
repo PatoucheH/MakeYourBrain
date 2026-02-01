@@ -198,7 +198,10 @@ class _AddThemePageState extends State<AddThemePage> {
                                 child: Center(
                                   child: Text(
                                     theme.icon,
-                                    style: const TextStyle(fontSize: 32),
+                                    style: const TextStyle(
+                                      fontSize: 32,
+                                      fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
+                                    ),
                                   ),
                                 ),
                               ),

@@ -127,7 +127,10 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                                     child: Center(
                                       child: Text(
                                         widget.theme.icon,
-                                        style: const TextStyle(fontSize: 56),
+                                        style: const TextStyle(
+                                          fontSize: 56,
+                                          fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
+                                        ),
                                       ),
                                     ),
                                   ),
