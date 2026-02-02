@@ -18,6 +18,7 @@ dependencies:
   google_sign_in: ^7.2.0
   sign_in_with_apple: ^7.0.1
   url_launcher: ^6.3.2
+  http: ^1.2.0
 
 dev_dependencies:
   flutter_test:

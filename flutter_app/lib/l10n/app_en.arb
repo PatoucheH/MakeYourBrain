@@ -161,5 +161,21 @@
   "currentUsername": "Current username",
   "newUsername": "New username",
   "usernameUpdated": "Username updated!",
-  "usernameUpdateFailed": "Failed to update username"
+  "usernameUpdateFailed": "Failed to update username",
+  "followers": "Followers",
+  "following": "Following",
+  "follow": "Follow",
+  "unfollow": "Unfollow",
+  "searchUsers": "Search users",
+  "searchByUsernameOrEmail": "Search by username or email",
+  "noFollowersYet": "No followers yet",
+  "noFollowingYet": "Not following anyone yet",
+  "followingLeaderboard": "Following",
+  "userNotFound": "No users found",
+  "profileSummary": "Profile",
+  "followSuccess": "You are now following this user",
+  "unfollowSuccess": "You unfollowed this user",
+  "cannotFollowYourself": "You cannot follow yourself",
+  "social": "Social",
+  "viewAll": "View all"
 }

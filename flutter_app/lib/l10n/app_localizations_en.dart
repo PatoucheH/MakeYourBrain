@@ -441,4 +441,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get usernameUpdateFailed => 'Failed to update username';
+
+  @override
+  String get followers => 'Followers';
+
+  @override
+  String get following => 'Following';
+
+  @override
+  String get follow => 'Follow';
+
+  @override
+  String get unfollow => 'Unfollow';
+
+  @override
+  String get searchUsers => 'Search users';
+
+  @override
+  String get searchByUsernameOrEmail => 'Search by username or email';
+
+  @override
+  String get noFollowersYet => 'No followers yet';
+
+  @override
+  String get noFollowingYet => 'Not following anyone yet';
+
+  @override
+  String get followingLeaderboard => 'Following';
+
+  @override
+  String get userNotFound => 'No users found';
+
+  @override
+  String get profileSummary => 'Profile';
+
+  @override
+  String get followSuccess => 'You are now following this user';
+
+  @override
+  String get unfollowSuccess => 'You unfollowed this user';
+
+  @override
+  String get cannotFollowYourself => 'You cannot follow yourself';
+
+  @override
+  String get social => 'Social';
+
+  @override
+  String get viewAll => 'View all';
 }

@@ -3,6 +3,8 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../data/repositories/leaderboard_repository.dart';
+import '../../../social/data/repositories/follow_repository.dart';
+import '../../../social/presentation/widgets/clickable_username.dart';
 
 class LeaderboardPage extends StatefulWidget {
   final String? themeId;
@@ -22,21 +24,24 @@ class _LeaderboardPageState extends State<LeaderboardPage>
     with SingleTickerProviderStateMixin {
   final _leaderboardRepo = LeaderboardRepository();
   final _authRepo = AuthRepository();
+  final _followRepo = FollowRepository();
 
   late TabController _tabController;
   List<Map<String, dynamic>> globalLeaderboard = [];
   List<Map<String, dynamic>> weeklyLeaderboard = [];
   List<Map<String, dynamic>> themeLeaderboard = [];
+  List<Map<String, dynamic>> followingLeaderboard = [];
   bool isLoading = true;
   int? myGlobalRank;
   int? myWeeklyRank;
   int? myThemeRank;
+  int? myFollowingRank;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: widget.themeId != null ? 3 : 2,
+      length: widget.themeId != null ? 4 : 3,
       vsync: this,
     );
     loadLeaderboards();
@@ -54,16 +59,21 @@ class _LeaderboardPageState extends State<LeaderboardPage>
 
       final global = await _leaderboardRepo.getGlobalLeaderboard();
       final weekly = await _leaderboardRepo.getWeeklyLeaderboard();
+      final followingLb = await _followRepo.getFollowingLeaderboard();
 
       int? globalRank;
       int? weeklyRank;
       int? themeRank;
+      int? followRank;
       List<Map<String, dynamic>> theme = [];
 
       if (userId != null) {
         globalRank = await _leaderboardRepo.getUserGlobalRank(userId);
         final weeklyIndex = weekly.indexWhere((item) => item['user_id'] == userId);
         weeklyRank = weeklyIndex >= 0 ? weeklyIndex + 1 : null;
+
+        final followIndex = followingLb.indexWhere((item) => item['user_id'] == userId);
+        followRank = followIndex >= 0 ? followIndex + 1 : null;
 
         if (widget.themeId != null) {
           theme = await _leaderboardRepo.getThemeLeaderboard(widget.themeId!);
@@ -75,9 +85,11 @@ class _LeaderboardPageState extends State<LeaderboardPage>
         globalLeaderboard = global;
         weeklyLeaderboard = weekly;
         themeLeaderboard = theme;
+        followingLeaderboard = followingLb;
         myGlobalRank = globalRank;
         myWeeklyRank = weeklyRank;
         myThemeRank = themeRank;
+        myFollowingRank = followRank;
         isLoading = false;
       });
     } catch (e) {
@@ -212,8 +224,9 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          displayName,
+                        ClickableUsername(
+                          userId: item['user_id'] ?? '',
+                          displayName: displayName,
                           style: TextStyle(
                             fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.w600,
                             fontSize: 15,
@@ -312,6 +325,8 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                 ),
                 child: TabBar(
                   controller: _tabController,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
                   labelColor: AppColors.brainPurple,
                   unselectedLabelColor: AppColors.textSecondary,
                   indicatorSize: TabBarIndicatorSize.tab,
@@ -325,10 +340,12 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                           Tab(icon: const Icon(Icons.style, size: 20), text: l10n.level),
                           Tab(icon: const Icon(Icons.public, size: 20), text: l10n.global),
                           Tab(icon: const Icon(Icons.calendar_today, size: 20), text: l10n.thisWeek),
+                          Tab(icon: const Icon(Icons.people, size: 20), text: l10n.followingLeaderboard),
                         ]
                       : [
                           Tab(icon: const Icon(Icons.public, size: 20), text: l10n.global),
                           Tab(icon: const Icon(Icons.calendar_today, size: 20), text: l10n.thisWeek),
+                          Tab(icon: const Icon(Icons.people, size: 20), text: l10n.followingLeaderboard),
                         ],
                 ),
               ),
@@ -347,10 +364,12 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                                 _buildLeaderboardList(themeLeaderboard, myThemeRank, 'xp'),
                                 _buildLeaderboardList(globalLeaderboard, myGlobalRank, 'total_xp'),
                                 _buildLeaderboardList(weeklyLeaderboard, myWeeklyRank, 'xp_earned'),
+                                _buildLeaderboardList(followingLeaderboard, myFollowingRank, 'total_xp'),
                               ]
                             : [
                                 _buildLeaderboardList(globalLeaderboard, myGlobalRank, 'total_xp'),
                                 _buildLeaderboardList(weeklyLeaderboard, myWeeklyRank, 'xp_earned'),
+                                _buildLeaderboardList(followingLeaderboard, myFollowingRank, 'total_xp'),
                               ],
                       ),
               ),

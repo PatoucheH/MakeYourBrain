@@ -18,6 +18,10 @@ class QuestionModel {
   });
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
+    final answers = (json['answers'] as List)
+        .map((a) => AnswerModel.fromJson(a))
+        .toList()
+      ..shuffle();
     return QuestionModel(
       id: json['question_id'],
       themeId: json['theme_id'],
@@ -25,9 +29,7 @@ class QuestionModel {
       questionText: json['question_text'],
       explanation: json['explanation'],
       languageCode: json['language_code'],
-      answers: (json['answers'] as List)
-          .map((a) => AnswerModel.fromJson(a))
-          .toList(),
+      answers: answers,
     );
   }
 }

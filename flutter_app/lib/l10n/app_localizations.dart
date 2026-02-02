@@ -937,6 +937,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to update username'**
   String get usernameUpdateFailed;
+
+  /// No description provided for @followers.
+  ///
+  /// In en, this message translates to:
+  /// **'Followers'**
+  String get followers;
+
+  /// No description provided for @following.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get following;
+
+  /// No description provided for @follow.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow'**
+  String get follow;
+
+  /// No description provided for @unfollow.
+  ///
+  /// In en, this message translates to:
+  /// **'Unfollow'**
+  String get unfollow;
+
+  /// No description provided for @searchUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Search users'**
+  String get searchUsers;
+
+  /// No description provided for @searchByUsernameOrEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by username or email'**
+  String get searchByUsernameOrEmail;
+
+  /// No description provided for @noFollowersYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No followers yet'**
+  String get noFollowersYet;
+
+  /// No description provided for @noFollowingYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not following anyone yet'**
+  String get noFollowingYet;
+
+  /// No description provided for @followingLeaderboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get followingLeaderboard;
+
+  /// No description provided for @userNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No users found'**
+  String get userNotFound;
+
+  /// No description provided for @profileSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileSummary;
+
+  /// No description provided for @followSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'You are now following this user'**
+  String get followSuccess;
+
+  /// No description provided for @unfollowSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'You unfollowed this user'**
+  String get unfollowSuccess;
+
+  /// No description provided for @cannotFollowYourself.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot follow yourself'**
+  String get cannotFollowYourself;
+
+  /// No description provided for @social.
+  ///
+  /// In en, this message translates to:
+  /// **'Social'**
+  String get social;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get viewAll;
 }
 
 class _AppLocalizationsDelegate

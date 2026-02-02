@@ -9,6 +9,8 @@ import '../../data/repositories/profile_repository.dart';
 import '../../../quiz/data/repositories/theme_preferences_repository.dart';
 import '../../../quiz/data/repositories/quiz_repository.dart';
 import '../../../quiz/data/models/theme_model.dart';
+import '../../../social/data/repositories/follow_repository.dart';
+import '../../../social/presentation/pages/follow_list_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -22,6 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _profileRepo = ProfileRepository();
   final _prefsRepo = ThemePreferencesRepository();
   final _quizRepo = QuizRepository();
+  final _followRepo = FollowRepository();
 
   UserModel? userStats;
   List<Map<String, dynamic>> progressByTheme = [];
@@ -30,6 +33,8 @@ class _ProfilePageState extends State<ProfilePage> {
   List<String> favoriteThemeIds = [];
   bool isLoading = true;
   String selectedLanguage = 'en';
+  int followersCount = 0;
+  int followingCount = 0;
 
   @override
   void initState() {
@@ -50,6 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final preferred = themes
           .where((theme) => preferredIds.contains(theme.id))
           .toList();
+      final counts = await _followRepo.getFollowCounts(userId);
 
       setState(() {
         userStats = stats;
@@ -58,6 +64,8 @@ class _ProfilePageState extends State<ProfilePage> {
         allThemes = themes;
         favoriteThemes = preferred;
         favoriteThemeIds = preferredIds;
+        followersCount = counts['followers'] ?? 0;
+        followingCount = counts['following'] ?? 0;
         isLoading = false;
       });
     } catch (e) {
@@ -156,6 +164,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         // Profile Header Card
                         _buildProfileHeader(l10n),
+                        const SizedBox(height: 16),
+
+                        // Social Section
+                        _buildSocialSection(l10n),
                         const SizedBox(height: 24),
 
                         // Statistics Section
@@ -343,6 +355,83 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSocialSection(AppLocalizations l10n) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const FollowListPage()),
+        ).then((_) => loadProfile());
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: AppColors.cardShadow,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _buildSocialCounter(
+                '$followingCount',
+                l10n.following,
+                Icons.people,
+              ),
+            ),
+            Container(
+              width: 1,
+              height: 40,
+              color: AppColors.backgroundGray,
+            ),
+            Expanded(
+              child: _buildSocialCounter(
+                '$followersCount',
+                l10n.followers,
+                Icons.person,
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right,
+              color: AppColors.textLight,
+              size: 24,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSocialCounter(String count, String label, IconData icon) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: AppColors.brainPurple, size: 18),
+            const SizedBox(width: 6),
+            Text(
+              count,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: AppColors.brainPurple,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
     );
   }
 

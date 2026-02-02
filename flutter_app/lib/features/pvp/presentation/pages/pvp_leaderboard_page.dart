@@ -3,6 +3,8 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../data/repositories/pvp_repository.dart';
+import '../../../social/data/repositories/follow_repository.dart';
+import '../../../social/presentation/widgets/clickable_username.dart';
 
 class PvPLeaderboardPage extends StatefulWidget {
   const PvPLeaderboardPage({super.key});
@@ -14,10 +16,14 @@ class PvPLeaderboardPage extends StatefulWidget {
 class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
   final _pvpRepo = PvPRepository();
   final _authRepo = AuthRepository();
+  final _followRepo = FollowRepository();
 
   List<Map<String, dynamic>> leaderboard = [];
+  List<Map<String, dynamic>> followingLeaderboard = [];
   bool isLoading = true;
   int? myRank;
+  int? myFollowingRank;
+  bool showFollowingOnly = false;
 
   @override
   void initState() {
@@ -28,17 +34,24 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
   Future<void> _loadLeaderboard() async {
     try {
       final data = await _pvpRepo.getPvPLeaderboard(limit: 100);
+      final followingData = await _followRepo.getPvPFollowingLeaderboard();
       final userId = _authRepo.getCurrentUserId();
 
       int? rank;
+      int? followRank;
       if (userId != null) {
         final index = data.indexWhere((item) => item['user_id'] == userId);
         if (index >= 0) rank = index + 1;
+
+        final followIndex = followingData.indexWhere((item) => item['user_id'] == userId);
+        if (followIndex >= 0) followRank = followIndex + 1;
       }
 
       setState(() {
         leaderboard = data;
+        followingLeaderboard = followingData;
         myRank = rank;
+        myFollowingRank = followRank;
         isLoading = false;
       });
     } catch (e) {
@@ -120,8 +133,40 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                 ),
               ),
 
+              // Following filter
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: Row(
+                  children: [
+                    FilterChip(
+                      label: Text(l10n.global),
+                      selected: !showFollowingOnly,
+                      onSelected: (_) => setState(() => showFollowingOnly = false),
+                      selectedColor: AppColors.brainPurpleLight,
+                      checkmarkColor: AppColors.brainPurple,
+                      labelStyle: TextStyle(
+                        color: !showFollowingOnly ? AppColors.brainPurple : AppColors.textSecondary,
+                        fontWeight: !showFollowingOnly ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilterChip(
+                      label: Text(l10n.followingLeaderboard),
+                      selected: showFollowingOnly,
+                      onSelected: (_) => setState(() => showFollowingOnly = true),
+                      selectedColor: AppColors.brainPurpleLight,
+                      checkmarkColor: AppColors.brainPurple,
+                      labelStyle: TextStyle(
+                        color: showFollowingOnly ? AppColors.brainPurple : AppColors.textSecondary,
+                        fontWeight: showFollowingOnly ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               // My rank card
-              if (!isLoading && myRank != null)
+              if (!isLoading && (showFollowingOnly ? myFollowingRank : myRank) != null)
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   padding: const EdgeInsets.all(16),
@@ -152,7 +197,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                             ),
                           ),
                           Text(
-                            '#$myRank',
+                            '#${showFollowingOnly ? myFollowingRank : myRank}',
                             style: const TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -171,7 +216,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                     ? const Center(
                         child: CircularProgressIndicator(color: AppColors.brainPurple),
                       )
-                    : leaderboard.isEmpty
+                    : (showFollowingOnly ? followingLeaderboard : leaderboard).isEmpty
                         ? Center(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -196,9 +241,9 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                             color: AppColors.brainPurple,
                             child: ListView.builder(
                               padding: const EdgeInsets.all(16),
-                              itemCount: leaderboard.length,
+                              itemCount: (showFollowingOnly ? followingLeaderboard : leaderboard).length,
                               itemBuilder: (context, index) {
-                                final item = leaderboard[index];
+                                final item = (showFollowingOnly ? followingLeaderboard : leaderboard)[index];
                                 final rank = index + 1;
                                 final isMe = item['user_id'] == userId;
                                 final rating = item['pvp_rating'] ?? 1000;
@@ -271,8 +316,9 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                displayName,
+                                              ClickableUsername(
+                                                userId: item['user_id'] ?? '',
+                                                displayName: displayName,
                                                 style: TextStyle(
                                                   fontWeight: isMe
                                                       ? FontWeight.bold

@@ -140,5 +140,21 @@
   "currentUsername": "Pseudo actuel",
   "newUsername": "Nouveau pseudo",
   "usernameUpdated": "Pseudo mis à jour !",
-  "usernameUpdateFailed": "Échec de la mise à jour du pseudo"
+  "usernameUpdateFailed": "Échec de la mise à jour du pseudo",
+  "followers": "Abonnés",
+  "following": "Abonnements",
+  "follow": "S'abonner",
+  "unfollow": "Se désabonner",
+  "searchUsers": "Rechercher des utilisateurs",
+  "searchByUsernameOrEmail": "Rechercher par pseudo ou email",
+  "noFollowersYet": "Aucun abonné pour le moment",
+  "noFollowingYet": "Aucun abonnement pour le moment",
+  "followingLeaderboard": "Abonnements",
+  "userNotFound": "Aucun utilisateur trouvé",
+  "profileSummary": "Profil",
+  "followSuccess": "Vous suivez maintenant cet utilisateur",
+  "unfollowSuccess": "Vous ne suivez plus cet utilisateur",
+  "cannotFollowYourself": "Vous ne pouvez pas vous suivre vous-même",
+  "social": "Social",
+  "viewAll": "Voir tout"
 }

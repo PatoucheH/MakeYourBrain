@@ -443,4 +443,52 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get usernameUpdateFailed => 'Échec de la mise à jour du pseudo';
+
+  @override
+  String get followers => 'Abonnés';
+
+  @override
+  String get following => 'Abonnements';
+
+  @override
+  String get follow => 'S\'abonner';
+
+  @override
+  String get unfollow => 'Se désabonner';
+
+  @override
+  String get searchUsers => 'Rechercher des utilisateurs';
+
+  @override
+  String get searchByUsernameOrEmail => 'Rechercher par pseudo ou email';
+
+  @override
+  String get noFollowersYet => 'Aucun abonné pour le moment';
+
+  @override
+  String get noFollowingYet => 'Aucun abonnement pour le moment';
+
+  @override
+  String get followingLeaderboard => 'Abonnements';
+
+  @override
+  String get userNotFound => 'Aucun utilisateur trouvé';
+
+  @override
+  String get profileSummary => 'Profil';
+
+  @override
+  String get followSuccess => 'Vous suivez maintenant cet utilisateur';
+
+  @override
+  String get unfollowSuccess => 'Vous ne suivez plus cet utilisateur';
+
+  @override
+  String get cannotFollowYourself => 'Vous ne pouvez pas vous suivre vous-même';
+
+  @override
+  String get social => 'Social';
+
+  @override
+  String get viewAll => 'Voir tout';
 }
