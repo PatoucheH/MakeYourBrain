@@ -8,6 +8,7 @@ import '../../data/models/pvp_match_model.dart';
 import '../../data/providers/pvp_provider.dart';
 import '../../data/repositories/pvp_repository.dart';
 import 'pvp_game_page.dart';
+import 'pvp_leaderboard_page.dart';
 
 class PvPMenuPage extends StatefulWidget {
   const PvPMenuPage({super.key});
@@ -120,6 +121,10 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                             children: [
                               // Stats Card
                               _buildStatsCard(l10n),
+                              const SizedBox(height: 16),
+
+                              // Leaderboard Button
+                              _buildLeaderboardButton(l10n),
                               const SizedBox(height: 24),
 
                               // Find Match Button
@@ -431,6 +436,54 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
       height: 40,
       width: 1,
       color: Colors.white.withOpacity(0.3),
+    );
+  }
+
+  Widget _buildLeaderboardButton(AppLocalizations l10n) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const PvPLeaderboardPage()),
+          );
+        },
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFFFD700).withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.leaderboard, color: Colors.white, size: 22),
+              const SizedBox(width: 10),
+              Text(
+                l10n.pvpRating,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const Spacer(),
+              const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

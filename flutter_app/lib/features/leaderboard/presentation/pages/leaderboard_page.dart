@@ -152,11 +152,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
           final score = item[scoreKey] ?? 0;
           final accuracy = item['accuracy']?.toStringAsFixed(1) ?? '0.0';
 
-          String email = item['email'] ?? 'Unknown';
-          if (!isCurrentUser && email.contains('@')) {
-            final parts = email.split('@');
-            email = '${parts[0][0]}***@${parts[1]}';
-          }
+          final displayName = item['display_name'] ?? 'Unknown';
 
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
@@ -217,7 +213,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          email,
+                          displayName,
                           style: TextStyle(
                             fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.w600,
                             fontSize: 15,
