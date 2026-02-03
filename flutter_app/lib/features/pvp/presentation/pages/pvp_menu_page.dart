@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/brain_app_bar.dart';
 import '../../../../main.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../data/models/pvp_match_model.dart';
@@ -102,7 +103,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
           child: Column(
             children: [
               // Custom AppBar
-              _buildAppBar(l10n),
+              const BrainAppBar(),
 
               // Content
               Expanded(
@@ -261,46 +262,6 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
           );
         }),
       ],
-    );
-  }
-
-  Widget _buildAppBar(AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: AppColors.softShadow,
-                ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: AppColors.brainPurple,
-                  size: 22,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              l10n.pvpArena,
-              style: const TextStyle(
-                color: AppColors.brainPurple,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 

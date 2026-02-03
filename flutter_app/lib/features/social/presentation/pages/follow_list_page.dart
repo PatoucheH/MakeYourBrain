@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/brain_app_bar.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../data/repositories/follow_repository.dart';
 import '../widgets/user_profile_bottom_sheet.dart';
@@ -130,7 +131,7 @@ class _FollowListPageState extends State<FollowListPage>
           child: Column(
             children: [
               // AppBar
-              _buildAppBar(l10n),
+              const BrainAppBar(),
 
               // Search bar
               _buildSearchBar(l10n),
@@ -197,55 +198,6 @@ class _FollowListPageState extends State<FollowListPage>
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildAppBar(AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: AppColors.softShadow,
-                ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: AppColors.brainPurple,
-                  size: 22,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.people, color: Colors.white, size: 24),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              l10n.social,
-              style: const TextStyle(
-                color: AppColors.brainPurple,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

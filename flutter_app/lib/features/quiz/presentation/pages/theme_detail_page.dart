@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/brain_app_bar.dart';
 import '../../data/models/theme_model.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
@@ -10,7 +11,6 @@ import 'timed_quiz_page.dart';
 import '../../../leaderboard/presentation/pages/leaderboard_page.dart';
 import '../../../lives/data/providers/lives_provider.dart';
 import '../../../lives/presentation/widgets/no_lives_dialog.dart';
-import '../../../lives/presentation/widgets/lives_indicator.dart';
 
 class ThemeDetailPage extends StatefulWidget {
   final ThemeModel theme;
@@ -83,7 +83,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
           child: Column(
             children: [
               // Custom AppBar
-              _buildAppBar(l10n),
+              const BrainAppBar(),
 
               // Content
               Expanded(
@@ -639,52 +639,4 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
     );
   }
 
-  Widget _buildAppBar(AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: AppColors.softShadow,
-                ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: AppColors.brainPurple,
-                  size: 22,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              widget.theme.name,
-              style: const TextStyle(
-                color: AppColors.brainPurple,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: AppColors.softShadow,
-            ),
-            child: const LivesIndicator(),
-          ),
-        ],
-      ),
-    );
-  }
 }

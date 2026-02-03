@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/brain_app_bar.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../data/repositories/profile_repository.dart';
@@ -151,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: SafeArea(
           child: Column(
             children: [
-              _buildAppBar(l10n),
+              const BrainAppBar(),
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: loadProfile,
@@ -195,44 +196,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildAppBar(AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: AppColors.softShadow,
-                ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: AppColors.brainPurple,
-                  size: 22,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Text(
-            l10n.profile,
-            style: const TextStyle(
-              color: AppColors.brainPurple,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
       ),
     );
   }

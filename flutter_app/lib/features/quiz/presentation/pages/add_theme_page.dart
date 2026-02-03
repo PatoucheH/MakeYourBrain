@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/language_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/brain_app_bar.dart';
 import '../../data/repositories/quiz_repository.dart';
 import '../../data/repositories/theme_preferences_repository.dart';
 import '../../data/models/theme_model.dart';
@@ -85,11 +86,15 @@ class _AddThemePageState extends State<AddThemePage> {
     final hasReachedLimit = widget.currentPreferences.length >= maxFavoriteThemes;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('➕ ${l10n.addTheme}'),
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const BrainAppBar(),
+              Expanded(
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator(color: AppColors.brainPurple))
           : hasReachedLimit
               ? Center(
                   child: Padding(
@@ -252,6 +257,11 @@ class _AddThemePageState extends State<AddThemePage> {
                     );
                   },
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
