@@ -1,6 +1,6 @@
 {
-    "name": "flutter_app",
-    "short_name": "flutter_app",
+    "name": "Make Your Brain",
+    "short_name": "Make Your Brain",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

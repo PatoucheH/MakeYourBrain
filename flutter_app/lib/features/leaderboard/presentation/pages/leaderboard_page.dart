@@ -170,7 +170,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
-              color: isCurrentUser ? AppColors.brainPurpleLight.withOpacity(0.3) : AppColors.white,
+              color: isCurrentUser ? AppColors.brainPurpleLight.withValues(alpha:0.3) : AppColors.white,
               borderRadius: BorderRadius.circular(16),
               border: isCurrentUser
                   ? Border.all(color: AppColors.brainPurple, width: 2)
@@ -190,7 +190,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                           ? LinearGradient(
                               colors: [
                                 _getMedalColor(rank),
-                                _getMedalColor(rank).withOpacity(0.7),
+                                _getMedalColor(rank).withValues(alpha:0.7),
                               ],
                             )
                           : null,
@@ -199,7 +199,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                       boxShadow: rank <= 3
                           ? [
                               BoxShadow(
-                                color: _getMedalColor(rank).withOpacity(0.4),
+                                color: _getMedalColor(rank).withValues(alpha:0.4),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -332,7 +332,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                   unselectedLabelColor: AppColors.textSecondary,
                   indicatorSize: TabBarIndicatorSize.tab,
                   indicator: BoxDecoration(
-                    color: AppColors.brainPurpleLight.withOpacity(0.3),
+                    color: AppColors.brainPurpleLight.withValues(alpha:0.3),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   dividerColor: Colors.transparent,
@@ -410,7 +410,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha:0.2),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: iconColor, size: 24),
@@ -428,7 +428,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha:0.9),
           ),
         ),
       ],

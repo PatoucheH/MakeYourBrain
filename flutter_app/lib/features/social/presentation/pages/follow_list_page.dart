@@ -154,7 +154,7 @@ class _FollowListPageState extends State<FollowListPage>
                     unselectedLabelColor: AppColors.textSecondary,
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicator: BoxDecoration(
-                      color: AppColors.brainPurpleLight.withOpacity(0.3),
+                      color: AppColors.brainPurpleLight.withValues(alpha:0.3),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     dividerColor: Colors.transparent,
@@ -253,7 +253,7 @@ class _FollowListPageState extends State<FollowListPage>
             Image.asset(
               'assets/branding/mascot/brainly_thinking.png',
               height: 80,
-              errorBuilder: (_, __, ___) => const Icon(
+              errorBuilder: (_, _, _) => const Icon(
                 Icons.search_off,
                 size: 64,
                 color: AppColors.textLight,
@@ -316,7 +316,7 @@ class _FollowListPageState extends State<FollowListPage>
               Image.asset(
                 'assets/branding/mascot/brainly_thinking.png',
                 height: 80,
-                errorBuilder: (_, __, ___) => const Icon(
+                errorBuilder: (_, _, _) => const Icon(
                   Icons.people_outline,
                   size: 64,
                   color: AppColors.textLight,
@@ -381,7 +381,7 @@ class _FollowListPageState extends State<FollowListPage>
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: isMe ? AppColors.brainPurpleLight.withOpacity(0.3) : AppColors.white,
+        color: isMe ? AppColors.brainPurpleLight.withValues(alpha:0.3) : AppColors.white,
         borderRadius: BorderRadius.circular(16),
         border: isMe ? Border.all(color: AppColors.brainPurple, width: 2) : null,
         boxShadow: AppColors.cardShadow,

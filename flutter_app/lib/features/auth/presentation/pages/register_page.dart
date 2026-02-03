@@ -384,7 +384,7 @@ class _RegisterPageState extends State<RegisterPage> {
             prefixIcon: const Icon(Icons.person_outline, color: AppColors.brainPurple),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: AppColors.brainPurpleLight.withOpacity(0.3),
+            fillColor: AppColors.brainPurpleLight.withValues(alpha:0.3),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide.none,
@@ -448,7 +448,7 @@ class _RegisterPageState extends State<RegisterPage> {
         prefixIcon: Icon(icon, color: AppColors.brainPurple),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: AppColors.brainPurpleLight.withOpacity(0.3),
+        fillColor: AppColors.brainPurpleLight.withValues(alpha:0.3),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,

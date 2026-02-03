@@ -135,7 +135,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha:0.2),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.person, color: Colors.white, size: 24),
@@ -147,7 +147,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                             l10n.yourGlobalRank,
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha:0.9),
                             ),
                           ),
                           Text(
@@ -212,7 +212,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                                   margin: const EdgeInsets.only(bottom: 10),
                                   decoration: BoxDecoration(
                                     color: isMe
-                                        ? AppColors.brainPurpleLight.withOpacity(0.3)
+                                        ? AppColors.brainPurpleLight.withValues(alpha:0.3)
                                         : AppColors.white,
                                     borderRadius: BorderRadius.circular(16),
                                     border: isMe
@@ -233,7 +233,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                                                 ? LinearGradient(
                                                     colors: [
                                                       _getMedalColor(rank),
-                                                      _getMedalColor(rank).withOpacity(0.7),
+                                                      _getMedalColor(rank).withValues(alpha:0.7),
                                                     ],
                                                   )
                                                 : null,
@@ -242,7 +242,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                                             boxShadow: rank <= 3
                                                 ? [
                                                     BoxShadow(
-                                                      color: _getMedalColor(rank).withOpacity(0.4),
+                                                      color: _getMedalColor(rank).withValues(alpha:0.4),
                                                       blurRadius: 8,
                                                       offset: const Offset(0, 2),
                                                     ),

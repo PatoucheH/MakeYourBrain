@@ -80,7 +80,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
         isLoading = false;
       });
     } catch (e) {
-      print('Error loading PvP data: $e');
+      debugPrint('Error loading PvP data: $e');
       setState(() => isLoading = false);
     }
   }
@@ -163,7 +163,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.warning.withOpacity(0.3),
+                color: AppColors.warning.withValues(alpha:0.3),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
@@ -197,14 +197,14 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
               color: AppColors.white,
               borderRadius: BorderRadius.circular(16),
               boxShadow: AppColors.cardShadow,
-              border: Border.all(color: statusColor.withOpacity(0.3), width: 2),
+              border: Border.all(color: statusColor.withValues(alpha:0.3), width: 2),
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.15),
+                    color: statusColor.withValues(alpha:0.15),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(statusIcon, color: statusColor, size: 24),
@@ -278,7 +278,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6366F1).withOpacity(0.4),
+            color: const Color(0xFF6366F1).withValues(alpha:0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -290,7 +290,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha:0.2),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -303,7 +303,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
           Text(
             l10n.rating,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha:0.9),
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
@@ -323,7 +323,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha:0.15),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -383,7 +383,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha:0.9),
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -396,7 +396,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
     return Container(
       height: 40,
       width: 1,
-      color: Colors.white.withOpacity(0.3),
+      color: Colors.white.withValues(alpha:0.3),
     );
   }
 
@@ -420,7 +420,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFFFD700).withOpacity(0.3),
+                color: const Color(0xFFFFD700).withValues(alpha:0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -509,7 +509,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
 
   Future<void> _startMatchmaking(BuildContext context, PvPProvider pvpProvider) async {
     await pvpProvider.joinMatchmaking();
-    if (mounted && pvpProvider.errorMessage != null) {
+    if (context.mounted && pvpProvider.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(pvpProvider.errorMessage!),
@@ -530,7 +530,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.brainPurpleLight.withOpacity(0.3),
+                color: AppColors.brainPurpleLight.withValues(alpha:0.3),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
@@ -602,8 +602,6 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
     final userId = _authRepo.getCurrentUserId();
     final isWinner = match.winnerId == userId;
     final isDraw = match.winnerId == null && match.isCompleted;
-    final isLoss = !isWinner && !isDraw && match.isCompleted;
-
     Color statusColor;
     String statusText;
     IconData statusIcon;
@@ -646,7 +644,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
         borderRadius: BorderRadius.circular(16),
         boxShadow: AppColors.cardShadow,
         border: Border.all(
-          color: statusColor.withOpacity(0.3),
+          color: statusColor.withValues(alpha:0.3),
           width: 2,
         ),
       ),
@@ -656,7 +654,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.15),
+              color: statusColor.withValues(alpha:0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(statusIcon, color: statusColor, size: 24),
@@ -702,8 +700,8 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: ratingChange >= 0
-                    ? AppColors.success.withOpacity(0.15)
-                    : AppColors.error.withOpacity(0.15),
+                    ? AppColors.success.withValues(alpha:0.15)
+                    : AppColors.error.withValues(alpha:0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(

@@ -187,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
                                   gradient: LinearGradient(
                                     colors: [
                                       Colors.transparent,
-                                      AppColors.brainPurple.withOpacity(0.3),
+                                      AppColors.brainPurple.withValues(alpha:0.3),
                                     ],
                                   ),
                                 ),
@@ -209,7 +209,7 @@ class _LoginPageState extends State<LoginPage> {
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      AppColors.brainPurple.withOpacity(0.3),
+                                      AppColors.brainPurple.withValues(alpha:0.3),
                                       Colors.transparent,
                                     ],
                                   ),
@@ -345,7 +345,7 @@ class _LoginPageState extends State<LoginPage> {
         prefixIcon: Icon(icon, color: AppColors.brainPurple),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: AppColors.brainPurpleLight.withOpacity(0.3),
+        fillColor: AppColors.brainPurpleLight.withValues(alpha:0.3),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -374,7 +374,7 @@ class _LoginPageState extends State<LoginPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha:0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

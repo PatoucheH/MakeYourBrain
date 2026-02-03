@@ -197,7 +197,7 @@ class _AddThemePageState extends State<AddThemePage> {
                                 width: 60,
                                 height: 60,
                                 decoration: BoxDecoration(
-                                  color: AppColors.brainLightPurple.withOpacity(0.2),
+                                  color: AppColors.brainLightPurple.withValues(alpha:0.2),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Center(

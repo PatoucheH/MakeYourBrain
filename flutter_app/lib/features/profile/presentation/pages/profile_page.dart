@@ -108,14 +108,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
       await _prefsRepo.savePreferences(userId, updatedPreferences);
 
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('$themeName removed from favorites')),
         );
         loadProfile();
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error removing theme : $e')),
         );
@@ -215,7 +215,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.white.withOpacity(0.2),
+                  color: AppColors.white.withValues(alpha:0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Image.asset(
@@ -251,7 +251,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: AppColors.white.withOpacity(0.2),
+                                color: AppColors.white.withValues(alpha:0.2),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(
@@ -286,7 +286,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.white.withOpacity(0.2),
+                        color: AppColors.white.withValues(alpha:0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -506,7 +506,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ? const Icon(Icons.cancel, color: AppColors.error)
                                 : null,
                     filled: true,
-                    fillColor: AppColors.brainPurpleLight.withOpacity(0.3),
+                    fillColor: AppColors.brainPurpleLight.withValues(alpha:0.3),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -556,7 +556,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         Navigator.pop(context);
 
                         final success = await _authRepo.updateUsername(newUsername);
-                        if (mounted) {
+                        if (context.mounted) {
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -710,7 +710,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha:0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, size: 28, color: color),
@@ -799,12 +799,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          themeColor.withOpacity(0.2),
-                          themeColor.withOpacity(0.1),
+                          themeColor.withValues(alpha:0.2),
+                          themeColor.withValues(alpha:0.1),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: themeColor.withOpacity(0.3)),
+                      border: Border.all(color: themeColor.withValues(alpha:0.3)),
                     ),
                     child: Center(
                       child: Text(
@@ -844,7 +844,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: themeColor.withOpacity(0.4),
+                          color: themeColor.withValues(alpha:0.4),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -889,7 +889,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Container(
                     height: 8,
                     decoration: BoxDecoration(
-                      color: themeColor.withOpacity(0.15),
+                      color: themeColor.withValues(alpha:0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -899,7 +899,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       height: 8,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [themeColor, themeColor.withOpacity(0.7)],
+                          colors: [themeColor, themeColor.withValues(alpha:0.7)],
                         ),
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -949,7 +949,7 @@ class _ProfilePageState extends State<ProfilePage> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: AppColors.brainPurpleLight.withOpacity(0.3),
+                color: AppColors.brainPurpleLight.withValues(alpha:0.3),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(

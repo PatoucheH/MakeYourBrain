@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import '../../../../shared/services/supabase_service.dart';
 import '../../../quiz/data/models/question_model.dart';
 import '../models/pvp_match_model.dart';
@@ -170,7 +171,7 @@ class PvPRepository {
           .map((json) => PvPMatchModel.fromJson(json))
           .toList();
     } catch (e) {
-      print('Error getting matches: $e');
+      debugPrint('Error getting matches: $e');
       return [];
     }
   }
@@ -189,7 +190,7 @@ class PvPRepository {
           .map((json) => PvPMatchModel.fromJson(json))
           .toList();
     } catch (e) {
-      print('Error getting active matches: $e');
+      debugPrint('Error getting active matches: $e');
       return [];
     }
   }
@@ -264,7 +265,7 @@ class PvPRepository {
       };
     } catch (e) {
       // Si les colonnes PvP n'existent pas encore, retourner les valeurs par défaut
-      print('Error getting PvP stats: $e');
+      debugPrint('Error getting PvP stats: $e');
       return {
         'rating': 1000,
         'wins': 0,
@@ -286,7 +287,7 @@ class PvPRepository {
 
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      print('Error getting PvP leaderboard: $e');
+      debugPrint('Error getting PvP leaderboard: $e');
       return [];
     }
   }

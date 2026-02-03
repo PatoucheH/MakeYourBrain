@@ -48,8 +48,7 @@ class MyApp extends StatelessWidget {
               seedColor: AppColors.brainPurple,
               primary: AppColors.brainPurple,
               secondary: AppColors.brainLightPurple,
-              surface: AppColors.white,
-              background: AppColors.backgroundLight,
+              surface: AppColors.backgroundLight,
             ),
             useMaterial3: true,
             scaffoldBackgroundColor: AppColors.backgroundLight,
@@ -77,7 +76,7 @@ class MyApp extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              shadowColor: AppColors.brainPurple.withOpacity(0.1),
+              shadowColor: AppColors.brainPurple.withValues(alpha:0.1),
             ),
 
             // Elevated Button Theme
@@ -126,11 +125,11 @@ class MyApp extends StatelessWidget {
               contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: AppColors.brainPurple.withOpacity(0.2)),
+                borderSide: BorderSide(color: AppColors.brainPurple.withValues(alpha:0.2)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: AppColors.brainPurple.withOpacity(0.2)),
+                borderSide: BorderSide(color: AppColors.brainPurple.withValues(alpha:0.2)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -141,7 +140,7 @@ class MyApp extends StatelessWidget {
                 borderSide: const BorderSide(color: AppColors.error),
               ),
               labelStyle: const TextStyle(color: AppColors.textSecondary),
-              hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.7)),
+              hintStyle: TextStyle(color: AppColors.textSecondary.withValues(alpha:0.7)),
             ),
 
             // Chip Theme
@@ -189,7 +188,7 @@ class MyApp extends StatelessWidget {
 
             // Divider Theme
             dividerTheme: DividerThemeData(
-              color: AppColors.brainPurple.withOpacity(0.1),
+              color: AppColors.brainPurple.withValues(alpha:0.1),
               thickness: 1,
             ),
           ),

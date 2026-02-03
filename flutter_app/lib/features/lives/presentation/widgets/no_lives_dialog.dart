@@ -48,13 +48,13 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
 
     await Future.delayed(const Duration(seconds: 3));
 
-    if (mounted) {
+    if (context.mounted) {
       Navigator.of(context).pop();
     }
 
     await livesProvider.addLivesFromAd();
 
-    if (mounted) {
+    if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
@@ -139,7 +139,7 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
                     decoration: BoxDecoration(
                       color: AppColors.infoLight,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.info.withOpacity(0.3)),
+                      border: Border.all(color: AppColors.info.withValues(alpha:0.3)),
                     ),
                     child: Column(
                       children: [
@@ -179,7 +179,7 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
                       Expanded(
                         child: Container(
                           height: 1,
-                          color: AppColors.brainPurple.withOpacity(0.2),
+                          color: AppColors.brainPurple.withValues(alpha:0.2),
                         ),
                       ),
                       Padding(
@@ -196,7 +196,7 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
                       Expanded(
                         child: Container(
                           height: 1,
-                          color: AppColors.brainPurple.withOpacity(0.2),
+                          color: AppColors.brainPurple.withValues(alpha:0.2),
                         ),
                       ),
                     ],
@@ -244,7 +244,7 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.success.withOpacity(0.4),
+                                color: AppColors.success.withValues(alpha:0.4),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),

@@ -17,7 +17,7 @@ class LivesRepository {
       };
     }
 
-    return (response as List).first as Map<String, dynamic>;
+    return response.first;
   }
 
   // Utiliser une vie (retourne false si plus de vies)

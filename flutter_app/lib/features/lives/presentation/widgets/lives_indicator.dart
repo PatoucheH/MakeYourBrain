@@ -58,7 +58,7 @@ class LivesIndicator extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 decoration: BoxDecoration(
-                  color: AppColors.brainPurpleLight.withOpacity(0.3),
+                  color: AppColors.brainPurpleLight.withValues(alpha:0.3),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(

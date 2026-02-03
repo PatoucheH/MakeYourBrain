@@ -14,8 +14,15 @@ class ProfileRepository {
 
   // Mettre à jour le streak
   Future<void> updateStreak(String userId) async {
-    await _supabase.rpc('update_user_streak', 
-      params: {'p_user_id': userId}
+    final offsetHours = DateTime.now().timeZoneOffset.inHours;
+    // Convert offset to POSIX timezone format (e.g., +02, -05)
+    final sign = offsetHours >= 0 ? '+' : '';
+    final utcOffset = 'UTC$sign$offsetHours';
+    await _supabase.rpc('update_user_streak',
+      params: {
+        'p_user_id': userId,
+        'p_timezone': utcOffset,
+      }
     );
   }
 }

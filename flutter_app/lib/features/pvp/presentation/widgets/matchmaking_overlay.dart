@@ -88,7 +88,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppColors.brainPurple.withOpacity(0.3),
+            color: AppColors.brainPurple.withValues(alpha:0.3),
             width: 2,
           ),
         ),
@@ -141,7 +141,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                 onPressed: () => pvpProvider.leaveMatchmaking(),
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  backgroundColor: AppColors.error.withOpacity(0.1),
+                  backgroundColor: AppColors.error.withValues(alpha:0.1),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -192,7 +192,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha:0.2),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -219,7 +219,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                         l10n.matchStartingIn(countdown),
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha:0.9),
                         ),
                       ),
                     ],
@@ -233,7 +233,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
               child: LinearProgressIndicator(
                 value: countdown / 5,
                 minHeight: 6,
-                backgroundColor: Colors.white.withOpacity(0.3),
+                backgroundColor: Colors.white.withValues(alpha:0.3),
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               ),
             ),

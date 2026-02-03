@@ -153,15 +153,15 @@ class _AllThemesPageState extends State<AllThemesPage> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        themeColor.withOpacity(0.2),
-                        themeColor.withOpacity(0.1),
+                        themeColor.withValues(alpha:0.2),
+                        themeColor.withValues(alpha:0.1),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: themeColor.withOpacity(0.3),
+                      color: themeColor.withValues(alpha:0.3),
                       width: 2,
                     ),
                   ),
@@ -204,7 +204,7 @@ class _AllThemesPageState extends State<AllThemesPage> {
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
-                                  color: themeColor.withOpacity(0.4),
+                                  color: themeColor.withValues(alpha:0.4),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -229,7 +229,7 @@ class _AllThemesPageState extends State<AllThemesPage> {
                           Container(
                             height: 8,
                             decoration: BoxDecoration(
-                              color: themeColor.withOpacity(0.15),
+                              color: themeColor.withValues(alpha:0.15),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -239,7 +239,7 @@ class _AllThemesPageState extends State<AllThemesPage> {
                               height: 8,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
-                                  colors: [themeColor, themeColor.withOpacity(0.7)],
+                                  colors: [themeColor, themeColor.withValues(alpha:0.7)],
                                 ),
                                 borderRadius: BorderRadius.circular(4),
                               ),

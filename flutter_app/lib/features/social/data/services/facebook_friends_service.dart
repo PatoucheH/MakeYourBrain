@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../../../../shared/services/supabase_service.dart';
 import '../repositories/follow_repository.dart';
@@ -44,7 +45,7 @@ class FacebookFriendsService {
       );
 
       if (response.statusCode != 200) {
-        print('Facebook friends API error: ${response.statusCode} - ${response.body}');
+        debugPrint('Facebook friends API error: ${response.statusCode} - ${response.body}');
         return -1;
       }
 
@@ -73,7 +74,7 @@ class FacebookFriendsService {
 
       return newFollows;
     } catch (e) {
-      print('Error syncing Facebook friends: $e');
+      debugPrint('Error syncing Facebook friends: $e');
       return -1;
     }
   }
@@ -106,7 +107,7 @@ class FacebookFriendsService {
       return list.map((item) => item['user_id'] as String).toList();
     } catch (e) {
       // RPC function may not exist yet - this is expected in development
-      print('Facebook ID lookup not available: $e');
+      debugPrint('Facebook ID lookup not available: $e');
       return [];
     }
   }

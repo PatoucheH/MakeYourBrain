@@ -56,7 +56,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
         }
       }
     } catch (e) {
-      print('Error loading theme progress: $e');
+      debugPrint('Error loading theme progress: $e');
     } finally {
       setState(() => isLoading = false);
     }
@@ -101,14 +101,14 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                               padding: const EdgeInsets.all(24),
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
-                                  colors: [themeColor, themeColor.withOpacity(0.7)],
+                                  colors: [themeColor, themeColor.withValues(alpha:0.7)],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                 ),
                                 borderRadius: BorderRadius.circular(24),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: themeColor.withOpacity(0.4),
+                                    color: themeColor.withValues(alpha:0.4),
                                     blurRadius: 20,
                                     offset: const Offset(0, 8),
                                   ),
@@ -121,7 +121,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                                     width: 100,
                                     height: 100,
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
+                                      color: Colors.white.withValues(alpha:0.2),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Center(
@@ -147,7 +147,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                                       borderRadius: BorderRadius.circular(20),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
+                                          color: Colors.black.withValues(alpha:0.1),
                                           blurRadius: 8,
                                           offset: const Offset(0, 4),
                                         ),
@@ -183,7 +183,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color: Colors.white.withValues(alpha:0.9),
                                             ),
                                           ),
                                         ],
@@ -194,7 +194,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                                           Container(
                                             height: 12,
                                             decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.3),
+                                              color: Colors.white.withValues(alpha:0.3),
                                               borderRadius: BorderRadius.circular(6),
                                             ),
                                           ),
@@ -286,7 +286,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFF9800).withOpacity(0.4),
+                                    color: const Color(0xFFFF9800).withValues(alpha:0.4),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),
                                   ),
@@ -329,7 +329,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: AppColors.cardShadow,
                                 border: Border.all(
-                                  color: const Color(0xFFFFD700).withOpacity(0.3),
+                                  color: const Color(0xFFFFD700).withValues(alpha:0.3),
                                   width: 2,
                                 ),
                               ),
@@ -398,7 +398,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
                                       Container(
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: AppColors.brainPurpleLight.withOpacity(0.3),
+                                          color: AppColors.brainPurpleLight.withValues(alpha:0.3),
                                           borderRadius: BorderRadius.circular(10),
                                         ),
                                         child: const Icon(
@@ -581,11 +581,11 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () async {
+          final stateNavigator = Navigator.of(this.context);
           await livesProvider.useLife();
-          if (!mounted) return;
+          if (!context.mounted) return;
           Navigator.pop(context);
-          Navigator.push(
-            this.context,
+          stateNavigator.push(
             MaterialPageRoute(
               builder: (context) => TimedQuizPage(
                 theme: widget.theme,
@@ -599,9 +599,9 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withOpacity(0.3), width: 2),
+            border: Border.all(color: color.withValues(alpha:0.3), width: 2),
           ),
           child: Row(
             children: [

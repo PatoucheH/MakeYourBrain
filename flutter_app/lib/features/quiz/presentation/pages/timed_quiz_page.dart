@@ -174,7 +174,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
           languageUsed: context.read<LanguageProvider>().currentLanguage,
         );
       } catch (e) {
-        print('Error saving answer: $e');
+        debugPrint('Error saving answer: $e');
       }
     }
 
@@ -209,7 +209,6 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
   void showResultDialog() async {
     final l10n = AppLocalizations.of(context)!;
     final timeBonus = _getTimeBonus();
-    final xpEarned = (score * 10) + timeBonus;
     final percentage = questions.isEmpty ? 0.0 : (score / questions.length) * 100;
 
     final authRepo = AuthRepository();
@@ -222,7 +221,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
           bonusXp: timeBonus,
         );
       } catch (e) {
-        print('Error adding XP: $e');
+        debugPrint('Error adding XP: $e');
       }
     }
 
@@ -277,14 +276,14 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                     gradient: LinearGradient(
                       colors: [
                         percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error,
-                        percentage >= 70 ? AppColors.success.withOpacity(0.7) : percentage >= 40 ? AppColors.warning.withOpacity(0.7) : AppColors.error.withOpacity(0.7),
+                        percentage >= 70 ? AppColors.success.withValues(alpha:0.7) : percentage >= 40 ? AppColors.warning.withValues(alpha:0.7) : AppColors.error.withValues(alpha:0.7),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: (percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error).withOpacity(0.4),
+                        color: (percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error).withValues(alpha:0.4),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -465,15 +464,15 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isVeryLow
-              ? [AppColors.error, AppColors.error.withOpacity(0.8)]
+              ? [AppColors.error, AppColors.error.withValues(alpha:0.8)]
               : isLow
-                  ? [AppColors.warning, AppColors.warning.withOpacity(0.8)]
+                  ? [AppColors.warning, AppColors.warning.withValues(alpha:0.8)]
                   : [const Color(0xFFFF9800), const Color(0xFFFF5722)],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: (isVeryLow ? AppColors.error : isLow ? AppColors.warning : const Color(0xFFFF9800)).withOpacity(0.4),
+            color: (isVeryLow ? AppColors.error : isLow ? AppColors.warning : const Color(0xFFFF9800)).withValues(alpha:0.4),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -608,7 +607,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                         Container(
                           height: 8,
                           decoration: BoxDecoration(
-                            color: AppColors.brainPurple.withOpacity(0.15),
+                            color: AppColors.brainPurple.withValues(alpha:0.15),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -644,10 +643,10 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
-                              color: _getDifficultyColor(currentQuestion.difficulty).withOpacity(0.15),
+                              color: _getDifficultyColor(currentQuestion.difficulty).withValues(alpha:0.15),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: _getDifficultyColor(currentQuestion.difficulty).withOpacity(0.3),
+                                color: _getDifficultyColor(currentQuestion.difficulty).withValues(alpha:0.3),
                               ),
                             ),
                             child: Text(
@@ -703,7 +702,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                         final showWrong = hasAnswered && isSelected && !answer.isCorrect;
 
                         Color bgColor = AppColors.white;
-                        Color borderColor = AppColors.brainPurple.withOpacity(0.2);
+                        Color borderColor = AppColors.brainPurple.withValues(alpha:0.2);
                         Color textColor = AppColors.textPrimary;
 
                         if (showCorrect) {

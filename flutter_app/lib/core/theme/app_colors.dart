@@ -69,7 +69,7 @@ class AppColors {
   // Box Shadows
   static List<BoxShadow> get softShadow => [
     BoxShadow(
-      color: brainPurple.withOpacity(0.08),
+      color: brainPurple.withValues(alpha:0.08),
       blurRadius: 20,
       offset: const Offset(0, 4),
     ),
@@ -77,7 +77,7 @@ class AppColors {
 
   static List<BoxShadow> get cardShadow => [
     BoxShadow(
-      color: brainPurple.withOpacity(0.1),
+      color: brainPurple.withValues(alpha:0.1),
       blurRadius: 16,
       offset: const Offset(0, 4),
     ),
@@ -85,7 +85,7 @@ class AppColors {
 
   static List<BoxShadow> get buttonShadow => [
     BoxShadow(
-      color: brainPurple.withOpacity(0.3),
+      color: brainPurple.withValues(alpha:0.3),
       blurRadius: 12,
       offset: const Offset(0, 4),
     ),

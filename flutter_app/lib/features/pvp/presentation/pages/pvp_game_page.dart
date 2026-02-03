@@ -294,7 +294,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                                 padding: const EdgeInsets.all(24),
                                 decoration: BoxDecoration(
                                   color: AppColors.brainPurple
-                                      .withOpacity(0.1),
+                                      .withValues(alpha:0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
@@ -374,9 +374,9 @@ class _PvPGamePageState extends State<PvPGamePage>
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.error.withOpacity(0.1),
+                        color: AppColors.error.withValues(alpha:0.1),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.error.withOpacity(0.3)),
+                        border: Border.all(color: AppColors.error.withValues(alpha:0.3)),
                       ),
                       child: Text(
                         error,
@@ -450,7 +450,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                 Text(
                   '${l10n.score}: ',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha:0.9),
                     fontSize: 14,
                   ),
                 ),
@@ -472,7 +472,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                 Text(
                   '$opponentScore',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha:0.8),
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -553,9 +553,9 @@ class _PvPGamePageState extends State<PvPGamePage>
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
               color: _scoreJustIncreased
-                  ? AppColors.success.withOpacity(0.15)
+                  ? AppColors.success.withValues(alpha:0.15)
                   : _scoreJustDecreased
-                      ? AppColors.error.withOpacity(0.15)
+                      ? AppColors.error.withValues(alpha:0.15)
                       : AppColors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
@@ -563,7 +563,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                     ? AppColors.success
                     : _scoreJustDecreased
                         ? AppColors.error
-                        : AppColors.brainPurple.withOpacity(0.3),
+                        : AppColors.brainPurple.withValues(alpha:0.3),
                 width: 2,
               ),
               boxShadow: AppColors.softShadow,
@@ -620,10 +620,10 @@ class _PvPGamePageState extends State<PvPGamePage>
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: difficultyColor.withOpacity(0.15),
+                    color: difficultyColor.withValues(alpha:0.15),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                        color: difficultyColor.withOpacity(0.3)),
+                        color: difficultyColor.withValues(alpha:0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -643,7 +643,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                       Text(
                         _getPointsForDifficulty(question.difficulty),
                         style: TextStyle(
-                          color: difficultyColor.withOpacity(0.8),
+                          color: difficultyColor.withValues(alpha:0.8),
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
@@ -752,7 +752,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
                               color: AppColors.brainPurple
-                                  .withOpacity(0.1),
+                                  .withValues(alpha:0.1),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -911,7 +911,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: resultColor.withOpacity(0.15),
+                      color: resultColor.withValues(alpha:0.15),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(resultIcon,
@@ -1000,9 +1000,9 @@ class _PvPGamePageState extends State<PvPGamePage>
           padding:
               const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withOpacity(0.3)),
+            border: Border.all(color: color.withValues(alpha:0.3)),
           ),
           child: Text(
             '$score',
@@ -1074,8 +1074,8 @@ class _PvPGamePageState extends State<PvPGamePage>
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            resultColor.withOpacity(0.3),
-                            resultColor.withOpacity(0.1),
+                            resultColor.withValues(alpha:0.3),
+                            resultColor.withValues(alpha:0.1),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -1083,7 +1083,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: resultColor.withOpacity(0.3),
+                            color: resultColor.withValues(alpha:0.3),
                             blurRadius: 20,
                             spreadRadius: 5,
                           ),
@@ -1182,13 +1182,13 @@ class _PvPGamePageState extends State<PvPGamePage>
                     horizontal: 24, vertical: 16),
                 decoration: BoxDecoration(
                   color: ratingChange >= 0
-                      ? AppColors.success.withOpacity(0.1)
-                      : AppColors.error.withOpacity(0.1),
+                      ? AppColors.success.withValues(alpha:0.1)
+                      : AppColors.error.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: ratingChange >= 0
-                        ? AppColors.success.withOpacity(0.3)
-                        : AppColors.error.withOpacity(0.3),
+                        ? AppColors.success.withValues(alpha:0.3)
+                        : AppColors.error.withValues(alpha:0.3),
                   ),
                 ),
                 child: Row(

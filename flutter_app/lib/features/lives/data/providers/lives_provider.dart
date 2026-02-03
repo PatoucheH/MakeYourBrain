@@ -35,7 +35,7 @@ class LivesProvider extends ChangeNotifier {
       nextLifeInSeconds = data['next_life_in_seconds'] ?? 0;
       notifyListeners();
     } catch (e) {
-      print('Error refreshing lives: $e');
+      debugPrint('Error refreshing lives: $e');
     }
   }
 
@@ -50,7 +50,7 @@ class LivesProvider extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error using life: $e');
+      debugPrint('Error using life: $e');
       return false;
     }
   }
@@ -63,7 +63,7 @@ class LivesProvider extends ChangeNotifier {
       await _repository.addLivesFromAd(userId);
       await refresh();
     } catch (e) {
-      print('Error adding lives: $e');
+      debugPrint('Error adding lives: $e');
     }
   }
 

@@ -207,7 +207,7 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   l10n.moreFeaturesComingSoon.split('\n').first,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.85),
+                    color: Colors.white.withValues(alpha:0.85),
                     fontSize: 13,
                   ),
                 ),
@@ -243,7 +243,7 @@ class _HomePageState extends State<HomePage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: AppColors.brainPurple.withOpacity(0.1),
+                color: AppColors.brainPurple.withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -325,7 +325,7 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFFF6B35).withOpacity(0.4),
+                color: const Color(0xFFFF6B35).withValues(alpha:0.4),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -337,7 +337,7 @@ class _HomePageState extends State<HomePage> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
@@ -359,7 +359,7 @@ class _HomePageState extends State<HomePage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -400,7 +400,7 @@ class _HomePageState extends State<HomePage> {
             color: AppColors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: AppColors.cardShadow,
-            border: Border.all(color: color.withOpacity(0.3), width: 2),
+            border: Border.all(color: color.withValues(alpha:0.3), width: 2),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -529,15 +529,15 @@ class _HomePageState extends State<HomePage> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        themeColor.withOpacity(0.2),
-                        themeColor.withOpacity(0.1),
+                        themeColor.withValues(alpha:0.2),
+                        themeColor.withValues(alpha:0.1),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: themeColor.withOpacity(0.3),
+                      color: themeColor.withValues(alpha:0.3),
                       width: 2,
                     ),
                   ),
@@ -580,7 +580,7 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
-                                  color: themeColor.withOpacity(0.4),
+                                  color: themeColor.withValues(alpha:0.4),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -605,7 +605,7 @@ class _HomePageState extends State<HomePage> {
                           Container(
                             height: 8,
                             decoration: BoxDecoration(
-                              color: themeColor.withOpacity(0.15),
+                              color: themeColor.withValues(alpha:0.15),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -615,7 +615,7 @@ class _HomePageState extends State<HomePage> {
                               height: 8,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
-                                  colors: [themeColor, themeColor.withOpacity(0.7)],
+                                  colors: [themeColor, themeColor.withValues(alpha:0.7)],
                                 ),
                                 borderRadius: BorderRadius.circular(4),
                               ),

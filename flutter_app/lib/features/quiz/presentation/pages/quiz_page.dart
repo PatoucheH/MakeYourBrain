@@ -107,6 +107,8 @@ class _QuizPageState extends State<QuizPage> {
       if (isCorrect) score++;
     });
 
+    final currentLanguage = context.read<LanguageProvider>().currentLanguage;
+
     if (!isCorrect && mounted) {
       final livesProvider = context.read<LivesProvider>();
       await livesProvider.useLife();
@@ -132,10 +134,10 @@ class _QuizPageState extends State<QuizPage> {
           questionId: questionId,
           selectedAnswerId: answerId,
           isCorrect: isCorrect,
-          languageUsed: context.read<LanguageProvider>().currentLanguage,
+          languageUsed: currentLanguage,
         );
       } catch (e) {
-        print('Error saving answer: $e');
+        debugPrint('Error saving answer: $e');
       }
     }
 
@@ -171,7 +173,7 @@ class _QuizPageState extends State<QuizPage> {
           correctAnswers: score,
         );
       } catch (e) {
-        print('Error adding XP: $e');
+        debugPrint('Error adding XP: $e');
       }
     }
 
@@ -223,14 +225,14 @@ class _QuizPageState extends State<QuizPage> {
                     gradient: LinearGradient(
                       colors: [
                         percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error,
-                        percentage >= 70 ? AppColors.success.withOpacity(0.7) : percentage >= 40 ? AppColors.warning.withOpacity(0.7) : AppColors.error.withOpacity(0.7),
+                        percentage >= 70 ? AppColors.success.withValues(alpha:0.7) : percentage >= 40 ? AppColors.warning.withValues(alpha:0.7) : AppColors.error.withValues(alpha:0.7),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: (percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error).withOpacity(0.4),
+                        color: (percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error).withValues(alpha:0.4),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -269,7 +271,7 @@ class _QuizPageState extends State<QuizPage> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.amber.withOpacity(0.4),
+                        color: Colors.amber.withValues(alpha:0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -572,7 +574,7 @@ class _QuizPageState extends State<QuizPage> {
                         Container(
                           height: 8,
                           decoration: BoxDecoration(
-                            color: AppColors.brainPurple.withOpacity(0.15),
+                            color: AppColors.brainPurple.withValues(alpha:0.15),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -606,10 +608,10 @@ class _QuizPageState extends State<QuizPage> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
-                              color: _getDifficultyColor(currentQuestion.difficulty).withOpacity(0.15),
+                              color: _getDifficultyColor(currentQuestion.difficulty).withValues(alpha:0.15),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: _getDifficultyColor(currentQuestion.difficulty).withOpacity(0.3),
+                                color: _getDifficultyColor(currentQuestion.difficulty).withValues(alpha:0.3),
                               ),
                             ),
                             child: Text(
@@ -665,7 +667,7 @@ class _QuizPageState extends State<QuizPage> {
                         final showWrong = hasAnswered && isSelected && !answer.isCorrect;
 
                         Color bgColor = AppColors.white;
-                        Color borderColor = AppColors.brainPurple.withOpacity(0.2);
+                        Color borderColor = AppColors.brainPurple.withValues(alpha:0.2);
                         Color textColor = AppColors.textPrimary;
 
                         if (showCorrect) {
@@ -721,7 +723,7 @@ class _QuizPageState extends State<QuizPage> {
                             ),
                           ),
                         );
-                      }).toList(),
+                      }),
                       const SizedBox(height: 20),
                     ],
                   ),

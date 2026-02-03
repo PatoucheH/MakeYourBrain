@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import '../../../../shared/services/supabase_service.dart';
 
 class FollowRepository {
@@ -13,7 +14,7 @@ class FollowRepository {
       });
       return true;
     } catch (e) {
-      print('Error following user: $e');
+      debugPrint('Error following user: $e');
       return false;
     }
   }
@@ -26,7 +27,7 @@ class FollowRepository {
       });
       return true;
     } catch (e) {
-      print('Error unfollowing user: $e');
+      debugPrint('Error unfollowing user: $e');
       return false;
     }
   }
@@ -39,7 +40,7 @@ class FollowRepository {
       });
       return List<Map<String, dynamic>>.from(response ?? []);
     } catch (e) {
-      print('Error getting followers: $e');
+      debugPrint('Error getting followers: $e');
       return [];
     }
   }
@@ -52,7 +53,7 @@ class FollowRepository {
       });
       return List<Map<String, dynamic>>.from(response ?? []);
     } catch (e) {
-      print('Error getting following: $e');
+      debugPrint('Error getting following: $e');
       return [];
     }
   }
@@ -66,7 +67,7 @@ class FollowRepository {
       });
       return List<Map<String, dynamic>>.from(response ?? []);
     } catch (e) {
-      print('Error searching users: $e');
+      debugPrint('Error searching users: $e');
       return [];
     }
   }
@@ -80,7 +81,7 @@ class FollowRepository {
       final list = List<Map<String, dynamic>>.from(response ?? []);
       return list.isNotEmpty ? list.first : null;
     } catch (e) {
-      print('Error getting user profile summary: $e');
+      debugPrint('Error getting user profile summary: $e');
       return null;
     }
   }
@@ -100,7 +101,7 @@ class FollowRepository {
       }
       return {'followers': 0, 'following': 0};
     } catch (e) {
-      print('Error getting follow counts: $e');
+      debugPrint('Error getting follow counts: $e');
       return {'followers': 0, 'following': 0};
     }
   }
@@ -115,7 +116,7 @@ class FollowRepository {
       });
       return List<Map<String, dynamic>>.from(response ?? []);
     } catch (e) {
-      print('Error getting following leaderboard: $e');
+      debugPrint('Error getting following leaderboard: $e');
       return [];
     }
   }
@@ -130,7 +131,7 @@ class FollowRepository {
       });
       return List<Map<String, dynamic>>.from(response ?? []);
     } catch (e) {
-      print('Error getting PvP following leaderboard: $e');
+      debugPrint('Error getting PvP following leaderboard: $e');
       return [];
     }
   }
@@ -148,7 +149,7 @@ class FollowRepository {
           .maybeSingle();
       return response != null;
     } catch (e) {
-      print('Error checking follow status: $e');
+      debugPrint('Error checking follow status: $e');
       return false;
     }
   }

@@ -1,6 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart';
 import '../../../../shared/services/supabase_service.dart';
 import '../models/user_model.dart';
 
@@ -99,12 +98,12 @@ Future<bool> signInWithFacebook() async {
   try {
     final response = await _supabase.auth.signInWithOAuth(
       OAuthProvider.facebook,
-      redirectTo: kIsWeb ? null : 'https://gqicisbofczmmjogfogz.supabase.co/auth/v1/callback',
+      redirectTo: kIsWeb ? null : 'makeyourbrain://auth-callback',
     );
     
     return response;
   } catch (e) {
-    print('Facebook login error: $e');
+    debugPrint('Facebook login error: $e');
     return false;
   }
 }

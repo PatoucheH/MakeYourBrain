@@ -164,7 +164,7 @@ class PvPProvider extends ChangeNotifier {
         _startMatchFoundCountdown();
       }
     } catch (e) {
-      print('Error checking for match: $e');
+      debugPrint('Error checking for match: $e');
     }
   }
 
@@ -231,21 +231,21 @@ class PvPProvider extends ChangeNotifier {
       errorMessage = null;
       notifyListeners();
 
-      print('[PvP] loadMatch($matchId)');
+      debugPrint('[PvP] loadMatch($matchId)');
       currentMatch = await _pvpRepository.getMatch(matchId);
       if (currentMatch == null) {
-        print('[PvP] loadMatch - match not found');
+        debugPrint('[PvP] loadMatch - match not found');
         errorMessage = 'Match not found';
         isLoading = false;
         notifyListeners();
         return;
       }
 
-      print('[PvP] loadMatch - status=${currentMatch!.status}, currentRound=${currentMatch!.currentRound}, player1=${currentMatch!.player1Id}, player2=${currentMatch!.player2Id}');
+      debugPrint('[PvP] loadMatch - status=${currentMatch!.status}, currentRound=${currentMatch!.currentRound}, player1=${currentMatch!.player1Id}, player2=${currentMatch!.player2Id}');
 
       // Déterminer si c'est notre tour
       _updateIsMyTurn();
-      print('[PvP] loadMatch - isMyTurn=$isMyTurn, currentUserId=$currentUserId');
+      debugPrint('[PvP] loadMatch - isMyTurn=$isMyTurn, currentUserId=$currentUserId');
 
       // Charger le round actuel
       await loadRound(currentMatch!.currentRound);
@@ -256,7 +256,7 @@ class PvPProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     } catch (e) {
-      print('[PvP] ERROR loadMatch: $e');
+      debugPrint('[PvP] ERROR loadMatch: $e');
       errorMessage = 'Error loading match: $e';
       isLoading = false;
       notifyListeners();
@@ -301,7 +301,7 @@ class PvPProvider extends ChangeNotifier {
         }
       },
       onError: (e) {
-        print('Error watching match: $e');
+        debugPrint('Error watching match: $e');
       },
     );
   }
@@ -311,9 +311,9 @@ class PvPProvider extends ChangeNotifier {
     if (currentMatch == null) return;
 
     try {
-      print('[PvP] loadRound($roundNumber) - isMyTurn=$isMyTurn');
+      debugPrint('[PvP] loadRound($roundNumber) - isMyTurn=$isMyTurn');
       currentRound = await _pvpRepository.getRound(currentMatch!.id, roundNumber);
-      print('[PvP] loadRound - round=${currentRound != null ? 'found (${currentRound!.questionIds.length} questionIds)' : 'null'}');
+      debugPrint('[PvP] loadRound - round=${currentRound != null ? 'found (${currentRound!.questionIds.length} questionIds)' : 'null'}');
 
       // Réinitialiser les réponses locales pour ce round
       myAnswers = [];
@@ -325,21 +325,21 @@ class PvPProvider extends ChangeNotifier {
       if (currentRound == null) {
         // Nouveau round, le premier joueur doit le créer
         if (isMyTurn) {
-          print('[PvP] loadRound - creating new round (startRound)');
+          debugPrint('[PvP] loadRound - creating new round (startRound)');
           await startRound();
         } else {
-          print('[PvP] loadRound - round null and not my turn, waiting');
+          debugPrint('[PvP] loadRound - round null and not my turn, waiting');
         }
       } else {
         // Round existant, charger les questions
-        print('[PvP] loadRound - loading questions from existing round');
+        debugPrint('[PvP] loadRound - loading questions from existing round');
         await _loadQuestionsFromRound();
       }
 
-      print('[PvP] loadRound done - ${currentQuestions.length} questions loaded');
+      debugPrint('[PvP] loadRound done - ${currentQuestions.length} questions loaded');
       notifyListeners();
     } catch (e) {
-      print('[PvP] ERROR loadRound: $e');
+      debugPrint('[PvP] ERROR loadRound: $e');
       errorMessage = 'Error loading round: $e';
       notifyListeners();
     }
@@ -347,13 +347,13 @@ class PvPProvider extends ChangeNotifier {
 
   Future<void> _loadQuestionsFromRound() async {
     if (currentRound == null || currentRound!.questionIds.isEmpty) {
-      print('[PvP] _loadQuestionsFromRound - skipped (round=${currentRound == null ? 'null' : 'empty questionIds'})');
+      debugPrint('[PvP] _loadQuestionsFromRound - skipped (round=${currentRound == null ? 'null' : 'empty questionIds'})');
       return;
     }
 
     final userStats = await _authRepository.getUserStats();
     final language = userStats?.preferredLanguage ?? 'en';
-    print('[PvP] _loadQuestionsFromRound - fetching ${currentRound!.questionIds.length} questions (lang=$language)');
+    debugPrint('[PvP] _loadQuestionsFromRound - fetching ${currentRound!.questionIds.length} questions (lang=$language)');
 
     currentQuestions = await _pvpRepository.getQuestionsByIds(
       currentRound!.questionIds,
@@ -369,19 +369,19 @@ class PvPProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      print('[PvP] startRound - generating questions');
+      debugPrint('[PvP] startRound - generating questions');
       final userStats = await _authRepository.getUserStats();
       final language = userStats?.preferredLanguage ?? 'en';
 
       // Générer un large pool de questions
       currentQuestions = await _pvpRepository.getQuestionsForRound(language, 150);
-      print('[PvP] startRound - got ${currentQuestions.length} questions');
+      debugPrint('[PvP] startRound - got ${currentQuestions.length} questions');
 
       // Extraire les IDs des questions
       final questionIds = currentQuestions.map((q) => q.id).toList();
 
       // Créer le round dans la base de données
-      final roundId = await _pvpRepository.createRound(
+      await _pvpRepository.createRound(
         currentMatch!.id,
         currentMatch!.currentRound,
         questionIds,
@@ -403,7 +403,7 @@ class PvPProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     } catch (e) {
-      print('[PvP] ERROR startRound: $e');
+      debugPrint('[PvP] ERROR startRound: $e');
       errorMessage = 'Error starting round: $e';
       isLoading = false;
       notifyListeners();
@@ -618,7 +618,7 @@ class PvPProvider extends ChangeNotifier {
     try {
       return await _pvpRepository.getMyMatches(userId, limit: limit);
     } catch (e) {
-      print('Error getting match history: $e');
+      debugPrint('Error getting match history: $e');
       return [];
     }
   }
@@ -631,7 +631,7 @@ class PvPProvider extends ChangeNotifier {
     try {
       return await _pvpRepository.getActiveMatches(userId);
     } catch (e) {
-      print('Error getting active matches: $e');
+      debugPrint('Error getting active matches: $e');
       return [];
     }
   }
