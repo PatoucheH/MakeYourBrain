@@ -188,7 +188,7 @@ class _AllThemesPageState extends State<AllThemesPage> {
                             child: Text(
                               theme.name,
                               style: const TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
                               ),

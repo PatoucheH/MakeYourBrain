@@ -29,11 +29,22 @@ class _HomePageState extends State<HomePage> {
   List<ThemeModel> favoriteThemes = [];
   List<String> favoriteThemeIds = [];
   bool isLoading = true;
+  String _lastLanguage = '';
 
   @override
   void initState() {
     super.initState();
     loadFavoriteThemes();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentLang = context.watch<LanguageProvider>().currentLanguage;
+    if (_lastLanguage.isNotEmpty && _lastLanguage != currentLang) {
+      loadFavoriteThemes();
+    }
+    _lastLanguage = currentLang;
   }
 
   Future<void> loadFavoriteThemes() async {
@@ -549,10 +560,12 @@ class _HomePageState extends State<HomePage> {
                             child: Text(
                               theme.name,
                               style: const TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Container(
