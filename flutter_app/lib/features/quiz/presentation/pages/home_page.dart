@@ -208,7 +208,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Image.asset(
-            'assets/branding/mascot/brainly_happy.png',
+            'assets/branding/mascot/brainly_hello.png',
             height: 70,
           ),
         ],

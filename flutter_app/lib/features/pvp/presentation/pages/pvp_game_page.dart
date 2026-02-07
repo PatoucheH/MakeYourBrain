@@ -339,7 +339,8 @@ class _PvPGamePageState extends State<PvPGamePage>
                           child: OutlinedButton.icon(
                             onPressed: () => Navigator.of(context).pop(),
                             icon: const Icon(Icons.arrow_back),
-                            label: Text(l10n.backToMenu),
+                            label: Text(l10n.backToMenu,
+                            textAlign: TextAlign.center,),
                           ),
                         ),
                       ],
@@ -817,7 +818,8 @@ class _PvPGamePageState extends State<PvPGamePage>
                       child: OutlinedButton.icon(
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.arrow_back),
-                        label: Text(l10n.backToMenu),
+                        label: Text(l10n.backToMenu,
+                        textAlign: TextAlign.center,),
                       ),
                     ),
                   ],
@@ -1240,6 +1242,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),

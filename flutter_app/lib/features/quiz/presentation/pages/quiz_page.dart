@@ -311,7 +311,8 @@ class _QuizPageState extends State<QuizPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: Text(l10n.backToThemes),
+                        child: Text(l10n.backToThemes,
+                        textAlign : TextAlign.center),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -373,14 +374,6 @@ class _QuizPageState extends State<QuizPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(
-                  isCorrect
-                      ? 'assets/branding/mascot/brainly_happy.png'
-                      : 'assets/branding/mascot/brainly_fail.png',
-                  height: 80,
-                ),
-                const SizedBox(height: 16),
-
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   decoration: BoxDecoration(
@@ -406,6 +399,14 @@ class _QuizPageState extends State<QuizPage> {
                       ),
                     ],
                   ),
+                ),
+                const SizedBox(height: 16),
+
+                Image.asset(
+                  isCorrect
+                      ? 'assets/branding/mascot/brainly_happy.png'
+                      : 'assets/branding/mascot/brainly_fail.png',
+                  height: 160,
                 ),
                 const SizedBox(height: 20),
 

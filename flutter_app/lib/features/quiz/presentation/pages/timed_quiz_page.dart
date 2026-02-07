@@ -193,19 +193,6 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
     }
   }
 
-  Color _getDifficultyColor(String difficulty) {
-    switch (difficulty.toLowerCase()) {
-      case 'easy':
-        return AppColors.success;
-      case 'medium':
-        return AppColors.warning;
-      case 'hard':
-        return AppColors.error;
-      default:
-        return AppColors.brainPurple;
-    }
-  }
-
   void showResultDialog() async {
     final l10n = AppLocalizations.of(context)!;
     final timeBonus = _getTimeBonus();
@@ -405,7 +392,8 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: Text(l10n.backToThemes),
+                        child: Text(l10n.backToThemes,
+                        textAlign : TextAlign.center,),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -637,31 +625,6 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Difficulty Badge
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: _getDifficultyColor(currentQuestion.difficulty).withValues(alpha:0.15),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: _getDifficultyColor(currentQuestion.difficulty).withValues(alpha:0.3),
-                              ),
-                            ),
-                            child: Text(
-                              currentQuestion.difficulty.toUpperCase(),
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: _getDifficultyColor(currentQuestion.difficulty),
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
                       // Question Card
                       Container(
                         padding: const EdgeInsets.all(24),
