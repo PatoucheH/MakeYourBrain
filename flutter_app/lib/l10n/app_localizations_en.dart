@@ -112,7 +112,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorLoadingQuestions => 'Error loading questions';
 
   @override
-  String get quizCompleted => 'Quiz Completed! 🎉';
+  String get quizCompleted => 'Quiz Completed!';
 
   @override
   String get yourScore => 'Your score';
@@ -127,7 +127,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noQuestionsAvailable => 'No questions available for this theme';
 
   @override
-  String get explanation => '💡 Explanation:';
+  String get explanation => 'Explanation:';
 
   @override
   String get createAccount => 'Create Account';
@@ -154,10 +154,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutThisTheme => 'About this theme';
 
   @override
-  String get moreFeaturesComingSoon =>
-      '🚀 More features coming soon!\nLeaderboard, Time Challenge, Versus Mode...';
-
-  @override
   String get removeFromFavorites => 'Remove from favorites?';
 
   @override
@@ -173,7 +169,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get allThemesInFavorites =>
-      'You already have all themes in your favorites! 🎉';
+      'You already have all themes in your favorites!';
 
   @override
   String get manageFavoriteThemes => 'Manage Favorite Themes';
@@ -182,10 +178,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noFavoriteThemesProfile => 'No favorite themes yet.';
 
   @override
-  String get correctAnswer => '✅ Correct!';
+  String get correctAnswer => 'Correct!';
 
   @override
-  String get incorrectAnswer => '❌ Incorrect';
+  String get incorrectAnswer => 'Incorrect';
 
   @override
   String get continueButton => 'Continue →';

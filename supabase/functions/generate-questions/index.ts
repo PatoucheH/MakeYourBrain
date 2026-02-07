@@ -249,6 +249,25 @@ Respond ONLY with valid JSON (no markdown):
 CRITICAL REQUIREMENTS:
 - ALL questions MUST be specifically about "${conceptName}"
 - Questions must be DIVERSE (different aspects, angles, perspectives)
+
+⚠️ CONTEXT IN QUESTIONS (VERY IMPORTANT):
+- Each question must be self-explanatory - users should understand the topic from the question alone
+- If the question would be ambiguous without context, explicitly mention "${conceptName}" or key contextual words
+- If the question already contains clear context (e.g., "Which dog breed...", "What ocean animal..."), don't add redundant mentions
+- Goal: Natural questions that are clear without being repetitive
+
+Examples of GOOD context:
+✅ "In which year did World War II begin?" (concept mentioned when needed)
+✅ "Which dog breed is the smallest?" (word "dog" provides context)
+✅ "What is the largest animal in the ocean?" (word "ocean" provides context)
+✅ "How many teeth does an adult dog have?" (context word added naturally)
+
+Examples of BAD context:
+❌ "In which year did the war begin?" (which war? - missing context)
+❌ "Which breed is the smallest?" (breed of what? - missing context)
+❌ "How many teeth does an adult have?" (adult what? - missing context)
+❌ "Which dog breed among dogs is smallest?" (redundant - "dog" mentioned twice)
+
 - Difficulty distribution: ${easyCount} EASY, ${mediumCount} MEDIUM, ${hardCount} HARD
 - Factually accurate and verifiable
 - 4 answers per question (exactly 1 correct)
@@ -332,6 +351,26 @@ RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
       throw new Error('Invalid questions format')
     }
 
+    // ===== CRÉER LE CONCEPT UNE SEULE FOIS AVANT LA BOUCLE =====
+    console.log(`📝 Création du concept "${conceptName}"...`)
+
+    const { data: conceptData, error: conceptErr } = await supabaseAdmin
+      .from('question_concepts')
+      .insert({
+        concept: conceptName,
+        theme_id: theme.id
+      })
+      .select()
+      .single()
+
+    if (conceptErr || !conceptData) {
+      console.error('❌ Erreur création concept:', conceptErr?.message)
+      throw new Error('Failed to create concept')
+    }
+
+    const conceptId = conceptData.id
+    console.log(`✅ Concept créé avec ID: ${conceptId}`)
+
     // ===== ÉTAPE 3 : INSÉRER TOUTES LES QUESTIONS =====
     let added = 0
     const difficultyCount = { easy: 0, medium: 0, hard: 0 }
@@ -379,13 +418,14 @@ RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
           ? q.difficulty 
           : 'medium'
 
-        // Insérer question
+        // Insérer question AVEC concept_id
         const { data: question, error: qErr } = await supabaseAdmin
           .from('questions')
           .insert({
             theme_id: theme.id,
             difficulty: difficulty,
-            times_used: 0
+            times_used: 0,
+            concept_id: conceptId
           })
           .select()
           .single()
@@ -464,15 +504,6 @@ RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
           continue
         }
 
-        // ===== ENREGISTRER LE CONCEPT (UNE SEULE FOIS) =====
-        if (added === 0) {
-          await supabaseAdmin.from('question_concepts').insert({
-            question_id: question.id,
-            concept: conceptName,
-            theme_id: theme.id
-          })
-        }
-
         added++
         difficultyCount[difficulty]++
 
@@ -494,6 +525,7 @@ RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
         theme: themeName,
         theme_icon: theme.icon,
         concept: conceptName,
+        concept_id: conceptId,
         questions_generated: added,
         difficulty_distribution: difficultyCount,
         total_concepts_for_theme: conceptsList.length + 1

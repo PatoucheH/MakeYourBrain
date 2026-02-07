@@ -202,15 +202,8 @@ class _HomePageState extends State<HomePage> {
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  l10n.moreFeaturesComingSoon.split('\n').first,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha:0.85),
-                    fontSize: 13,
-                  ),
-                ),
+                    textAlign: TextAlign.center, 
+                )
               ],
             ),
           ),

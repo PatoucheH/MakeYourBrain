@@ -305,7 +305,7 @@ abstract class AppLocalizations {
   /// No description provided for @quizCompleted.
   ///
   /// In en, this message translates to:
-  /// **'Quiz Completed! 🎉'**
+  /// **'Quiz Completed!'**
   String get quizCompleted;
 
   /// No description provided for @yourScore.
@@ -335,7 +335,7 @@ abstract class AppLocalizations {
   /// No description provided for @explanation.
   ///
   /// In en, this message translates to:
-  /// **'💡 Explanation:'**
+  /// **'Explanation:'**
   String get explanation;
 
   /// No description provided for @createAccount.
@@ -386,12 +386,6 @@ abstract class AppLocalizations {
   /// **'About this theme'**
   String get aboutThisTheme;
 
-  /// No description provided for @moreFeaturesComingSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'🚀 More features coming soon!\nLeaderboard, Time Challenge, Versus Mode...'**
-  String get moreFeaturesComingSoon;
-
   /// No description provided for @removeFromFavorites.
   ///
   /// In en, this message translates to:
@@ -419,7 +413,7 @@ abstract class AppLocalizations {
   /// No description provided for @allThemesInFavorites.
   ///
   /// In en, this message translates to:
-  /// **'You already have all themes in your favorites! 🎉'**
+  /// **'You already have all themes in your favorites!'**
   String get allThemesInFavorites;
 
   /// No description provided for @manageFavoriteThemes.
@@ -437,13 +431,13 @@ abstract class AppLocalizations {
   /// No description provided for @correctAnswer.
   ///
   /// In en, this message translates to:
-  /// **'✅ Correct!'**
+  /// **'Correct!'**
   String get correctAnswer;
 
   /// No description provided for @incorrectAnswer.
   ///
   /// In en, this message translates to:
-  /// **'❌ Incorrect'**
+  /// **'Incorrect'**
   String get incorrectAnswer;
 
   /// No description provided for @continueButton.
