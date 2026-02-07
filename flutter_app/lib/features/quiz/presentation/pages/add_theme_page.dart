@@ -91,7 +91,7 @@ class _AddThemePageState extends State<AddThemePage> {
         child: SafeArea(
           child: Column(
             children: [
-              const BrainAppBar(),
+              const BrainAppBar(currentPage: AppPage.other),
               Expanded(
                 child: isLoading
                     ? const Center(child: CircularProgressIndicator(color: AppColors.brainPurple))

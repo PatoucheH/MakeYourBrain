@@ -268,6 +268,28 @@ Examples of BAD context:
 ❌ "How many teeth does an adult have?" (adult what? - missing context)
 ❌ "Which dog breed among dogs is smallest?" (redundant - "dog" mentioned twice)
 
+🚨 ANSWER LENGTH - ABSOLUTELY CRITICAL:
+ALL ANSWERS MUST BE SHORT AND CONCISE:
+- Maximum 10-12 words per answer
+- NO paragraphs, NO long explanations in answers
+- Answers should be direct facts, names, or short phrases
+- If an answer needs context, include it but keep it brief
+
+✅ GOOD answer examples (SHORT):
+- "Strategic governance and investment since 1965"
+- "Rapid growth strains infrastructure but drives innovation"
+- "Germany"
+- "Lee Kuan Yew transformed it through strict governance"
+- "35 km apart but 50x GDP gap since 1953"
+
+❌ BAD answer examples (TOO LONG - paragraphs):
+- "From expelled Malaysian state in 1965 to $65K GDP per capita through strict governance and strategic investment creating one of the world's wealthiest nations"
+- "Explosive 3-5% annual growth strains infrastructure creating sprawling informal settlements while simultaneously driving economic growth and digital innovation across the continent"
+
+EXPLANATION vs ANSWER:
+- ANSWERS = Short (max 10-12 words)
+- EXPLANATIONS = Can be longer (2-3 sentences) to provide context
+
 - Difficulty distribution: ${easyCount} EASY, ${mediumCount} MEDIUM, ${hardCount} HARD
 - Factually accurate and verifiable
 - 4 answers per question (exactly 1 correct)
@@ -295,16 +317,16 @@ RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
       "explanation_fr": "Explication détaillée en français (2-3 phrases)",
       "difficulty": "easy",
       "answers_en": [
-        {"text": "Wrong answer 1", "is_correct": false},
-        {"text": "Correct answer", "is_correct": true},
-        {"text": "Wrong answer 2", "is_correct": false},
-        {"text": "Wrong answer 3", "is_correct": false}
+        {"text": "Short wrong answer (max 10-12 words)", "is_correct": false},
+        {"text": "Short correct answer (max 10-12 words)", "is_correct": true},
+        {"text": "Short wrong answer (max 10-12 words)", "is_correct": false},
+        {"text": "Short wrong answer (max 10-12 words)", "is_correct": false}
       ],
       "answers_fr": [
-        {"text": "Mauvaise réponse 1", "is_correct": false},
-        {"text": "Bonne réponse", "is_correct": true},
-        {"text": "Mauvaise réponse 2", "is_correct": false},
-        {"text": "Mauvaise réponse 3", "is_correct": false}
+        {"text": "Courte mauvaise réponse (max 10-12 mots)", "is_correct": false},
+        {"text": "Courte bonne réponse (max 10-12 mots)", "is_correct": true},
+        {"text": "Courte mauvaise réponse (max 10-12 mots)", "is_correct": false},
+        {"text": "Courte mauvaise réponse (max 10-12 mots)", "is_correct": false}
       ]
     }
   ]
@@ -397,6 +419,18 @@ RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
                                q.answers_fr.every(a => a.text && a.text.trim().length > 0)
         if (!allAnswersValid) {
           console.log('⚠️ Réponses vides')
+          continue
+        }
+
+        // ✅ VALIDATION DE LA LONGUEUR DES RÉPONSES
+        const MAX_ANSWER_WORDS = 15
+        const answerTooLong = [...q.answers_en, ...q.answers_fr].some(a => {
+          const wordCount = a.text.trim().split(/\s+/).length
+          return wordCount > MAX_ANSWER_WORDS
+        })
+
+        if (answerTooLong) {
+          console.log('⚠️ Réponse trop longue (>15 mots), question ignorée')
           continue
         }
 

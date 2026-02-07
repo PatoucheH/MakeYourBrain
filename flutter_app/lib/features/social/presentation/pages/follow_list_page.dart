@@ -131,7 +131,7 @@ class _FollowListPageState extends State<FollowListPage>
           child: Column(
             children: [
               // AppBar
-              const BrainAppBar(),
+              const BrainAppBar(currentPage: AppPage.other),
 
               // Search bar
               _buildSearchBar(l10n),

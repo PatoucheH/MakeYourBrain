@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
+import '../../../../core/providers/user_stats_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/repositories/quiz_repository.dart';
 import '../../data/models/theme_model.dart';
@@ -162,20 +163,18 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
       if (isCorrect) score++;
     });
 
-    // Save answer to database
+    // Save answer to database (fire and forget - don't block UI)
     final authRepo = AuthRepository();
     if (authRepo.isLoggedIn()) {
-      try {
-        await _repository.saveUserAnswer(
-          userId: authRepo.getCurrentUserId()!,
-          questionId: questionId,
-          selectedAnswerId: answerId,
-          isCorrect: isCorrect,
-          languageUsed: context.read<LanguageProvider>().currentLanguage,
-        );
-      } catch (e) {
+      _repository.saveUserAnswer(
+        userId: authRepo.getCurrentUserId()!,
+        questionId: questionId,
+        selectedAnswerId: answerId,
+        isCorrect: isCorrect,
+        languageUsed: context.read<LanguageProvider>().currentLanguage,
+      ).catchError((e) {
         debugPrint('Error saving answer: $e');
-      }
+      });
     }
 
     // Go to next question immediately
@@ -207,6 +206,9 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
           correctAnswers: score,
           bonusXp: timeBonus,
         );
+        if (mounted) {
+          context.read<UserStatsProvider>().refresh();
+        }
       } catch (e) {
         debugPrint('Error adding XP: $e');
       }
@@ -229,21 +231,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Timer icon with result
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFFF9800), Color(0xFFFF5722)],
-                    ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Image.asset(
-                    'assets/branding/mascot/brainly_victory.png',
-                    height: 80,
-                  ),
-                ),
-                const SizedBox(height: 20),
+                // Title at the top
                 Text(
                   remainingSeconds <= 0 ? l10n.timesUp : l10n.quizCompleted,
                   style: const TextStyle(
@@ -252,126 +240,67 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                     color: AppColors.brainPurple,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
-                // Score circle
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error,
-                        percentage >= 70 ? AppColors.success.withValues(alpha:0.7) : percentage >= 40 ? AppColors.warning.withValues(alpha:0.7) : AppColors.error.withValues(alpha:0.7),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error).withValues(alpha:0.4),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+                // Mascot - large
+                Image.asset(
+                  percentage >= 60
+                      ? 'assets/branding/mascot/brainly_victory_trophee.png'
+                      : 'assets/branding/mascot/brainly_lose_trophee.png',
+                  height: 160,
+                ),
+                const SizedBox(height: 16),
+
+                // Score text
+                Text(
+                  '$score/${questions.length}',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${percentage.toStringAsFixed(0)}%',
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        '$score/${questions.length}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white70,
-                        ),
-                      ),
-                    ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${percentage.toStringAsFixed(0)}%',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: percentage >= 60 ? AppColors.success : AppColors.error,
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // Questions answered info
-                Text(
-                  '${l10n.questionsAnswered}: ${currentQuestionIndex + (hasAnswered ? 1 : 0)}/${questions.length}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
+                // Total XP earned (score XP + time bonus)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.amber.withValues(alpha: 0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 20),
-
-                // XP Badges
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Score XP
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star_rounded, color: Colors.white, size: 28),
+                      const SizedBox(width: 8),
+                      Text(
+                        '+${score * 10 + timeBonus} ${l10n.xp}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
-                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.star_rounded, color: Colors.white, size: 20),
-                          const SizedBox(width: 4),
-                          Text(
-                            '+${score * 10} ${l10n.xp}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Time Bonus XP
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFFF9800), Color(0xFFFF5722)],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.timer, color: Colors.white, size: 20),
-                          const SizedBox(width: 4),
-                          Text(
-                            '+$timeBonus ${l10n.xp}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${l10n.timeBonus}: ${widget.totalSeconds}s',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
+                    ],
                   ),
                 ),
                 const SizedBox(height: 28),

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
+import '../../../../core/providers/user_stats_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/brain_app_bar.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../auth/data/models/user_model.dart';
-import '../../data/repositories/profile_repository.dart';
 import '../../../quiz/data/repositories/theme_preferences_repository.dart';
 import '../../../quiz/data/repositories/quiz_repository.dart';
 import '../../../quiz/data/models/theme_model.dart';
@@ -22,13 +22,10 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final _authRepo = AuthRepository();
-  final _profileRepo = ProfileRepository();
   final _prefsRepo = ThemePreferencesRepository();
   final _quizRepo = QuizRepository();
   final _followRepo = FollowRepository();
 
-  UserModel? userStats;
-  List<Map<String, dynamic>> progressByTheme = [];
   List<ThemeModel> favoriteThemes = [];
   List<ThemeModel> allThemes = [];
   List<String> favoriteThemeIds = [];
@@ -48,8 +45,9 @@ class _ProfilePageState extends State<ProfilePage> {
       final currentLang = context.read<LanguageProvider>().currentLanguage;
       final userId = _authRepo.getCurrentUserId()!;
 
-      final stats = await _authRepo.getUserStats();
-      final progress = await _profileRepo.getProgressByTheme(userId);
+      if (mounted) {
+        await context.read<UserStatsProvider>().refresh();
+      }
 
       final preferredIds = await _prefsRepo.getPreferences(userId);
       final themes = await _quizRepo.getThemes(currentLang);
@@ -59,9 +57,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final counts = await _followRepo.getFollowCounts(userId);
 
       setState(() {
-        userStats = stats;
         selectedLanguage = currentLang;
-        progressByTheme = progress;
         allThemes = themes;
         favoriteThemes = preferred;
         favoriteThemeIds = preferredIds;
@@ -134,6 +130,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final userStats = context.watch<UserStatsProvider>().userStats;
+    final progressByTheme = context.watch<UserStatsProvider>().themeProgress.values.toList();
 
     if (isLoading) {
       return Scaffold(
@@ -152,7 +150,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: SafeArea(
           child: Column(
             children: [
-              const BrainAppBar(),
+              const BrainAppBar(currentPage: AppPage.profile),
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: loadProfile,
@@ -164,7 +162,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Profile Header Card
-                        _buildProfileHeader(l10n),
+                        _buildProfileHeader(l10n, userStats),
                         const SizedBox(height: 16),
 
                         // Social Section
@@ -174,13 +172,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         // Statistics Section
                         _buildSectionTitle(l10n.statistics),
                         const SizedBox(height: 12),
-                        _buildStatsCards(l10n),
+                        _buildStatsCards(l10n, userStats),
                         const SizedBox(height: 24),
 
                         // Progress by Theme
                         _buildSectionTitle(l10n.progressByTheme),
                         const SizedBox(height: 12),
-                        _buildProgressSection(l10n),
+                        _buildProgressSection(l10n, progressByTheme),
                         const SizedBox(height: 24),
 
                         // Favorite Themes Management
@@ -200,7 +198,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProfileHeader(AppLocalizations l10n) {
+  Widget _buildProfileHeader(AppLocalizations l10n, UserModel? userStats) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -247,7 +245,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         MouseRegion(
                           cursor: SystemMouseCursors.click,
                           child: GestureDetector(
-                            onTap: () => _showChangeUsernameDialog(l10n),
+                            onTap: () => _showChangeUsernameDialog(l10n, userStats),
                             child: Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
@@ -398,7 +396,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _showChangeUsernameDialog(AppLocalizations l10n) {
+  void _showChangeUsernameDialog(AppLocalizations l10n, UserModel? userStats) {
     final controller = TextEditingController(text: userStats?.username ?? '');
     bool isChecking = false;
     bool? isAvailable;
@@ -603,7 +601,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildStatsCards(AppLocalizations l10n) {
+  Widget _buildStatsCards(AppLocalizations l10n, UserModel? userStats) {
     return Column(
       children: [
         // Streak Card
@@ -737,7 +735,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProgressSection(AppLocalizations l10n) {
+  Widget _buildProgressSection(AppLocalizations l10n, List<Map<String, dynamic>> progressByTheme) {
     if (progressByTheme.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(24),

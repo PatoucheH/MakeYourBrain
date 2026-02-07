@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/providers/user_stats_provider.dart';
 import '../../../../shared/widgets/brain_app_bar.dart';
 import '../../data/models/theme_model.dart';
-import '../../../auth/data/repositories/auth_repository.dart';
-import '../../../profile/data/repositories/profile_repository.dart';
 import 'quiz_page.dart';
 import 'timed_quiz_page.dart';
 import '../../../leaderboard/presentation/pages/leaderboard_page.dart';
@@ -22,46 +21,6 @@ class ThemeDetailPage extends StatefulWidget {
 }
 
 class _ThemeDetailPageState extends State<ThemeDetailPage> {
-  final _authRepo = AuthRepository();
-  final _profileRepo = ProfileRepository();
-
-  int level = 1;
-  int xp = 0;
-  int xpForNextLevel = 100;
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    loadThemeProgress();
-  }
-
-  Future<void> loadThemeProgress() async {
-    try {
-      final userId = _authRepo.getCurrentUserId();
-      if (userId != null) {
-        final progress = await _profileRepo.getProgressByTheme(userId);
-
-        final themeProgress = progress.firstWhere(
-          (p) => p['theme_id'] == widget.theme.id,
-          orElse: () => {},
-        );
-
-        if (themeProgress.isNotEmpty) {
-          setState(() {
-            level = themeProgress['level'] ?? 1;
-            xp = themeProgress['xp'] ?? 0;
-            xpForNextLevel = themeProgress['xp_for_next_level'] ?? 100;
-          });
-        }
-      }
-    } catch (e) {
-      debugPrint('Error loading theme progress: $e');
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
   Color _getColorForLevel(int level) {
     if (level >= 10) return AppColors.level10plus;
     if (level >= 7) return AppColors.level7_9;
@@ -73,6 +32,11 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final statsProvider = context.watch<UserStatsProvider>();
+    final themeProgress = statsProvider.themeProgress[widget.theme.id];
+    final level = themeProgress?['level'] ?? 1;
+    final xp = themeProgress?['xp'] ?? 0;
+    final xpForNextLevel = themeProgress?['xp_for_next_level'] ?? 100;
     final themeColor = _getColorForLevel(level);
     final progressPercent = xp / xpForNextLevel;
 
@@ -83,11 +47,11 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
           child: Column(
             children: [
               // Custom AppBar
-              const BrainAppBar(),
+              const BrainAppBar(currentPage: AppPage.other),
 
               // Content
               Expanded(
-                child: isLoading
+                child: statsProvider.isLoading
                     ? const Center(
                         child: CircularProgressIndicator(color: AppColors.brainPurple),
                       )
@@ -582,6 +546,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
       child: GestureDetector(
         onTap: () async {
           final stateNavigator = Navigator.of(this.context);
+          final currentLevel = this.context.read<UserStatsProvider>().themeProgress[widget.theme.id]?['level'] ?? 1;
           await livesProvider.useLife();
           if (!context.mounted) return;
           Navigator.pop(context);
@@ -590,7 +555,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
               builder: (context) => TimedQuizPage(
                 theme: widget.theme,
                 totalSeconds: seconds,
-                userLevel: level,
+                userLevel: currentLevel,
               ),
             ),
           );

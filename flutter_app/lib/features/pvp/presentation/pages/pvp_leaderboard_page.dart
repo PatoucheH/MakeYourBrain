@@ -85,7 +85,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
           child: Column(
             children: [
               // AppBar
-              const BrainAppBar(),
+              const BrainAppBar(currentPage: AppPage.other),
 
               // Following filter
               Padding(

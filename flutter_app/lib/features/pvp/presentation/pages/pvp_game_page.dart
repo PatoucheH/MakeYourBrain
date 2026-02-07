@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/providers/user_stats_provider.dart';
 import '../../../quiz/data/models/question_model.dart';
 import '../../data/providers/pvp_provider.dart';
 
@@ -1025,6 +1026,8 @@ class _PvPGamePageState extends State<PvPGamePage>
       PvPProvider pvpProvider, AppLocalizations l10n) {
     final currentMatch = pvpProvider.currentMatch;
     if (currentMatch == null) return;
+
+    context.read<UserStatsProvider>().refresh();
 
     final didWin = pvpProvider.didWin;
     final myScore = pvpProvider.myTotalScore;

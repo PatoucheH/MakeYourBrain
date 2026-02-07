@@ -86,7 +86,7 @@ class _AllThemesPageState extends State<AllThemesPage> {
           child: Column(
             children: [
               // Custom AppBar
-              const BrainAppBar(),
+              const BrainAppBar(currentPage: AppPage.other),
 
               // Content
               Expanded(

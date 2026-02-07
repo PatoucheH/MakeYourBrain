@@ -58,6 +58,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get selectTheme => 'Sélectionner un Thème';
 
   @override
+  String get home => 'Accueil';
+
+  @override
   String get profile => 'Profil';
 
   @override

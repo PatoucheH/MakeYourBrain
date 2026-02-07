@@ -8,6 +8,7 @@ import 'features/quiz/presentation/pages/theme_preferences_page.dart';
 import 'features/auth/data/repositories/auth_repository.dart';
 import 'features/quiz/data/repositories/theme_preferences_repository.dart';
 import 'core/providers/language_provider.dart';
+import 'core/providers/user_stats_provider.dart';
 import 'core/theme/app_colors.dart';
 import 'l10n/app_localizations.dart';
 import 'features/lives/data/providers/lives_provider.dart';
@@ -27,6 +28,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => LanguageProvider()),
         ChangeNotifierProvider(create: (context) => LivesProvider()),
         ChangeNotifierProvider(create: (context) => PvPProvider()),
+        ChangeNotifierProvider(create: (context) => UserStatsProvider()),
       ],
       child: const MyApp(),
     ),
@@ -334,6 +336,9 @@ class _AuthCheckerState extends State<AuthChecker> {
 
     try {
       final userId = _authRepo.getCurrentUserId()!;
+      if (mounted) {
+        await context.read<UserStatsProvider>().initialize();
+      }
       final hasCompletedOnboarding = await _prefsRepo.hasCompletedOnboarding(userId);
 
       setState(() {

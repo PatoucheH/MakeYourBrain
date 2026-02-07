@@ -103,7 +103,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
           child: Column(
             children: [
               // Custom AppBar
-              const BrainAppBar(),
+              const BrainAppBar(currentPage: AppPage.other),
 
               // Content
               Expanded(

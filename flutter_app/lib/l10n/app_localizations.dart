@@ -194,6 +194,12 @@ abstract class AppLocalizations {
   /// **'Select a Theme'**
   String get selectTheme;
 
+  /// No description provided for @home.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get home;
+
   /// No description provided for @profile.
   ///
   /// In en, this message translates to:

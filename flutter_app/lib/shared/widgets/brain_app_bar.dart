@@ -1,44 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/providers/user_stats_provider.dart';
 import '../../features/auth/data/repositories/auth_repository.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/leaderboard/presentation/pages/leaderboard_page.dart';
+import '../../features/quiz/presentation/pages/home_page.dart';
 import '../../features/lives/presentation/widgets/lives_indicator.dart';
 
-class BrainAppBar extends StatefulWidget {
-  const BrainAppBar({super.key});
+enum AppPage { home, profile, leaderboard, other }
 
-  @override
-  State<BrainAppBar> createState() => _BrainAppBarState();
-}
+class BrainAppBar extends StatelessWidget {
+  final AppPage currentPage;
 
-class _BrainAppBarState extends State<BrainAppBar> {
-  final _authRepo = AuthRepository();
-  int currentStreak = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadStreak();
-  }
-
-  Future<void> _loadStreak() async {
-    try {
-      final stats = await _authRepo.getUserStats();
-      if (mounted) {
-        setState(() {
-          currentStreak = stats?.currentStreak ?? 0;
-        });
-      }
-    } catch (_) {}
-  }
+  const BrainAppBar({super.key, this.currentPage = AppPage.home});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isFirstRoute = !Navigator.of(context).canPop();
+    final currentStreak = context.watch<UserStatsProvider>().currentStreak;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -139,13 +122,19 @@ class _BrainAppBarState extends State<BrainAppBar> {
                 borderRadius: BorderRadius.circular(12),
               ),
               onSelected: (value) async {
-                if (value == 'profile') {
-                  await Navigator.push(
+                if (value == 'home') {
+                  Navigator.of(context)
+                      .pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()),
+                        (route) => false,
+                      );
+                } else if (value == 'profile') {
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => const ProfilePage()),
                   );
-                  _loadStreak();
                 } else if (value == 'leaderboard') {
                   Navigator.push(
                     context,
@@ -153,8 +142,10 @@ class _BrainAppBarState extends State<BrainAppBar> {
                         builder: (context) => const LeaderboardPage()),
                   );
                 } else if (value == 'logout') {
-                  await _authRepo.signOut();
+                  final authRepo = AuthRepository();
+                  await authRepo.signOut();
                   if (context.mounted) {
+                    context.read<UserStatsProvider>().clear();
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
                           builder: (context) => const LoginPage()),
@@ -163,31 +154,54 @@ class _BrainAppBarState extends State<BrainAppBar> {
                   }
                 }
               },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'profile',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.person_outline,
-                          color: AppColors.brainPurple),
-                      const SizedBox(width: 12),
-                      Text(l10n.profile),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'leaderboard',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.leaderboard_outlined,
-                          color: AppColors.brainPurple),
-                      const SizedBox(width: 12),
-                      Text(l10n.viewLeaderboard),
-                    ],
-                  ),
-                ),
-                const PopupMenuDivider(),
-                PopupMenuItem(
+              itemBuilder: (context) {
+                final items = <PopupMenuEntry<String>>[];
+
+                if (currentPage != AppPage.home) {
+                  items.add(PopupMenuItem(
+                    value: 'home',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.home_outlined,
+                            color: AppColors.brainPurple),
+                        const SizedBox(width: 12),
+                        Text(l10n.home),
+                      ],
+                    ),
+                  ));
+                }
+
+                if (currentPage != AppPage.profile) {
+                  items.add(PopupMenuItem(
+                    value: 'profile',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.person_outline,
+                            color: AppColors.brainPurple),
+                        const SizedBox(width: 12),
+                        Text(l10n.profile),
+                      ],
+                    ),
+                  ));
+                }
+
+                if (currentPage != AppPage.leaderboard) {
+                  items.add(PopupMenuItem(
+                    value: 'leaderboard',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.leaderboard_outlined,
+                            color: AppColors.brainPurple),
+                        const SizedBox(width: 12),
+                        Text(l10n.viewLeaderboard),
+                      ],
+                    ),
+                  ));
+                }
+
+                items.add(const PopupMenuDivider());
+
+                items.add(PopupMenuItem(
                   value: 'logout',
                   child: Row(
                     children: [
@@ -197,8 +211,10 @@ class _BrainAppBarState extends State<BrainAppBar> {
                           style: const TextStyle(color: AppColors.error)),
                     ],
                   ),
-                ),
-              ],
+                ));
+
+                return items;
+              },
             ),
           ),
         ],

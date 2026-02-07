@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../lives/data/providers/lives_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
+import '../../../../core/providers/user_stats_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/repositories/quiz_repository.dart';
 import '../../data/models/theme_model.dart';
@@ -128,17 +129,15 @@ class _QuizPageState extends State<QuizPage> {
 
     final authRepo = AuthRepository();
     if (authRepo.isLoggedIn()) {
-      try {
-        await _repository.saveUserAnswer(
-          userId: authRepo.getCurrentUserId()!,
-          questionId: questionId,
-          selectedAnswerId: answerId,
-          isCorrect: isCorrect,
-          languageUsed: currentLanguage,
-        );
-      } catch (e) {
+      _repository.saveUserAnswer(
+        userId: authRepo.getCurrentUserId()!,
+        questionId: questionId,
+        selectedAnswerId: answerId,
+        isCorrect: isCorrect,
+        languageUsed: currentLanguage,
+      ).catchError((e) {
         debugPrint('Error saving answer: $e');
-      }
+      });
     }
 
     if (mounted) {
@@ -172,6 +171,9 @@ class _QuizPageState extends State<QuizPage> {
           themeId: widget.theme.id,
           correctAnswers: score,
         );
+        if (mounted) {
+          context.read<UserStatsProvider>().refresh();
+        }
       } catch (e) {
         debugPrint('Error adding XP: $e');
       }
@@ -201,7 +203,7 @@ class _QuizPageState extends State<QuizPage> {
                     shape: BoxShape.circle,
                   ),
                   child: Image.asset(
-                    'assets/branding/mascot/brainly_victory.png',
+                    'assets/branding/mascot/brainly_victory_trophee.png',
                     height: 80,
                   ),
                 ),

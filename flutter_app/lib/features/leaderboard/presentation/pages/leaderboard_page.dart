@@ -310,7 +310,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
           child: Column(
             children: [
               // Custom AppBar
-              const BrainAppBar(),
+              const BrainAppBar(currentPage: AppPage.leaderboard),
 
               // My Rank Card
               if (!isLoading && (myGlobalRank != null || myWeeklyRank != null || myThemeRank != null))

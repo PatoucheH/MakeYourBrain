@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
+import '../../../../core/providers/user_stats_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/brain_app_bar.dart';
 import '../../data/repositories/quiz_repository.dart';
 import '../../data/repositories/theme_preferences_repository.dart';
 import '../../data/models/theme_model.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
-import '../../../profile/data/repositories/profile_repository.dart';
 import 'theme_detail_page.dart';
 import 'all_themes_page.dart';
 import 'add_theme_page.dart';
@@ -25,14 +25,10 @@ class _HomePageState extends State<HomePage> {
   final _authRepo = AuthRepository();
   final _quizRepo = QuizRepository();
   final _prefsRepo = ThemePreferencesRepository();
-  final _profileRepo = ProfileRepository();
 
   List<ThemeModel> favoriteThemes = [];
   List<String> favoriteThemeIds = [];
-  Map<String, Map<String, dynamic>> themeProgress = {};
   bool isLoading = true;
-  int currentStreak = 0;
-  int pvpRating = 1000;
 
   @override
   void initState() {
@@ -52,20 +48,13 @@ class _HomePageState extends State<HomePage> {
           .where((theme) => preferredIds.contains(theme.id))
           .toList();
 
-      final progress = await _profileRepo.getProgressByTheme(userId);
-      final progressMap = <String, Map<String, dynamic>>{};
-      for (var p in progress) {
-        progressMap[p['theme_id']] = p;
+      if (mounted) {
+        await context.read<UserStatsProvider>().refresh();
       }
-
-      final stats = await _authRepo.getUserStats();
 
       setState(() {
         favoriteThemes = preferred;
         favoriteThemeIds = preferredIds;
-        themeProgress = progressMap;
-        currentStreak = stats?.currentStreak ?? 0;
-        pvpRating = stats?.pvpRating ?? 1000;
         isLoading = false;
       });
     } catch (e) {
@@ -102,6 +91,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final statsProvider = context.watch<UserStatsProvider>();
+    final pvpRating = statsProvider.pvpRating;
+    final themeProgress = statsProvider.themeProgress;
 
     return Scaffold(
       body: Container(
@@ -129,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                           slivers: [
                             // Header Section
                             SliverToBoxAdapter(
-                              child: _buildHeaderSection(l10n),
+                              child: _buildHeaderSection(l10n, pvpRating),
                             ),
 
                             // Themes Grid/List
@@ -144,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                                       delegate: SliverChildBuilderDelegate(
                                         (context, index) {
                                           final theme = favoriteThemes[index];
-                                          return _buildThemeCard(theme, l10n);
+                                          return _buildThemeCard(theme, l10n, themeProgress);
                                         },
                                         childCount: favoriteThemes.length,
                                       ),
@@ -161,7 +153,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildHeaderSection(AppLocalizations l10n) {
+  Widget _buildHeaderSection(AppLocalizations l10n, int pvpRating) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -171,7 +163,7 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 16),
 
           // PvP Arena Button
-          _buildPvPButton(l10n),
+          _buildPvPButton(l10n, pvpRating),
           const SizedBox(height: 16),
 
           // Themes Section Header
@@ -294,7 +286,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildPvPButton(AppLocalizations l10n) {
+  Widget _buildPvPButton(AppLocalizations l10n, int pvpRating) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -483,7 +475,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildThemeCard(ThemeModel theme, AppLocalizations l10n) {
+  Widget _buildThemeCard(ThemeModel theme, AppLocalizations l10n, Map<String, Map<String, dynamic>> themeProgress) {
     final progress = themeProgress[theme.id];
     final level = progress?['level'] ?? 1;
     final xp = progress?['xp'] ?? 0;
