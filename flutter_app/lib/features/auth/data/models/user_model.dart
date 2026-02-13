@@ -49,6 +49,18 @@ class UserModel {
     );
   }
 
+  /// Retourne le streak effectif : 0 si le dernier jeu date de plus d'1 jour
+  int get effectiveStreak {
+    if (lastPlayedAt == null) return 0;
+    final now = DateTime.now();
+    final local = lastPlayedAt!.toLocal();
+    final today = DateTime(now.year, now.month, now.day);
+    final lastPlayed = DateTime(local.year, local.month, local.day);
+    final diff = today.difference(lastPlayed).inDays;
+    if (diff <= 1) return currentStreak; // aujourd'hui ou hier
+    return 0; // plus d'1 jour sans jouer
+  }
+
   double get accuracy {
     if (totalQuestions == 0) return 0;
     return (correctAnswers / totalQuestions) * 100;

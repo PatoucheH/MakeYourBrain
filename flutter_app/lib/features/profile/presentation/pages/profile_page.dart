@@ -632,7 +632,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${userStats?.currentStreak ?? 0} ${l10n.days}',
+                      '${userStats?.effectiveStreak ?? 0} ${l10n.days}',
                       style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,

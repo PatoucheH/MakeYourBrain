@@ -125,8 +125,24 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
     final totalQuestions = (data['total_questions'] as num?)?.toInt() ?? 0;
     final correctAnswers = (data['correct_answers'] as num?)?.toInt() ?? 0;
     final accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions * 100) : 0.0;
-    final currentStreak = (data['current_streak'] as num?)?.toInt() ?? 0;
+    final rawStreak = (data['current_streak'] as num?)?.toInt() ?? 0;
     final bestStreak = (data['best_streak'] as num?)?.toInt() ?? 0;
+    // Calculer le streak effectif : 0 si pas joué depuis plus d'1 jour
+    final lastPlayedAt = data['last_played_at'] != null
+        ? DateTime.tryParse(data['last_played_at'].toString())
+        : null;
+    int currentStreak = rawStreak;
+    if (lastPlayedAt != null) {
+      final now = DateTime.now();
+      final local = lastPlayedAt.toLocal();
+      final today = DateTime(now.year, now.month, now.day);
+      final lastPlayed = DateTime(local.year, local.month, local.day);
+      if (today.difference(lastPlayed).inDays > 1) {
+        currentStreak = 0;
+      }
+    } else {
+      currentStreak = 0;
+    }
     final pvpRating = (data['pvp_rating'] as num?)?.toInt() ?? 1000;
     final pvpWins = (data['pvp_wins'] as num?)?.toInt() ?? 0;
     final pvpLosses = (data['pvp_losses'] as num?)?.toInt() ?? 0;

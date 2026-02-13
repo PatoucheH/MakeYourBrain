@@ -29,7 +29,7 @@ class _BrainAppBarState extends State<BrainAppBar> {
       final stats = await _authRepo.getUserStats();
       if (mounted) {
         setState(() {
-          currentStreak = stats?.currentStreak ?? 0;
+          currentStreak = stats?.effectiveStreak ?? 0;
         });
       }
     } catch (_) {}

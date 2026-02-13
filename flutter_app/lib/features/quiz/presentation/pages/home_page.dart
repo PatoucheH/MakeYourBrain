@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
         favoriteThemes = preferred;
         favoriteThemeIds = preferredIds;
         themeProgress = progressMap;
-        currentStreak = stats?.currentStreak ?? 0;
+        currentStreak = stats?.effectiveStreak ?? 0;
         pvpRating = stats?.pvpRating ?? 1000;
         isLoading = false;
       });
