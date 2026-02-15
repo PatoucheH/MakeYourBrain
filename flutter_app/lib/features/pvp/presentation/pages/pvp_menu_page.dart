@@ -59,11 +59,6 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
       final userId = _authRepo.getCurrentUserId();
       if (userId == null) return;
 
-      // Vérifier le statut de la queue au retour dans l'app
-      if (mounted) {
-        context.read<PvPProvider>().checkQueueStatusOnResume();
-      }
-
       // Load stats and match history in parallel
       final results = await Future.wait([
         _pvpRepo.getPlayerPvPStats(userId),

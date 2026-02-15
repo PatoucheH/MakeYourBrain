@@ -39,6 +39,10 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
     if ((pvp.matchFound || pvp.matchFoundWaiting || pvp.yourTurnNotification || pvp.matchCompletedNotification) && _isMinimized) {
       setState(() => _isMinimized = false);
     }
+    // Auto-navigation UNIQUEMENT pour le joueur qui commence (matchFound)
+    if (pvp.matchFound && pvp.matchFoundCountdown <= 0) {
+      _goToMatch();
+    }
   }
 
   void _toggleMinimized() {
@@ -435,22 +439,48 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                     ],
                   ),
                 ),
-                GestureDetector(
-                  onTap: () => pvp.dismissNotification(),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 18,
-                    ),
+                _buildMinimizeButton(Colors.white),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: _goToMatch,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  backgroundColor: Colors.white.withValues(alpha: 0.2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-              ],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.play_arrow, color: Colors.white, size: 20),
+                    const SizedBox(width: 6),
+                    Text(
+                      l10n.goToMatch,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () => pvp.dismissNotification(),
+              child: Text(
+                l10n.close,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.7),
+                  fontSize: 12,
+                ),
+              ),
             ),
           ],
         ),

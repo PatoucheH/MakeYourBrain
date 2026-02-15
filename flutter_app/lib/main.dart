@@ -247,8 +247,14 @@ class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Vérifier le statut de la queue PvP au retour dans l'app
-      context.read<PvPProvider>().checkQueueStatusOnResume();
+      // Redémarrer le polling PvP au retour dans l'app
+      final pvp = context.read<PvPProvider>();
+      if (pvp.currentUserId != null) {
+        pvp.startBackgroundChecks();
+      }
+    } else if (state == AppLifecycleState.paused) {
+      // Arrêter le polling quand l'app passe en arrière-plan
+      context.read<PvPProvider>().stopBackgroundChecks();
     }
   }
 
@@ -347,6 +353,11 @@ class _AuthCheckerState extends State<AuthChecker> {
         _isChecking = false;
       });
       return;
+    }
+
+    // Démarrer le polling PvP en arrière-plan dès que l'utilisateur est connecté
+    if (context.mounted) {
+      context.read<PvPProvider>().startBackgroundChecks();
     }
 
     try {

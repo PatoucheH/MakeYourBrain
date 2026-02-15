@@ -12,37 +12,47 @@ class PvPProvider extends ChangeNotifier {
   final AuthRepository _authRepository;
   final ProfileRepository _profileRepository;
 
-  // État
+  // === État du jeu ===
   PvPMatchModel? currentMatch;
   PvPRoundModel? currentRound;
   List<QuestionModel> currentQuestions = [];
   int currentQuestionIndex = 0;
   List<PvPAnswerModel> myAnswers = [];
-  bool isSearchingMatch = false;
-  bool isInQueue = false;
   bool isMyTurn = false;
   int timeSpent = 0;
-  int searchDuration = 0;
   String? errorMessage;
   bool isLoading = false;
+  int consecutiveWrong = 0;
+  bool roundSubmitted = false;
 
-  // États pour les notifications
-  bool matchFound = false;          // Match trouvé avec countdown → auto-nav (joueur qui commence)
-  bool matchFoundWaiting = false;   // Match trouvé mais c'est l'adversaire qui commence
+  // === État de la recherche ===
+  bool isSearchingMatch = false;
+  bool isInQueue = false;
+  int searchDuration = 0;
+
+  // === État des notifications ===
+  // Type 1a: Match trouvé, c'est à moi de jouer → countdown + auto-nav
+  bool matchFound = false;
+  // Type 1b: Match trouvé, c'est à l'adversaire de jouer → countdown + auto-nav
+  bool matchFoundWaiting = false;
   int matchFoundCountdown = 5;
   String? foundMatchId;
   String? opponentUsername;
-  bool yourTurnNotification = false; // C'est votre tour → bouton pour aller au match
-  int? notificationRoundNumber;       // Numéro du round pour la notif "your turn"
-  bool matchCompletedNotification = false; // Match terminé
-  bool? matchCompletedDidWin;        // Résultat du match terminé
-  Timer? _matchFoundTimer;
-  bool _previousIsMyTurn = false;     // Pour détecter les changements de tour
+  // Type 2: C'est ton tour → bouton pour aller au match
+  bool yourTurnNotification = false;
+  int? notificationRoundNumber;
+  // Type 3: Match terminé → résultat
+  bool matchCompletedNotification = false;
+  bool? matchCompletedDidWin;
 
-  // Streams
+  // === État interne ===
+  bool isOnGamePage = false;
+  bool _previousIsMyTurn = false;
+  Timer? _matchFoundTimer;
   StreamSubscription<PvPMatchModel?>? _matchSubscription;
   Timer? _searchTimer;
   Timer? _searchDurationTimer;
+  Timer? _backgroundCheckTimer; // Polling global en arrière-plan
 
   PvPProvider({
     PvPRepository? pvpRepository,
@@ -53,7 +63,6 @@ class PvPProvider extends ChangeNotifier {
         _profileRepository = profileRepository ?? ProfileRepository();
 
   String? get currentUserId => _authRepository.getCurrentUserId();
-
   bool get isPlayer1 => currentMatch?.player1Id == currentUserId;
 
   int get myTotalScore {
@@ -68,8 +77,6 @@ class PvPProvider extends ChangeNotifier {
     return currentMatch!.getPlayerScore(opponentId);
   }
 
-  int consecutiveWrong = 0;
-
   int get myRoundScore {
     int total = 0;
     for (final answer in myAnswers) {
@@ -77,8 +84,6 @@ class PvPProvider extends ChangeNotifier {
     }
     return total < 0 ? 0 : total;
   }
-
-  bool roundSubmitted = false;
 
   bool get hasAnsweredAllQuestions =>
       roundSubmitted ||
@@ -89,85 +94,77 @@ class PvPProvider extends ChangeNotifier {
     return currentQuestions[currentQuestionIndex];
   }
 
-  /// Vérifie si le joueur doit choisir un thème
   bool get isMyThemeChoice {
     if (currentMatch == null || currentUserId == null) return false;
     return currentMatch!.isPlayerChoosingTheme(currentUserId!);
   }
 
-  /// Vérifie le statut de la queue et des matchs actifs au retour dans l'app
-  Future<void> checkQueueStatusOnResume() async {
-    final userId = currentUserId;
-    if (userId == null) return;
-    // Ne pas vérifier si on est déjà en recherche active
-    if (isSearchingMatch || matchFound || matchFoundWaiting) return;
+  /// Indique si une notification quelconque est active
+  bool get hasActiveNotification =>
+      matchFound || matchFoundWaiting || yourTurnNotification || matchCompletedNotification;
 
-    try {
-      // 1. Vérifier la queue de matchmaking
-      if (currentMatch == null) {
-        final result = await _pvpRepository.checkQueueStatus(userId);
+  // =========================================================================
+  // POLLING GLOBAL EN ARRIÈRE-PLAN
+  // =========================================================================
 
-        if (result['matchFound'] == true && result['matchId'] != null) {
-          foundMatchId = result['matchId'] as String;
-          _onMatchFound();
-          return;
-        } else if (result['inQueue'] == true) {
-          isSearchingMatch = true;
-          isInQueue = true;
-          searchDuration = (result['timeInQueue'] as int?) ?? 0;
-          _startSearchTimer();
-          _startSearchDurationTimer();
-          notifyListeners();
-          return;
-        }
-      }
-
-      // 2. Vérifier les matchs actifs pour détecter si c'est notre tour
-      await checkActiveMatchesForTurn();
-    } catch (e) {
-      debugPrint('Error checking queue status: $e');
-    }
+  /// Démarre le polling global. Appelé une fois au login/init.
+  /// Vérifie toutes les 8 secondes : queue + matchs actifs.
+  void startBackgroundChecks() {
+    _backgroundCheckTimer?.cancel();
+    _backgroundCheckTimer = Timer.periodic(const Duration(seconds: 8), (_) {
+      _backgroundCheck();
+    });
+    // Vérification immédiate au démarrage
+    _backgroundCheck();
   }
 
-  /// Vérifie les matchs actifs et notifie si c'est le tour du joueur
-  Future<void> checkActiveMatchesForTurn() async {
+  void stopBackgroundChecks() {
+    _backgroundCheckTimer?.cancel();
+  }
+
+  Future<void> _backgroundCheck() async {
     final userId = currentUserId;
     if (userId == null) return;
+    // Ne pas vérifier si on est en plein jeu ou en recherche active
+    // ou si le countdown matchFound est en cours (auto-teleport)
+    if (isOnGamePage || isSearchingMatch || matchFound) return;
 
     try {
+      // 1. Vérifier la queue de matchmaking (match trouvé pendant l'absence ?)
+      final queueResult = await _pvpRepository.checkQueueStatus(userId);
+
+      if (queueResult['matchFound'] == true && queueResult['matchId'] != null) {
+        debugPrint('[PvP] _backgroundCheck - match found from queue!');
+        foundMatchId = queueResult['matchId'] as String;
+        await _onMatchFound();
+        return;
+      }
+
+      // 2. Vérifier les matchs actifs → est-ce mon tour ?
       final activeMatches = await _pvpRepository.getActiveMatches(userId);
       if (activeMatches.isEmpty) return;
 
       for (final match in activeMatches) {
-        final isMyTurn = match.isPlayerTurn(userId) || match.isPlayerChoosingTheme(userId);
-        if (isMyTurn) {
-          debugPrint('[PvP] checkActiveMatchesForTurn - found active match ${match.id} where it is my turn');
-
+        final myTurn = match.isPlayerTurn(userId) || match.isPlayerChoosingTheme(userId);
+        if (myTurn) {
+          debugPrint('[PvP] _backgroundCheck - it is my turn in match ${match.id}, status=${match.status}');
           // Charger le match et démarrer le watcher si pas déjà fait
           if (currentMatch?.id != match.id) {
             currentMatch = match;
             _updateIsMyTurn();
-            _previousIsMyTurn = true; // On sait déjà que c'est notre tour
+            _previousIsMyTurn = true;
             _watchMatch(match.id);
           }
-
-          // Récupérer le username de l'adversaire
-          if (opponentUsername == null) {
-            final opponentId = match.getOpponentId(userId);
-            if (opponentId != null) {
-              opponentUsername = await _pvpRepository.getUsername(opponentId);
-            }
-          }
-
-          // Déclencher la notification "your turn"
+          await _ensureOpponentUsername(match, userId);
+          // Toujours déclencher la notification (même si déjà active, ça met à jour le round)
           yourTurnNotification = true;
           notificationRoundNumber = match.currentRound;
           notifyListeners();
-          return; // Notifier pour le premier match trouvé
+          return;
         }
       }
 
-      // Si on a un match en cours mais pas notre tour, quand même garder le watcher actif
+      // Pas notre tour mais on a un match actif → garder le watcher actif
       if (currentMatch == null && activeMatches.isNotEmpty) {
         final match = activeMatches.first;
         currentMatch = match;
@@ -177,11 +174,41 @@ class PvPProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('[PvP] Error checking active matches for turn: $e');
+      debugPrint('[PvP] _backgroundCheck error: $e');
     }
   }
 
-  /// Rejoint la file d'attente de matchmaking
+  Future<void> _ensureOpponentUsername(PvPMatchModel match, String userId) async {
+    if (opponentUsername != null) return;
+    final opponentId = match.getOpponentId(userId);
+    if (opponentId != null) {
+      opponentUsername = await _pvpRepository.getUsername(opponentId);
+    }
+  }
+
+  // =========================================================================
+  // PAGE DE JEU - flag pour supprimer les notifications quand on est dessus
+  // =========================================================================
+
+  void setOnGamePage(bool value) {
+    isOnGamePage = value;
+    if (value) {
+      // On entre sur la page de jeu → dismiss toutes les notifications
+      final hadNotification = yourTurnNotification || matchFoundWaiting || matchCompletedNotification;
+      yourTurnNotification = false;
+      matchFoundWaiting = false;
+      matchCompletedNotification = false;
+      matchCompletedDidWin = null;
+      notificationRoundNumber = null;
+      _matchFoundTimer?.cancel();
+      if (hadNotification) notifyListeners();
+    }
+  }
+
+  // =========================================================================
+  // MATCHMAKING
+  // =========================================================================
+
   Future<void> joinMatchmaking() async {
     final userId = currentUserId;
     if (userId == null) {
@@ -197,26 +224,20 @@ class PvPProvider extends ChangeNotifier {
       errorMessage = null;
       notifyListeners();
 
-      // Récupérer les stats du joueur
       final stats = await _pvpRepository.getPlayerPvPStats(userId);
       final rating = stats['rating'] as int;
-
-      // Récupérer la langue préférée
       final userStats = await _authRepository.getUserStats();
       final language = userStats?.preferredLanguage ?? 'en';
 
-      // Rejoindre la file d'attente
-      debugPrint('[PvP] joinMatchmaking - calling RPC with userId=$userId, rating=$rating, language=$language');
+      debugPrint('[PvP] joinMatchmaking - calling RPC');
       final result = await _pvpRepository.joinMatchmaking(userId, rating, language);
       debugPrint('[PvP] joinMatchmaking - result: $result');
 
       if (result['matchFound'] == true && result['matchId'] != null) {
-        // Match trouvé immédiatement - démarrer le countdown
         foundMatchId = result['matchId'];
         debugPrint('[PvP] joinMatchmaking - match found! matchId=$foundMatchId');
-        _onMatchFound();
+        await _onMatchFound();
       } else {
-        // En attente d'un adversaire, on poll régulièrement
         debugPrint('[PvP] joinMatchmaking - no match, entering queue');
         isInQueue = true;
         _startSearchTimer();
@@ -256,41 +277,36 @@ class PvPProvider extends ChangeNotifier {
   Future<void> _checkForMatch() async {
     final userId = currentUserId;
     if (userId == null) return;
-    // Ne pas chercher si un match est déjà en cours
     if (currentMatch != null && currentMatch!.isInProgress) {
       _stopSearchTimers();
       return;
     }
 
     try {
-      // D'abord vérifier si un match a été trouvé (par l'autre joueur)
       final status = await _pvpRepository.checkQueueStatus(userId);
 
       if (status['matchFound'] == true && status['matchId'] != null) {
         _stopSearchTimers();
         foundMatchId = status['matchId'] as String;
-        debugPrint('[PvP] _checkForMatch - match found via checkQueueStatus! matchId=$foundMatchId');
-        _onMatchFound();
+        debugPrint('[PvP] _checkForMatch - match found! matchId=$foundMatchId');
+        await _onMatchFound();
         return;
       }
 
-      // Si toujours dans la queue, tenter de matcher avec quelqu'un
       if (status['inQueue'] == true) {
         final stats = await _pvpRepository.getPlayerPvPStats(userId);
         final rating = stats['rating'] as int;
         final userStats = await _authRepository.getUserStats();
         final language = userStats?.preferredLanguage ?? 'en';
-
         final result = await _pvpRepository.joinMatchmaking(userId, rating, language);
 
         if (result['matchFound'] == true && result['matchId'] != null) {
           _stopSearchTimers();
           foundMatchId = result['matchId'];
-          debugPrint('[PvP] _checkForMatch - match found via joinMatchmaking! matchId=$foundMatchId');
-          _onMatchFound();
+          debugPrint('[PvP] _checkForMatch - match found via join! matchId=$foundMatchId');
+          await _onMatchFound();
         }
       } else {
-        // Plus dans la queue et pas de match → arrêter le polling
         debugPrint('[PvP] _checkForMatch - not in queue anymore, stopping');
         _stopSearchTimers();
         isSearchingMatch = false;
@@ -302,9 +318,11 @@ class PvPProvider extends ChangeNotifier {
     }
   }
 
-  /// Match trouvé : charger le match, récupérer le username adversaire
-  /// Si c'est à moi de commencer → countdown 5s + auto-navigation
-  /// Sinon → notification silencieuse (attendre mon tour via watcher)
+  // =========================================================================
+  // MATCH FOUND
+  // =========================================================================
+
+  /// Match trouvé : charger, notifier, auto-naviguer les DEUX joueurs
   Future<void> _onMatchFound() async {
     _stopSearchTimers();
     isInQueue = false;
@@ -313,12 +331,8 @@ class PvPProvider extends ChangeNotifier {
     try {
       if (foundMatchId != null) {
         await loadMatch(foundMatchId!);
-        // Récupérer le username de l'adversaire
         if (currentMatch != null && currentUserId != null) {
-          final opponentId = currentMatch!.getOpponentId(currentUserId!);
-          if (opponentId != null) {
-            opponentUsername = await _pvpRepository.getUsername(opponentId);
-          }
+          await _ensureOpponentUsername(currentMatch!, currentUserId!);
         }
         foundMatchId = null;
       }
@@ -326,39 +340,34 @@ class PvPProvider extends ChangeNotifier {
       debugPrint('[PvP] Error in _onMatchFound: $e');
     }
 
-    // Initialiser le tracking de tour pour le watcher
     _previousIsMyTurn = isMyTurn || isMyThemeChoice;
 
-    // Si c'est à moi de commencer → countdown 5s + auto-navigation
     if (isMyTurn || isMyThemeChoice) {
+      // Je commence → countdown 5s puis auto-nav
       matchFound = true;
       matchFoundCountdown = 5;
       notifyListeners();
-      _matchFoundTimer?.cancel();
-      _matchFoundTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        matchFoundCountdown--;
-        notifyListeners();
-        if (matchFoundCountdown <= 0) {
-          timer.cancel();
-          matchFound = false;
-          notifyListeners();
-        }
-      });
+      _startMatchFoundCountdown();
     } else {
-      // Pas à mon tour → notifier que le match est trouvé mais l'adversaire joue en premier
+      // L'adversaire commence → notification persistante avec bouton "Aller au match"
       matchFoundWaiting = true;
       notifyListeners();
-      // Auto-dismiss après 5 secondes
-      Timer(const Duration(seconds: 5), () {
-        if (matchFoundWaiting) {
-          matchFoundWaiting = false;
-          notifyListeners();
-        }
-      });
     }
   }
 
-  /// Ferme une notification (appelé aussi par dismissMatchFound pour compatibilité)
+  void _startMatchFoundCountdown() {
+    _matchFoundTimer?.cancel();
+    _matchFoundTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      matchFoundCountdown--;
+      notifyListeners();
+      if (matchFoundCountdown <= 0) {
+        timer.cancel();
+        // Ne pas clear les flags ici - l'overlay gère la navigation
+        // et appelle dismissNotification() au moment de naviguer
+      }
+    });
+  }
+
   void dismissNotification() {
     matchFound = false;
     matchFoundWaiting = false;
@@ -370,10 +379,8 @@ class PvPProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Alias pour compatibilité
   void dismissMatchFound() => dismissNotification();
 
-  /// Quitte la file d'attente de matchmaking
   Future<void> leaveMatchmaking() async {
     final userId = currentUserId;
     if (userId == null) return;
@@ -394,7 +401,10 @@ class PvPProvider extends ChangeNotifier {
     }
   }
 
-  /// Calcule le rating moyen des deux joueurs
+  // =========================================================================
+  // MATCH LOADING & WATCHING
+  // =========================================================================
+
   int get _avgRating {
     if (currentMatch == null) return 1000;
     final r1 = currentMatch!.player1RatingBefore;
@@ -402,68 +412,6 @@ class PvPProvider extends ChangeNotifier {
     return ((r1 + r2) / 2).round();
   }
 
-  /// Sélectionne un thème pour le round actuel
-  Future<void> selectTheme(String themeId) async {
-    if (currentMatch == null || currentUserId == null) return;
-
-    try {
-      isLoading = true;
-      notifyListeners();
-
-      final userStats = await _authRepository.getUserStats();
-      final language = userStats?.preferredLanguage ?? 'en';
-
-      // Générer les questions pour ce thème avec difficulté basée sur le rating moyen
-      final questions = await _pvpRepository.getQuestionsByTheme(themeId, language, 100, avgRating: _avgRating);
-      currentQuestions = questions;
-      if (questions.isNotEmpty) {
-        final q = questions.first;
-        debugPrint('[PvP] selectTheme - first question: id=${q.id}, answers=${q.answers.length}, correctAnswers=${q.answers.where((a) => a.isCorrect).length}');
-      }
-
-      final questionIds = questions.map((q) => q.id).toList();
-
-      // Créer le round avec le thème et les questions
-      await _pvpRepository.createRound(
-        currentMatch!.id,
-        currentMatch!.currentRound,
-        questionIds,
-        themeId: themeId,
-      );
-
-      // Mettre à jour le statut du match vers playerX_turn
-      // (le backend pvp_create_round ne change pas le status, on le fait ici)
-      final newStatus = currentMatch!.currentRound == 1
-          ? 'player1_turn'
-          : 'player2_turn';
-      await _pvpRepository.updateMatchStatus(currentMatch!.id, newStatus);
-
-      // Recharger le match et le round
-      currentMatch = await _pvpRepository.getMatch(currentMatch!.id);
-      currentRound = await _pvpRepository.getRound(
-        currentMatch!.id,
-        currentMatch!.currentRound,
-      );
-
-      // Réinitialiser l'état de jeu
-      myAnswers = [];
-      currentQuestionIndex = 0;
-      timeSpent = 0;
-      roundSubmitted = false;
-      consecutiveWrong = 0;
-
-      _updateIsMyTurn();
-      isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      debugPrint('[PvP] ERROR selectTheme: $e');
-      errorMessage = 'Error selecting theme: $e';
-      isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  /// Charge un match et s'abonne aux changements
   Future<void> loadMatch(String matchId) async {
     try {
       isLoading = true;
@@ -480,19 +428,15 @@ class PvPProvider extends ChangeNotifier {
         return;
       }
 
-      debugPrint('[PvP] loadMatch - status=${currentMatch!.status}, currentRound=${currentMatch!.currentRound}, player1=${currentMatch!.player1Id}, player2=${currentMatch!.player2Id}');
+      debugPrint('[PvP] loadMatch - status=${currentMatch!.status}, round=${currentMatch!.currentRound}');
 
-      // Déterminer si c'est notre tour
       _updateIsMyTurn();
       _previousIsMyTurn = isMyTurn || isMyThemeChoice;
-      debugPrint('[PvP] loadMatch - isMyTurn=$isMyTurn, isMyThemeChoice=$isMyThemeChoice, _previousIsMyTurn=$_previousIsMyTurn, currentUserId=$currentUserId');
 
-      // Si c'est un état de choix de thème, ne pas charger le round
       if (!currentMatch!.isChoosingTheme) {
         await loadRound(currentMatch!.currentRound);
       }
 
-      // S'abonner aux changements du match
       _watchMatch(matchId);
 
       isLoading = false;
@@ -518,75 +462,66 @@ class PvPProvider extends ChangeNotifier {
     _matchSubscription?.cancel();
     _matchSubscription = _pvpRepository.watchMatch(matchId).listen(
       (match) async {
-        if (match != null) {
-          final previousMatchRound = currentMatch?.currentRound;
-          final previousStatus = currentMatch?.status;
-          final wasMyTurn = _previousIsMyTurn;
-          currentMatch = match;
-          _updateIsMyTurn();
+        if (match == null) return;
 
-          debugPrint('[PvP] _watchMatch - status=${match.status}, round=${match.currentRound}, wasMyTurn=$wasMyTurn, isMyTurn=$isMyTurn, isMyThemeChoice=$isMyThemeChoice');
+        final previousStatus = currentMatch?.status;
+        final previousMatchRound = currentMatch?.currentRound;
+        final wasMyTurn = _previousIsMyTurn;
+        currentMatch = match;
+        _updateIsMyTurn();
 
-          // Détecter si le match vient de se terminer
-          if (previousStatus != PvPMatchStatus.completed &&
-              match.status == PvPMatchStatus.completed) {
-            debugPrint('[PvP] _watchMatch - match completed!');
-            matchCompletedNotification = true;
-            if (match.winnerId == null) {
-              matchCompletedDidWin = null; // draw
-            } else {
-              matchCompletedDidWin = match.winnerId == currentUserId;
-            }
-            // Récupérer le username adversaire si pas encore fait
-            if (opponentUsername == null && currentUserId != null) {
-              final opponentId = match.getOpponentId(currentUserId!);
-              if (opponentId != null) {
-                opponentUsername = await _pvpRepository.getUsername(opponentId);
-              }
-            }
-            notifyListeners();
-            return;
+        debugPrint('[PvP] _watchMatch - status=${match.status}, round=${match.currentRound}, wasMyTurn=$wasMyTurn, isMyTurn=$isMyTurn');
+
+        // Match terminé
+        if (previousStatus != PvPMatchStatus.completed &&
+            match.status == PvPMatchStatus.completed) {
+          debugPrint('[PvP] _watchMatch - match completed!');
+          matchCompletedNotification = true;
+          matchCompletedDidWin = match.winnerId == null
+              ? null
+              : match.winnerId == currentUserId;
+          if (currentUserId != null) {
+            await _ensureOpponentUsername(match, currentUserId!);
           }
-
-          // Détecter si c'est devenu mon tour (et ça ne l'était pas avant)
-          if (!wasMyTurn && (isMyTurn || isMyThemeChoice) && !matchFound) {
-            debugPrint('[PvP] _watchMatch - it became my turn! round=${match.currentRound}');
-            yourTurnNotification = true;
-            notificationRoundNumber = match.currentRound;
-            // Récupérer le username adversaire si pas encore fait
-            if (opponentUsername == null && currentUserId != null) {
-              final opponentId = match.getOpponentId(currentUserId!);
-              if (opponentId != null) {
-                opponentUsername = await _pvpRepository.getUsername(opponentId);
-              }
-            }
-          }
-          _previousIsMyTurn = isMyTurn || isMyThemeChoice;
-
-          // Si le statut a changé de choosingTheme à playerTurn, charger le round
-          final wasChoosingTheme = previousStatus == PvPMatchStatus.player1ChoosingTheme ||
-              previousStatus == PvPMatchStatus.player2ChoosingTheme;
-          final isNowPlaying = match.status == PvPMatchStatus.player1Turn ||
-              match.status == PvPMatchStatus.player2Turn;
-
-          if (wasChoosingTheme && isNowPlaying) {
-            await loadRound(match.currentRound);
-          }
-
-          final roundChanged = previousMatchRound != null &&
-              previousMatchRound != match.currentRound;
-
-          if (roundChanged && hasAnsweredAllQuestions) {
-            currentRound = await _pvpRepository.getRound(matchId, previousMatchRound);
-          } else if (!match.isChoosingTheme && currentRound == null && isMyTurn) {
-            await loadRound(match.currentRound);
-          } else if (currentRound != null &&
-              currentRound!.roundNumber == match.currentRound) {
-            currentRound = await _pvpRepository.getRound(matchId, match.currentRound);
-          }
-
           notifyListeners();
+          return;
         }
+
+        // C'est devenu mon tour (et ça ne l'était pas avant)
+        // Notification SEULEMENT si PAS sur la page de jeu
+        if (!wasMyTurn && (isMyTurn || isMyThemeChoice) && !matchFound && !isOnGamePage) {
+          debugPrint('[PvP] _watchMatch - it became my turn! round=${match.currentRound}');
+          yourTurnNotification = true;
+          notificationRoundNumber = match.currentRound;
+          if (currentUserId != null) {
+            await _ensureOpponentUsername(match, currentUserId!);
+          }
+        }
+        _previousIsMyTurn = isMyTurn || isMyThemeChoice;
+
+        // Si statut changé de choosingTheme → playerTurn, charger le round
+        final wasChoosingTheme = previousStatus == PvPMatchStatus.player1ChoosingTheme ||
+            previousStatus == PvPMatchStatus.player2ChoosingTheme;
+        final isNowPlaying = match.status == PvPMatchStatus.player1Turn ||
+            match.status == PvPMatchStatus.player2Turn;
+
+        if (wasChoosingTheme && isNowPlaying) {
+          await loadRound(match.currentRound);
+        }
+
+        final roundChanged = previousMatchRound != null &&
+            previousMatchRound != match.currentRound;
+
+        if (roundChanged && hasAnsweredAllQuestions) {
+          currentRound = await _pvpRepository.getRound(matchId, previousMatchRound);
+        } else if (!match.isChoosingTheme && currentRound == null && isMyTurn) {
+          await loadRound(match.currentRound);
+        } else if (currentRound != null &&
+            currentRound!.roundNumber == match.currentRound) {
+          currentRound = await _pvpRepository.getRound(matchId, match.currentRound);
+        }
+
+        notifyListeners();
       },
       onError: (e) {
         debugPrint('Error watching match: $e');
@@ -594,11 +529,67 @@ class PvPProvider extends ChangeNotifier {
     );
   }
 
-  /// Charge un round spécifique
+  // =========================================================================
+  // THEME SELECTION
+  // =========================================================================
+
+  Future<void> selectTheme(String themeId) async {
+    if (currentMatch == null || currentUserId == null) return;
+
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final userStats = await _authRepository.getUserStats();
+      final language = userStats?.preferredLanguage ?? 'en';
+
+      final questions = await _pvpRepository.getQuestionsByTheme(themeId, language, 100, avgRating: _avgRating);
+      currentQuestions = questions;
+
+      final questionIds = questions.map((q) => q.id).toList();
+
+      await _pvpRepository.createRound(
+        currentMatch!.id,
+        currentMatch!.currentRound,
+        questionIds,
+        themeId: themeId,
+      );
+
+      final newStatus = currentMatch!.currentRound == 1
+          ? 'player1_turn'
+          : 'player2_turn';
+      await _pvpRepository.updateMatchStatus(currentMatch!.id, newStatus);
+
+      currentMatch = await _pvpRepository.getMatch(currentMatch!.id);
+      currentRound = await _pvpRepository.getRound(
+        currentMatch!.id,
+        currentMatch!.currentRound,
+      );
+
+      myAnswers = [];
+      currentQuestionIndex = 0;
+      timeSpent = 0;
+      roundSubmitted = false;
+      consecutiveWrong = 0;
+
+      _updateIsMyTurn();
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('[PvP] ERROR selectTheme: $e');
+      errorMessage = 'Error selecting theme: $e';
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // =========================================================================
+  // ROUND MANAGEMENT
+  // =========================================================================
+
   Future<void> loadRound(int roundNumber) async {
     if (currentMatch == null) return;
 
-    // Ne pas charger de round si on est en phase de choix de thème
     if (currentMatch!.isChoosingTheme) {
       debugPrint('[PvP] loadRound($roundNumber) - skipped, choosing theme phase');
       return;
@@ -607,9 +598,7 @@ class PvPProvider extends ChangeNotifier {
     try {
       debugPrint('[PvP] loadRound($roundNumber) - isMyTurn=$isMyTurn');
       currentRound = await _pvpRepository.getRound(currentMatch!.id, roundNumber);
-      debugPrint('[PvP] loadRound - round=${currentRound != null ? 'found (${currentRound!.questionIds.length} questionIds, theme=${currentRound!.themeId})' : 'null'}');
 
-      // Réinitialiser les réponses locales pour ce round
       myAnswers = [];
       currentQuestionIndex = 0;
       timeSpent = 0;
@@ -617,19 +606,14 @@ class PvPProvider extends ChangeNotifier {
       consecutiveWrong = 0;
 
       if (currentRound == null) {
-        // Round 3 : thème aléatoire, le premier joueur le crée
         if (isMyTurn && roundNumber == 3) {
-          debugPrint('[PvP] loadRound - round 3, creating with random theme');
           await _startRoundWithRandomTheme();
         } else if (isMyTurn) {
-          debugPrint('[PvP] loadRound - creating new round (startRound)');
           await startRound();
         } else {
           debugPrint('[PvP] loadRound - round null and not my turn, waiting');
         }
       } else {
-        // Round existant, charger les questions
-        debugPrint('[PvP] loadRound - loading questions from existing round');
         await _loadQuestionsFromRound();
       }
 
@@ -642,7 +626,6 @@ class PvPProvider extends ChangeNotifier {
     }
   }
 
-  /// Crée le round 3 avec un thème aléatoire
   Future<void> _startRoundWithRandomTheme() async {
     if (currentMatch == null) return;
 
@@ -653,7 +636,6 @@ class PvPProvider extends ChangeNotifier {
       final userStats = await _authRepository.getUserStats();
       final language = userStats?.preferredLanguage ?? 'en';
 
-      // Récupérer les thèmes des rounds 1 et 2
       final round1 = await _pvpRepository.getRound(currentMatch!.id, 1);
       final round2 = await _pvpRepository.getRound(currentMatch!.id, 2);
       final excludeThemes = [
@@ -661,14 +643,12 @@ class PvPProvider extends ChangeNotifier {
         if (round2?.themeId != null) round2!.themeId!,
       ];
 
-      // Choisir un thème aléatoire différent
       final randomThemeId = await _pvpRepository.getRandomTheme(language, excludeThemes);
 
       List<QuestionModel> questions;
       if (randomThemeId != null) {
         questions = await _pvpRepository.getQuestionsByTheme(randomThemeId, language, 100, avgRating: _avgRating);
       } else {
-        // Fallback : questions aléatoires tous thèmes
         questions = await _pvpRepository.getQuestionsForRound(language, 100);
       }
 
@@ -701,23 +681,18 @@ class PvPProvider extends ChangeNotifier {
   }
 
   Future<void> _loadQuestionsFromRound() async {
-    if (currentRound == null || currentRound!.questionIds.isEmpty) {
-      debugPrint('[PvP] _loadQuestionsFromRound - skipped (round=${currentRound == null ? 'null' : 'empty questionIds'})');
-      return;
-    }
+    if (currentRound == null || currentRound!.questionIds.isEmpty) return;
 
     final userStats = await _authRepository.getUserStats();
     final language = userStats?.preferredLanguage ?? 'en';
     final questionIds = currentRound!.questionIds;
-    debugPrint('[PvP] _loadQuestionsFromRound - fetching ${questionIds.length} questions (lang=$language)');
 
     final fetchedQuestions = await _pvpRepository.getQuestionsByIds(
       questionIds,
       language,
     );
 
-    // Réordonner les questions pour correspondre à l'ordre exact de questionIds
-    // (le SQL ne garantit pas l'ordre) → les deux joueurs auront les mêmes questions dans le même ordre
+    // Réordonner pour correspondre à l'ordre exact de questionIds
     final questionsMap = {for (final q in fetchedQuestions) q.id: q};
     currentQuestions = questionIds
         .where((id) => questionsMap.containsKey(id))
@@ -725,7 +700,6 @@ class PvPProvider extends ChangeNotifier {
         .toList();
   }
 
-  /// Démarre un nouveau round (génère les questions)
   Future<void> startRound() async {
     if (currentMatch == null) return;
 
@@ -733,11 +707,9 @@ class PvPProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      debugPrint('[PvP] startRound - generating questions');
       final userStats = await _authRepository.getUserStats();
       final language = userStats?.preferredLanguage ?? 'en';
 
-      // Vérifier si un round existe déjà avec un thème
       final existingRound = await _pvpRepository.getRound(
         currentMatch!.id,
         currentMatch!.currentRound,
@@ -747,16 +719,12 @@ class PvPProvider extends ChangeNotifier {
       String? themeId = existingRound?.themeId;
 
       if (themeId != null) {
-        // Le thème a été choisi, récupérer les questions pour ce thème
         questions = await _pvpRepository.getQuestionsByTheme(themeId, language, 100, avgRating: _avgRating);
       } else {
-        // Pas de thème (fallback ou ancien système)
         questions = await _pvpRepository.getQuestionsForRound(language, 100);
       }
 
       currentQuestions = questions;
-      debugPrint('[PvP] startRound - got ${currentQuestions.length} questions (theme=$themeId)');
-
       final questionIds = currentQuestions.map((q) => q.id).toList();
 
       await _pvpRepository.createRound(
@@ -787,14 +755,16 @@ class PvPProvider extends ChangeNotifier {
     }
   }
 
-  /// Sélectionne une réponse pour la question actuelle
+  // =========================================================================
+  // ANSWERING & SUBMITTING
+  // =========================================================================
+
   void selectAnswer(
     String questionId,
     String answerId,
     bool isCorrect,
     String difficulty,
   ) {
-    debugPrint('[PvP] selectAnswer - questionId=$questionId, answerId=$answerId, isCorrect=$isCorrect, difficulty=$difficulty');
     int points = 0;
     if (isCorrect) {
       switch (difficulty.toLowerCase()) {
@@ -813,7 +783,6 @@ class PvPProvider extends ChangeNotifier {
       consecutiveWrong = 0;
     } else {
       consecutiveWrong++;
-      // Ne pas descendre en dessous de 0
       points = myRoundScore > 0 ? -1 : 0;
     }
 
@@ -835,7 +804,6 @@ class PvPProvider extends ChangeNotifier {
     }
   }
 
-  /// Passe à la question suivante sans répondre (timeout)
   void skipQuestion() {
     if (currentQuestion == null) return;
 
@@ -857,7 +825,6 @@ class PvPProvider extends ChangeNotifier {
     }
   }
 
-  /// Termine le round (temps écoulé)
   void finishRound() {
     if (roundSubmitted) return;
     roundSubmitted = true;
@@ -865,12 +832,10 @@ class PvPProvider extends ChangeNotifier {
     submitRound();
   }
 
-  /// Met à jour le temps écoulé
   void updateTimeSpent(int seconds) {
     timeSpent = seconds;
   }
 
-  /// Soumet les réponses du round
   Future<void> submitRound() async {
     if (currentMatch == null || currentRound == null || currentUserId == null) {
       return;
@@ -890,7 +855,6 @@ class PvPProvider extends ChangeNotifier {
         score,
       );
 
-      // Mettre à jour la streak (le PvP compte comme activité)
       try {
         await _profileRepository.updateStreak(currentUserId!);
       } catch (e) {
@@ -907,11 +871,9 @@ class PvPProvider extends ChangeNotifier {
       if (currentRound!.isRoundCompleted) {
         final roundNumber = currentRound!.roundNumber;
         if (roundNumber >= 3) {
-          // Dernier round terminé → compléter le match
           await completeMatch();
         } else if (roundNumber == 1) {
-          // Round 1 terminé → Player 2 choisit le thème du round 2
-          debugPrint('[PvP] submitRound - round 1 complete, transitioning to player2_choosing_theme');
+          debugPrint('[PvP] submitRound - round 1 complete → player2_choosing_theme');
           await _pvpRepository.updateMatchStatusAndRound(
             currentMatch!.id,
             'player2_choosing_theme',
@@ -919,8 +881,7 @@ class PvPProvider extends ChangeNotifier {
           );
           currentMatch = await _pvpRepository.getMatch(currentMatch!.id);
         } else if (roundNumber == 2) {
-          // Round 2 terminé → Round 3 avec thème aléatoire, player1 joue en premier
-          debugPrint('[PvP] submitRound - round 2 complete, transitioning to player1_turn for round 3');
+          debugPrint('[PvP] submitRound - round 2 complete → player1_turn round 3');
           await _pvpRepository.updateMatchStatusAndRound(
             currentMatch!.id,
             'player1_turn',
@@ -929,7 +890,6 @@ class PvPProvider extends ChangeNotifier {
           currentMatch = await _pvpRepository.getMatch(currentMatch!.id);
         }
       } else {
-        // Round pas encore complété : basculer le tour vers l'autre joueur
         final newStatus = isPlayer1 ? 'player2_turn' : 'player1_turn';
         debugPrint('[PvP] submitRound - switching turn to $newStatus');
         await _pvpRepository.updateMatchStatus(currentMatch!.id, newStatus);
@@ -946,7 +906,6 @@ class PvPProvider extends ChangeNotifier {
     }
   }
 
-  /// Termine le match et calcule le gagnant
   Future<void> completeMatch() async {
     if (currentMatch == null) return;
 
@@ -960,31 +919,69 @@ class PvPProvider extends ChangeNotifier {
     }
   }
 
-  /// Vérifie si le joueur actuel a gagné
+  // =========================================================================
+  // GETTERS
+  // =========================================================================
+
   bool? get didWin {
     if (currentMatch == null ||
         currentMatch!.status != PvPMatchStatus.completed ||
         currentUserId == null) {
       return null;
     }
-
-    if (currentMatch!.winnerId == null) {
-      return null;
-    }
-
+    if (currentMatch!.winnerId == null) return null;
     return currentMatch!.winnerId == currentUserId;
   }
 
-  /// Retourne le changement de rating du joueur actuel
   int? get myRatingChange {
     if (currentMatch == null || currentUserId == null) return null;
     return currentMatch!.getPlayerRatingChange(currentUserId!);
   }
 
-  /// Remet tous les états à zéro
+  Future<List<String>> getUsedThemeIds() async {
+    if (currentMatch == null) return [];
+    try {
+      final rounds = await _pvpRepository.getRounds(currentMatch!.id);
+      return rounds
+          .where((r) => r.themeId != null)
+          .map((r) => r.themeId!)
+          .toList();
+    } catch (e) {
+      debugPrint('[PvP] Error getting used theme ids: $e');
+      return [];
+    }
+  }
+
+  Future<List<PvPMatchModel>> getMatchHistory({int limit = 20}) async {
+    final userId = currentUserId;
+    if (userId == null) return [];
+    try {
+      return await _pvpRepository.getMyMatches(userId, limit: limit);
+    } catch (e) {
+      debugPrint('Error getting match history: $e');
+      return [];
+    }
+  }
+
+  Future<List<PvPMatchModel>> getActiveMatches() async {
+    final userId = currentUserId;
+    if (userId == null) return [];
+    try {
+      return await _pvpRepository.getActiveMatches(userId);
+    } catch (e) {
+      debugPrint('Error getting active matches: $e');
+      return [];
+    }
+  }
+
+  // =========================================================================
+  // RESET & DISPOSE
+  // =========================================================================
+
   void reset() {
     _matchSubscription?.cancel();
     _stopSearchTimers();
+    _matchFoundTimer?.cancel();
 
     currentMatch = null;
     currentRound = null;
@@ -1009,56 +1006,18 @@ class PvPProvider extends ChangeNotifier {
     matchCompletedDidWin = null;
     notificationRoundNumber = null;
     _previousIsMyTurn = false;
-    _matchFoundTimer?.cancel();
+    isOnGamePage = false;
 
+    // NE PAS arrêter le background timer : il doit continuer à tourner
     notifyListeners();
-  }
-
-  /// Récupère l'historique des matchs
-  Future<List<PvPMatchModel>> getMatchHistory({int limit = 20}) async {
-    final userId = currentUserId;
-    if (userId == null) return [];
-
-    try {
-      return await _pvpRepository.getMyMatches(userId, limit: limit);
-    } catch (e) {
-      debugPrint('Error getting match history: $e');
-      return [];
-    }
-  }
-
-  /// Récupère les thèmes déjà utilisés dans les rounds précédents du match en cours
-  Future<List<String>> getUsedThemeIds() async {
-    if (currentMatch == null) return [];
-    try {
-      final rounds = await _pvpRepository.getRounds(currentMatch!.id);
-      return rounds
-          .where((r) => r.themeId != null)
-          .map((r) => r.themeId!)
-          .toList();
-    } catch (e) {
-      debugPrint('[PvP] Error getting used theme ids: $e');
-      return [];
-    }
-  }
-
-  /// Récupère les matchs actifs
-  Future<List<PvPMatchModel>> getActiveMatches() async {
-    final userId = currentUserId;
-    if (userId == null) return [];
-
-    try {
-      return await _pvpRepository.getActiveMatches(userId);
-    } catch (e) {
-      debugPrint('Error getting active matches: $e');
-      return [];
-    }
   }
 
   @override
   void dispose() {
     _matchSubscription?.cancel();
     _stopSearchTimers();
+    _backgroundCheckTimer?.cancel();
+    _matchFoundTimer?.cancel();
     super.dispose();
   }
 }

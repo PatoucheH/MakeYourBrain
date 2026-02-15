@@ -37,7 +37,9 @@ class _PvPGamePageState extends State<PvPGamePage>
     )..repeat(reverse: true);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<PvPProvider>().addListener(_onProviderChanged);
+      final pvp = context.read<PvPProvider>();
+      pvp.setOnGamePage(true);
+      pvp.addListener(_onProviderChanged);
       _checkAndStartTimer();
     });
   }
@@ -192,7 +194,15 @@ class _PvPGamePageState extends State<PvPGamePage>
   void dispose() {
     _timer?.cancel();
     try {
-      context.read<PvPProvider>().removeListener(_onProviderChanged);
+      final pvp = context.read<PvPProvider>();
+      pvp.removeListener(_onProviderChanged);
+      // Si le joueur quitte en plein quiz (timer actif, questions en cours),
+      // auto-submit le round pour éviter qu'il puisse recommencer
+      if (_timerActive && !pvp.hasAnsweredAllQuestions && pvp.currentRound != null) {
+        debugPrint('[PvP] GamePage dispose - player left during active quiz, auto-finishing round');
+        pvp.finishRound();
+      }
+      pvp.setOnGamePage(false);
     } catch (_) {}
     _pulseController.dispose();
     super.dispose();
@@ -1205,62 +1215,64 @@ class _PvPGamePageState extends State<PvPGamePage>
               ),
               const SizedBox(height: 32),
               Container(
+                width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Column(
-                      children: [
-                        Text(
-                          l10n.you,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
+                    Flexible(
+                      child: Column(
+                        children: [
+                          Text(
+                            l10n.you,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textSecondary,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '$myScore',
-                          style: const TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.brainPurple,
+                          Text(
+                            '$myScore',
+                            style: const TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.brainPurple,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 24),
-                      child: const Text(
-                        '-',
-                        style: TextStyle(
-                          fontSize: 32,
-                          color: AppColors.textSecondary,
-                        ),
+                        ],
                       ),
                     ),
-                    Column(
-                      children: [
-                        Text(
-                          l10n.opponent,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
+                    const Text(
+                      '-',
+                      style: TextStyle(
+                        fontSize: 28,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    Flexible(
+                      child: Column(
+                        children: [
+                          Text(
+                            l10n.opponent,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textSecondary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        Text(
-                          '$opponentScore',
-                          style: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade600,
+                          Text(
+                            '$opponentScore',
+                            style: TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey.shade600,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -1268,7 +1280,7 @@ class _PvPGamePageState extends State<PvPGamePage>
               const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 16),
+                    horizontal: 20, vertical: 14),
                 decoration: BoxDecoration(
                   color: ratingChange >= 0
                       ? AppColors.success.withValues(alpha:0.1)
@@ -1290,17 +1302,20 @@ class _PvPGamePageState extends State<PvPGamePage>
                       color: ratingChange >= 0
                           ? AppColors.success
                           : AppColors.error,
-                      size: 28,
+                      size: 24,
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      '${ratingChange >= 0 ? '+' : ''}$ratingChange ${l10n.rating}',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: ratingChange >= 0
-                            ? AppColors.success
-                            : AppColors.error,
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        '${ratingChange >= 0 ? '+' : ''}$ratingChange ${l10n.rating}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: ratingChange >= 0
+                              ? AppColors.success
+                              : AppColors.error,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
