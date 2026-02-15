@@ -391,6 +391,14 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String yourTurnAgainst(String opponent) {
+    return 'C\'est votre tour contre $opponent !';
+  }
+
+  @override
+  String get tapToPlay => 'Appuyez pour jouer';
+
+  @override
   String get opponentsTurn => 'Tour de l\'adversaire';
 
   @override
@@ -491,4 +499,70 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get viewAll => 'Voir tout';
+
+  @override
+  String selectThemeForRound(int round) {
+    return 'Choisissez le thème du Round $round';
+  }
+
+  @override
+  String get yourFavoriteThemes => 'Vos thèmes favoris';
+
+  @override
+  String get allThemesAvailable => 'Tous les thèmes';
+
+  @override
+  String get waitingForThemeSelection =>
+      'En attente du choix de thème de l\'adversaire...';
+
+  @override
+  String get randomTheme => 'Thème aléatoire';
+
+  @override
+  String get chooseTheme => 'Choisissez un thème pour cette manche';
+
+  @override
+  String get betaTitle => 'Version Beta';
+
+  @override
+  String get betaMessage =>
+      'Cette application est encore en Beta. Certains bugs peuvent encore apparaitre.\n\nMerci pour votre patience ! Si vous rencontrez un problème, merci de le signaler a :';
+
+  @override
+  String get betaEmail => 'hugo.patou@hotmail.com';
+
+  @override
+  String get thanks => 'Merci !';
+
+  @override
+  String get understood => 'Compris !';
+
+  @override
+  String get matchFoundWaiting =>
+      'Match trouve ! L\'adversaire joue en premier.';
+
+  @override
+  String roundAgainst(int round, String opponent) {
+    return 'Round $round contre $opponent';
+  }
+
+  @override
+  String get goToMatch => 'Aller au match';
+
+  @override
+  String matchEndedAgainst(String opponent) {
+    return 'Fin du match contre $opponent';
+  }
+
+  @override
+  String get youWon => 'Vous avez gagné !';
+
+  @override
+  String get youLost => 'Vous avez perdu !';
+
+  @override
+  String get matchDrew => 'Match nul !';
+
+  @override
+  String get seeResults => 'Voir les résultats';
 }

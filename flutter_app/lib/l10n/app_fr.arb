@@ -123,6 +123,8 @@
   "searchTakingLong": "La recherche prend du temps.\nPeu de joueurs sont en ligne actuellement.",
   "matchFound": "Match trouvé !",
   "matchStartingIn": "Début dans {seconds}s...",
+  "yourTurnAgainst": "C'est votre tour contre {opponent} !",
+  "tapToPlay": "Appuyez pour jouer",
   "opponentsTurn": "Tour de l'adversaire",
   "yourTurn": "Votre tour",
   "waitingOpponentTurn": "En attente du tour de l'adversaire...",
@@ -156,5 +158,48 @@
   "unfollowSuccess": "Vous ne suivez plus cet utilisateur",
   "cannotFollowYourself": "Vous ne pouvez pas vous suivre vous-même",
   "social": "Social",
-  "viewAll": "Voir tout"
+  "viewAll": "Voir tout",
+  "selectThemeForRound": "Choisissez le thème du Round {round}",
+  "@selectThemeForRound": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      }
+    }
+  },
+  "yourFavoriteThemes": "Vos thèmes favoris",
+  "allThemesAvailable": "Tous les thèmes",
+  "waitingForThemeSelection": "En attente du choix de thème de l'adversaire...",
+  "randomTheme": "Thème aléatoire",
+  "chooseTheme": "Choisissez un thème pour cette manche",
+  "betaTitle": "Version Beta",
+  "betaMessage": "Cette application est encore en Beta. Certains bugs peuvent encore apparaitre.\n\nMerci pour votre patience ! Si vous rencontrez un problème, merci de le signaler a :",
+  "betaEmail": "hugo.patou@hotmail.com",
+  "thanks": "Merci !",
+  "understood": "Compris !",
+  "matchFoundWaiting": "Match trouve ! L'adversaire joue en premier.",
+  "roundAgainst": "Round {round} contre {opponent}",
+  "@roundAgainst": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      },
+      "opponent": {
+        "type": "String"
+      }
+    }
+  },
+  "goToMatch": "Aller au match",
+  "matchEndedAgainst": "Fin du match contre {opponent}",
+  "@matchEndedAgainst": {
+    "placeholders": {
+      "opponent": {
+        "type": "String"
+      }
+    }
+  },
+  "youWon": "Vous avez gagné !",
+  "youLost": "Vous avez perdu !",
+  "matchDrew": "Match nul !",
+  "seeResults": "Voir les résultats"
 }

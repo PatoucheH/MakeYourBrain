@@ -144,6 +144,15 @@
       }
     }
   },
+  "yourTurnAgainst": "It's your turn against {opponent}!",
+  "@yourTurnAgainst": {
+    "placeholders": {
+      "opponent": {
+        "type": "String"
+      }
+    }
+  },
+  "tapToPlay": "Tap to play",
   "opponentsTurn": "Opponent's turn",
   "yourTurn": "Your turn",
   "waitingOpponentTurn": "Waiting for opponent to play...",
@@ -177,5 +186,48 @@
   "unfollowSuccess": "You unfollowed this user",
   "cannotFollowYourself": "You cannot follow yourself",
   "social": "Social",
-  "viewAll": "View all"
+  "viewAll": "View all",
+  "selectThemeForRound": "Select Theme for Round {round}",
+  "@selectThemeForRound": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      }
+    }
+  },
+  "yourFavoriteThemes": "Your Favorite Themes",
+  "allThemesAvailable": "All Themes",
+  "waitingForThemeSelection": "Waiting for opponent to choose theme...",
+  "randomTheme": "Random Theme",
+  "chooseTheme": "Choose a theme for this round",
+  "betaTitle": "Beta Version",
+  "betaMessage": "This app is still in Beta. Some bugs may appear.\n\nThank you for your patience! If you encounter any issue, please report it to:",
+  "betaEmail": "hugo.patou@hotmail.com",
+  "thanks": "Thank you!",
+  "understood": "Got it!",
+  "matchFoundWaiting": "Match found! Opponent plays first.",
+  "roundAgainst": "Round {round} vs {opponent}",
+  "@roundAgainst": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      },
+      "opponent": {
+        "type": "String"
+      }
+    }
+  },
+  "goToMatch": "Go to match",
+  "matchEndedAgainst": "Match ended vs {opponent}",
+  "@matchEndedAgainst": {
+    "placeholders": {
+      "opponent": {
+        "type": "String"
+      }
+    }
+  },
+  "youWon": "You won!",
+  "youLost": "You lost!",
+  "matchDrew": "It's a draw!",
+  "seeResults": "See results"
 }

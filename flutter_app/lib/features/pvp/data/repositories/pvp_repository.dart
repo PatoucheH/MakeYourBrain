@@ -91,12 +91,14 @@ class PvPRepository {
   Future<String> createRound(
     String matchId,
     int roundNumber,
-    List<String> questionIds,
-  ) async {
+    List<String> questionIds, {
+    String? themeId,
+  }) async {
     final response = await _supabase.rpc('pvp_create_round', params: {
       'p_match_id': matchId,
       'p_round_number': roundNumber,
       'p_question_ids': questionIds,
+      'p_theme_id': themeId,
     });
 
     return response as String;
@@ -183,7 +185,7 @@ class PvPRepository {
           .from('pvp_matches')
           .select()
           .or('player1_id.eq.$userId,player2_id.eq.$userId')
-          .inFilter('status', ['waiting', 'player1_turn', 'player2_turn'])
+          .inFilter('status', ['waiting', 'player1_turn', 'player2_turn', 'player1_choosing_theme', 'player2_choosing_theme'])
           .order('created_at', ascending: false);
 
       return (response as List)
@@ -220,6 +222,22 @@ class PvPRepository {
         });
   }
 
+  /// Met à jour le statut d'un match
+  Future<void> updateMatchStatus(String matchId, String status) async {
+    await _supabase
+        .from('pvp_matches')
+        .update({'status': status})
+        .eq('id', matchId);
+  }
+
+  /// Met à jour le statut et le round courant d'un match
+  Future<void> updateMatchStatusAndRound(String matchId, String status, int currentRound) async {
+    await _supabase
+        .from('pvp_matches')
+        .update({'status': status, 'current_round': currentRound})
+        .eq('id', matchId);
+  }
+
   /// Annule un match (si l'adversaire ne répond pas)
   Future<void> cancelMatch(String matchId) async {
     await _supabase
@@ -237,6 +255,21 @@ class PvPRepository {
         .maybeSingle();
 
     return response != null;
+  }
+
+  /// Récupère le username d'un joueur
+  Future<String?> getUsername(String userId) async {
+    try {
+      final response = await _supabase
+          .from('user_stats')
+          .select('username')
+          .eq('user_id', userId)
+          .maybeSingle();
+      return response?['username'] as String?;
+    } catch (e) {
+      debugPrint('Error getting username: $e');
+      return null;
+    }
   }
 
   /// Récupère les statistiques PvP d'un joueur
@@ -290,6 +323,53 @@ class PvPRepository {
       debugPrint('Error getting PvP leaderboard: $e');
       return [];
     }
+  }
+
+  /// Vérifie le statut de la queue au retour dans l'app
+  Future<Map<String, dynamic>> checkQueueStatus(String userId) async {
+    final response = await _supabase.rpc('pvp_check_queue_status', params: {
+      'p_user_id': userId,
+    });
+
+    final data = response is Map<String, dynamic> ? response : {};
+    return {
+      'inQueue': data['in_queue'] ?? false,
+      'matchFound': data['match_found'] ?? false,
+      'matchId': data['match_id'],
+      'timeInQueue': data['time_in_queue'],
+    };
+  }
+
+  /// Récupère des questions aléatoires pour un thème spécifique
+  Future<List<QuestionModel>> getQuestionsByTheme(
+    String themeId,
+    String language,
+    int limit, {
+    int avgRating = 1000,
+  }) async {
+    final response = await _supabase.rpc('pvp_get_random_questions_by_theme', params: {
+      'p_theme_id': themeId,
+      'p_language_code': language,
+      'p_limit': limit,
+      'p_avg_rating': avgRating,
+    });
+
+    return (response as List)
+        .map((json) => QuestionModel.fromJson(json))
+        .toList();
+  }
+
+  /// Récupère un thème aléatoire excluant certains thèmes
+  Future<String?> getRandomTheme(
+    String language,
+    List<String> excludeThemeIds,
+  ) async {
+    final response = await _supabase.rpc('pvp_get_random_theme', params: {
+      'p_language_code': language,
+      'p_exclude_theme_ids': excludeThemeIds,
+    });
+
+    return response as String?;
   }
 
   static int _toInt(dynamic value, int fallback) {

@@ -15,6 +15,7 @@ import 'features/pvp/data/providers/pvp_provider.dart';
 import 'features/pvp/presentation/widgets/matchmaking_overlay.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -203,6 +204,7 @@ class MyApp extends StatelessWidget {
             Locale('fr'),
           ],
           locale: Locale(languageProvider.currentLanguage),
+          navigatorKey: navigatorKey,
           navigatorObservers: [routeObserver],
           builder: (context, child) {
             return Stack(
@@ -226,13 +228,28 @@ class AuthGate extends StatefulWidget {
   State<AuthGate> createState() => _AuthGateState();
 }
 
-class _AuthGateState extends State<AuthGate> {
+class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
   bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initialize();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Vérifier le statut de la queue PvP au retour dans l'app
+      context.read<PvPProvider>().checkQueueStatusOnResume();
+    }
   }
 
   Future<void> _initialize() async {

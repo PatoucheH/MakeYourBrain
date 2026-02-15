@@ -389,6 +389,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String yourTurnAgainst(String opponent) {
+    return 'It\'s your turn against $opponent!';
+  }
+
+  @override
+  String get tapToPlay => 'Tap to play';
+
+  @override
   String get opponentsTurn => 'Opponent\'s turn';
 
   @override
@@ -489,4 +497,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get viewAll => 'View all';
+
+  @override
+  String selectThemeForRound(int round) {
+    return 'Select Theme for Round $round';
+  }
+
+  @override
+  String get yourFavoriteThemes => 'Your Favorite Themes';
+
+  @override
+  String get allThemesAvailable => 'All Themes';
+
+  @override
+  String get waitingForThemeSelection =>
+      'Waiting for opponent to choose theme...';
+
+  @override
+  String get randomTheme => 'Random Theme';
+
+  @override
+  String get chooseTheme => 'Choose a theme for this round';
+
+  @override
+  String get betaTitle => 'Beta Version';
+
+  @override
+  String get betaMessage =>
+      'This app is still in Beta. Some bugs may appear.\n\nThank you for your patience! If you encounter any issue, please report it to:';
+
+  @override
+  String get betaEmail => 'hugo.patou@hotmail.com';
+
+  @override
+  String get thanks => 'Thank you!';
+
+  @override
+  String get understood => 'Got it!';
+
+  @override
+  String get matchFoundWaiting => 'Match found! Opponent plays first.';
+
+  @override
+  String roundAgainst(int round, String opponent) {
+    return 'Round $round vs $opponent';
+  }
+
+  @override
+  String get goToMatch => 'Go to match';
+
+  @override
+  String matchEndedAgainst(String opponent) {
+    return 'Match ended vs $opponent';
+  }
+
+  @override
+  String get youWon => 'You won!';
+
+  @override
+  String get youLost => 'You lost!';
+
+  @override
+  String get matchDrew => 'It\'s a draw!';
+
+  @override
+  String get seeResults => 'See results';
 }

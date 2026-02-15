@@ -60,6 +60,7 @@ class PvPRoundModel {
   final String id;
   final String matchId;
   final int roundNumber;
+  final String? themeId;
   final List<String> questionIds;
   final int player1Score;
   final int player2Score;
@@ -72,6 +73,7 @@ class PvPRoundModel {
     required this.id,
     required this.matchId,
     required this.roundNumber,
+    this.themeId,
     required this.questionIds,
     this.player1Score = 0,
     this.player2Score = 0,
@@ -86,6 +88,7 @@ class PvPRoundModel {
       id: json['id'],
       matchId: json['match_id'],
       roundNumber: json['round_number'] ?? 1,
+      themeId: json['theme_id'],
       questionIds: List<String>.from(json['question_ids'] ?? []),
       player1Score: json['player1_score'] ?? 0,
       player2Score: json['player2_score'] ?? 0,
@@ -111,6 +114,7 @@ class PvPRoundModel {
       'id': id,
       'match_id': matchId,
       'round_number': roundNumber,
+      'theme_id': themeId,
       'question_ids': questionIds,
       'player1_score': player1Score,
       'player2_score': player2Score,
@@ -141,6 +145,7 @@ class PvPRoundModel {
     String? id,
     String? matchId,
     int? roundNumber,
+    String? themeId,
     List<String>? questionIds,
     int? player1Score,
     int? player2Score,
@@ -153,6 +158,7 @@ class PvPRoundModel {
       id: id ?? this.id,
       matchId: matchId ?? this.matchId,
       roundNumber: roundNumber ?? this.roundNumber,
+      themeId: themeId ?? this.themeId,
       questionIds: questionIds ?? this.questionIds,
       player1Score: player1Score ?? this.player1Score,
       player2Score: player2Score ?? this.player2Score,

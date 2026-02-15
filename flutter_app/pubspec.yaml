@@ -31,7 +31,6 @@ flutter:
   assets:
     - assets/branding/logo/
     - assets/branding/mascot/
-    - assets/branding/icons/
 
 flutter_launcher_icons:
   android: true

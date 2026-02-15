@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
@@ -13,6 +14,9 @@ import 'theme_detail_page.dart';
 import 'all_themes_page.dart';
 import 'add_theme_page.dart';
 import '../../../pvp/presentation/pages/pvp_menu_page.dart';
+
+/// Mettre à false pour désactiver la modal Beta
+const bool kShowBetaDialog = true;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -38,6 +42,113 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     loadFavoriteThemes();
+    if (kShowBetaDialog) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showBetaDialog());
+    }
+  }
+
+  void _showBetaDialog() {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/branding/mascot/brainly_encourage.png',
+              height: 40,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l10n.betaTitle,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l10n.betaMessage,
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: () {
+                Clipboard.setData(const ClipboardData(text: 'hugo.patou@hotmail.com'));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Email copied!')),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.brainPurple.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.brainPurple.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.email, color: AppColors.brainPurple, size: 18),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        l10n.betaEmail,
+                        style: const TextStyle(
+                          color: AppColors.brainPurple,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.copy, color: AppColors.brainPurple, size: 16),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n.thanks,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.brainPurple,
+                fontSize: 15,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(ctx),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.brainPurple,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: Text(l10n.understood, style: const TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> loadFavoriteThemes() async {
@@ -183,40 +294,27 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildMascotCard(AppLocalizations l10n) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       decoration: BoxDecoration(
         gradient: AppColors.primaryGradient,
         borderRadius: BorderRadius.circular(24),
         boxShadow: AppColors.buttonShadow,
       ),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.welcome,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  l10n.moreFeaturesComingSoon.split('\n').first,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha:0.85),
-                    fontSize: 13,
-                  ),
-                ),
-              ],
+          Text(
+            l10n.welcome,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 12),
           Image.asset(
             'assets/branding/mascot/brainly_happy.png',
-            height: 70,
+            height: 80,
           ),
         ],
       ),

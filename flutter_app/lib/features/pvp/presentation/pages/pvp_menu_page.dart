@@ -59,6 +59,11 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
       final userId = _authRepo.getCurrentUserId();
       if (userId == null) return;
 
+      // Vérifier le statut de la queue au retour dans l'app
+      if (mounted) {
+        context.read<PvPProvider>().checkQueueStatusOnResume();
+      }
+
       // Load stats and match history in parallel
       final results = await Future.wait([
         _pvpRepo.getPlayerPvPStats(userId),
@@ -185,7 +190,8 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
         ),
         const SizedBox(height: 12),
         ...activeMatches.map((match) {
-          final isMyTurn = match.isPlayerTurn(userId ?? '');
+          final isMyTurn = match.isPlayerTurn(userId ?? '') ||
+              match.isPlayerChoosingTheme(userId ?? '');
           final statusColor = isMyTurn ? AppColors.success : AppColors.warning;
           final statusText = isMyTurn ? l10n.yourTurn : l10n.opponentsTurn;
           final statusIcon = isMyTurn ? Icons.play_arrow : Icons.hourglass_top;
@@ -233,30 +239,31 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                     ],
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    final pvpProvider = context.read<PvPProvider>();
-                    pvpProvider.loadMatch(match.id);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const PvPGamePage()),
-                    ).then((_) => _loadData());
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: statusColor,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                if (isMyTurn)
+                  ElevatedButton(
+                    onPressed: () {
+                      final pvpProvider = context.read<PvPProvider>();
+                      pvpProvider.loadMatch(match.id);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const PvPGamePage()),
+                      ).then((_) => _loadData());
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: statusColor,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      l10n.resumeMatch,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  child: Text(
-                    l10n.resumeMatch,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
               ],
             ),
           );

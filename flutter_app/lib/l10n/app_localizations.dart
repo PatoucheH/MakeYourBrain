@@ -830,6 +830,18 @@ abstract class AppLocalizations {
   /// **'Starting in {seconds}s...'**
   String matchStartingIn(int seconds);
 
+  /// No description provided for @yourTurnAgainst.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s your turn against {opponent}!'**
+  String yourTurnAgainst(String opponent);
+
+  /// No description provided for @tapToPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to play'**
+  String get tapToPlay;
+
   /// No description provided for @opponentsTurn.
   ///
   /// In en, this message translates to:
@@ -1033,6 +1045,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View all'**
   String get viewAll;
+
+  /// No description provided for @selectThemeForRound.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Theme for Round {round}'**
+  String selectThemeForRound(int round);
+
+  /// No description provided for @yourFavoriteThemes.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Favorite Themes'**
+  String get yourFavoriteThemes;
+
+  /// No description provided for @allThemesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'All Themes'**
+  String get allThemesAvailable;
+
+  /// No description provided for @waitingForThemeSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for opponent to choose theme...'**
+  String get waitingForThemeSelection;
+
+  /// No description provided for @randomTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Random Theme'**
+  String get randomTheme;
+
+  /// No description provided for @chooseTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a theme for this round'**
+  String get chooseTheme;
+
+  /// No description provided for @betaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta Version'**
+  String get betaTitle;
+
+  /// No description provided for @betaMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This app is still in Beta. Some bugs may appear.\n\nThank you for your patience! If you encounter any issue, please report it to:'**
+  String get betaMessage;
+
+  /// No description provided for @betaEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'hugo.patou@hotmail.com'**
+  String get betaEmail;
+
+  /// No description provided for @thanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you!'**
+  String get thanks;
+
+  /// No description provided for @understood.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it!'**
+  String get understood;
+
+  /// No description provided for @matchFoundWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Match found! Opponent plays first.'**
+  String get matchFoundWaiting;
+
+  /// No description provided for @roundAgainst.
+  ///
+  /// In en, this message translates to:
+  /// **'Round {round} vs {opponent}'**
+  String roundAgainst(int round, String opponent);
+
+  /// No description provided for @goToMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to match'**
+  String get goToMatch;
+
+  /// No description provided for @matchEndedAgainst.
+  ///
+  /// In en, this message translates to:
+  /// **'Match ended vs {opponent}'**
+  String matchEndedAgainst(String opponent);
+
+  /// No description provided for @youWon.
+  ///
+  /// In en, this message translates to:
+  /// **'You won!'**
+  String get youWon;
+
+  /// No description provided for @youLost.
+  ///
+  /// In en, this message translates to:
+  /// **'You lost!'**
+  String get youLost;
+
+  /// No description provided for @matchDrew.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s a draw!'**
+  String get matchDrew;
+
+  /// No description provided for @seeResults.
+  ///
+  /// In en, this message translates to:
+  /// **'See results'**
+  String get seeResults;
 }
 
 class _AppLocalizationsDelegate

@@ -1,6 +1,8 @@
 enum PvPMatchStatus {
   waiting,
+  player1ChoosingTheme,
   player1Turn,
+  player2ChoosingTheme,
   player2Turn,
   completed,
   cancelled;
@@ -9,8 +11,12 @@ enum PvPMatchStatus {
     switch (value) {
       case 'waiting':
         return PvPMatchStatus.waiting;
+      case 'player1_choosing_theme':
+        return PvPMatchStatus.player1ChoosingTheme;
       case 'player1_turn':
         return PvPMatchStatus.player1Turn;
+      case 'player2_choosing_theme':
+        return PvPMatchStatus.player2ChoosingTheme;
       case 'player2_turn':
         return PvPMatchStatus.player2Turn;
       case 'completed':
@@ -26,8 +32,12 @@ enum PvPMatchStatus {
     switch (this) {
       case PvPMatchStatus.waiting:
         return 'waiting';
+      case PvPMatchStatus.player1ChoosingTheme:
+        return 'player1_choosing_theme';
       case PvPMatchStatus.player1Turn:
         return 'player1_turn';
+      case PvPMatchStatus.player2ChoosingTheme:
+        return 'player2_choosing_theme';
       case PvPMatchStatus.player2Turn:
         return 'player2_turn';
       case PvPMatchStatus.completed:
@@ -118,9 +128,23 @@ class PvPMatchModel {
   }
 
   bool get isWaitingForPlayer2 => status == PvPMatchStatus.waiting;
-  bool get isInProgress => status == PvPMatchStatus.player1Turn || status == PvPMatchStatus.player2Turn;
+  bool get isInProgress =>
+      status == PvPMatchStatus.player1Turn ||
+      status == PvPMatchStatus.player2Turn ||
+      status == PvPMatchStatus.player1ChoosingTheme ||
+      status == PvPMatchStatus.player2ChoosingTheme;
   bool get isCompleted => status == PvPMatchStatus.completed;
   bool get isCancelled => status == PvPMatchStatus.cancelled;
+
+  bool get isChoosingTheme =>
+      status == PvPMatchStatus.player1ChoosingTheme ||
+      status == PvPMatchStatus.player2ChoosingTheme;
+
+  bool isPlayerChoosingTheme(String playerId) {
+    if (status == PvPMatchStatus.player1ChoosingTheme && playerId == player1Id) return true;
+    if (status == PvPMatchStatus.player2ChoosingTheme && playerId == player2Id) return true;
+    return false;
+  }
 
   bool isPlayerTurn(String playerId) {
     if (status == PvPMatchStatus.player1Turn && playerId == player1Id) return true;
