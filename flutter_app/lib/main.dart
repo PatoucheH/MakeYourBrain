@@ -273,7 +273,7 @@ class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
   }
 }
 
-// Splash Screen avec le branding
+// Splash Screen avec le Branding
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
