@@ -7,8 +7,12 @@ import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/leaderboard/presentation/pages/leaderboard_page.dart';
 import '../../features/lives/presentation/widgets/lives_indicator.dart';
 
+enum AppPage { home, profile, leaderboard, other }
+
 class BrainAppBar extends StatefulWidget {
-  const BrainAppBar({super.key});
+  final AppPage currentPage;
+
+  const BrainAppBar({super.key, this.currentPage = AppPage.other});
 
   @override
   State<BrainAppBar> createState() => _BrainAppBarState();
@@ -139,7 +143,10 @@ class _BrainAppBarState extends State<BrainAppBar> {
                 borderRadius: BorderRadius.circular(12),
               ),
               onSelected: (value) async {
-                if (value == 'profile') {
+                if (value == 'home') {
+                  Navigator.of(context)
+                      .popUntil((route) => route.isFirst);
+                } else if (value == 'profile') {
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -163,31 +170,53 @@ class _BrainAppBarState extends State<BrainAppBar> {
                   }
                 }
               },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'profile',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.person_outline,
-                          color: AppColors.brainPurple),
-                      const SizedBox(width: 12),
-                      Text(l10n.profile),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'leaderboard',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.leaderboard_outlined,
-                          color: AppColors.brainPurple),
-                      const SizedBox(width: 12),
-                      Text(l10n.viewLeaderboard),
-                    ],
-                  ),
-                ),
-                const PopupMenuDivider(),
-                PopupMenuItem(
+              itemBuilder: (context) {
+                final items = <PopupMenuEntry<String>>[];
+
+                if (widget.currentPage != AppPage.home) {
+                  items.add(PopupMenuItem(
+                    value: 'home',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.home_outlined,
+                            color: AppColors.brainPurple),
+                        const SizedBox(width: 12),
+                        Text(l10n.home),
+                      ],
+                    ),
+                  ));
+                }
+
+                if (widget.currentPage != AppPage.profile) {
+                  items.add(PopupMenuItem(
+                    value: 'profile',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.person_outline,
+                            color: AppColors.brainPurple),
+                        const SizedBox(width: 12),
+                        Text(l10n.profile),
+                      ],
+                    ),
+                  ));
+                }
+
+                if (widget.currentPage != AppPage.leaderboard) {
+                  items.add(PopupMenuItem(
+                    value: 'leaderboard',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.leaderboard_outlined,
+                            color: AppColors.brainPurple),
+                        const SizedBox(width: 12),
+                        Text(l10n.viewLeaderboard),
+                      ],
+                    ),
+                  ));
+                }
+
+                items.add(const PopupMenuDivider());
+                items.add(PopupMenuItem(
                   value: 'logout',
                   child: Row(
                     children: [
@@ -197,8 +226,10 @@ class _BrainAppBarState extends State<BrainAppBar> {
                           style: const TextStyle(color: AppColors.error)),
                     ],
                   ),
-                ),
-              ],
+                ));
+
+                return items;
+              },
             ),
           ),
         ],

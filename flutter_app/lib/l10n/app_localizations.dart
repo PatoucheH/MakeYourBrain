@@ -1159,6 +1159,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'See results'**
   String get seeResults;
+
+  /// No description provided for @loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get loadMore;
+
+  /// No description provided for @home.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get home;
+
+  /// No description provided for @loadingQuestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading questions...'**
+  String get loadingQuestions;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
 }
 
 class _AppLocalizationsDelegate

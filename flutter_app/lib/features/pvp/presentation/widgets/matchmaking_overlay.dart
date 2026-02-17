@@ -121,8 +121,18 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
           : pvp.matchCompletedDidWin == false
               ? l10n.defeat
               : l10n.draw;
-    } else if (hasNotification) {
+    } else if (pvp.matchFound) {
       bgColor = const Color(0xFF10B981);
+      textColor = Colors.white;
+      icon = Icons.sports_esports;
+      label = l10n.matchFound;
+    } else if (pvp.matchFoundWaiting) {
+      bgColor = const Color(0xFF6366F1);
+      textColor = Colors.white;
+      icon = Icons.sports_esports;
+      label = l10n.matchFound;
+    } else if (hasNotification) {
+      bgColor = const Color(0xFF6366F1);
       textColor = Colors.white;
       icon = Icons.sports_esports;
       label = l10n.yourTurn;

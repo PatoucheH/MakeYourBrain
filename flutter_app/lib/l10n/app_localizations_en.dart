@@ -562,4 +562,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get seeResults => 'See results';
+
+  @override
+  String get loadMore => 'Load more';
+
+  @override
+  String get home => 'Home';
+
+  @override
+  String get loadingQuestions => 'Loading questions...';
+
+  @override
+  String get back => 'Back';
 }

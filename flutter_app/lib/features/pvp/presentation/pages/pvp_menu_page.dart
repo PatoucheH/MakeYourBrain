@@ -29,6 +29,9 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
   int draws = 0;
   List<PvPMatchModel> matchHistory = [];
   List<PvPMatchModel> activeMatches = [];
+  bool _hasMoreHistory = true;
+  bool _isLoadingMore = false;
+  static const int _historyPageSize = 10;
 
   @override
   void initState() {
@@ -62,7 +65,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
       // Load stats and match history in parallel
       final results = await Future.wait([
         _pvpRepo.getPlayerPvPStats(userId),
-        _pvpRepo.getMyMatches(userId, limit: 10),
+        _pvpRepo.getMyMatches(userId, limit: _historyPageSize),
         _pvpRepo.getActiveMatches(userId),
       ]);
 
@@ -77,12 +80,37 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
         draws = stats['draws'] ?? 0;
         matchHistory = history;
         activeMatches = active;
+        _hasMoreHistory = history.length >= _historyPageSize;
         isLoading = false;
       });
     } catch (e) {
       debugPrint('Error loading PvP data: $e');
       setState(() => isLoading = false);
     }
+  }
+
+  Future<void> _loadMoreHistory() async {
+    if (_isLoadingMore || !_hasMoreHistory) return;
+    final userId = _authRepo.getCurrentUserId();
+    if (userId == null) return;
+
+    setState(() => _isLoadingMore = true);
+    try {
+      final moreMatches = await _pvpRepo.getMyMatches(
+        userId,
+        limit: _historyPageSize,
+        offset: matchHistory.length,
+      );
+      setState(() {
+        matchHistory.addAll(moreMatches);
+        _hasMoreHistory = moreMatches.length >= _historyPageSize;
+        _isLoadingMore = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading more history: $e');
+      setState(() => _isLoadingMore = false);
+    }
+    
   }
 
   int get totalGames => wins + losses + draws;
@@ -555,6 +583,23 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
           _buildEmptyHistoryCard(l10n)
         else
           ...matchHistory.map((match) => _buildMatchHistoryItem(match, l10n)),
+
+        if (_hasMoreHistory && matchHistory.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Center(
+              child: TextButton(
+                onPressed: _isLoadingMore ? null : _loadMoreHistory,
+                child: _isLoadingMore
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(l10n.loadMore),
+              ),
+            ),
+          ),
       ],
     );
   }

@@ -254,7 +254,7 @@ class _PvPGamePageState extends State<PvPGamePage>
         // My turn but questions still loading
         if (pvpProvider.currentQuestions.isEmpty ||
             pvpProvider.currentQuestion == null) {
-          return _buildLoadingScreen();
+          return _buildLoadingScreen(l10n);
         }
 
         // My turn, questions loaded → quiz UI
@@ -467,7 +467,7 @@ class _PvPGamePageState extends State<PvPGamePage>
     );
   }
 
-  Widget _buildLoadingScreen() {
+  Widget _buildLoadingScreen(AppLocalizations l10n) {
     final pvpProvider = context.read<PvPProvider>();
     final error = pvpProvider.errorMessage;
 
@@ -501,14 +501,14 @@ class _PvPGamePageState extends State<PvPGamePage>
                   OutlinedButton.icon(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.arrow_back),
-                    label: const Text('Back'),
+                    label: Text(l10n.back),
                   ),
                 ] else ...[
                   const CircularProgressIndicator(color: AppColors.brainPurple),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Loading questions...',
-                    style: TextStyle(color: AppColors.textSecondary),
+                  Text(
+                    l10n.loadingQuestions,
+                    style: const TextStyle(color: AppColors.textSecondary),
                   ),
                 ],
               ],

@@ -201,5 +201,9 @@
   "youWon": "Vous avez gagné !",
   "youLost": "Vous avez perdu !",
   "matchDrew": "Match nul !",
-  "seeResults": "Voir les résultats"
+  "seeResults": "Voir les résultats",
+  "loadMore": "Charger plus",
+  "home": "Accueil",
+  "loadingQuestions": "Chargement des questions...",
+  "back": "Retour"
 }

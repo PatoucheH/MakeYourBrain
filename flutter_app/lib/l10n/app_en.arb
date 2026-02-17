@@ -229,5 +229,9 @@
   "youWon": "You won!",
   "youLost": "You lost!",
   "matchDrew": "It's a draw!",
-  "seeResults": "See results"
+  "seeResults": "See results",
+  "loadMore": "Load more",
+  "home": "Home",
+  "loadingQuestions": "Loading questions...",
+  "back": "Back"
 }

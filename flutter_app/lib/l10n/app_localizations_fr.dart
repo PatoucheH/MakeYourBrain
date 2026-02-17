@@ -565,4 +565,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get seeResults => 'Voir les résultats';
+
+  @override
+  String get loadMore => 'Charger plus';
+
+  @override
+  String get home => 'Accueil';
+
+  @override
+  String get loadingQuestions => 'Chargement des questions...';
+
+  @override
+  String get back => 'Retour';
 }

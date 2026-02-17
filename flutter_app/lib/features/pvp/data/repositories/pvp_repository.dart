@@ -160,6 +160,7 @@ class PvPRepository {
   Future<List<PvPMatchModel>> getMyMatches(
     String userId, {
     int limit = 20,
+    int offset = 0,
   }) async {
     try {
       final response = await _supabase
@@ -167,7 +168,7 @@ class PvPRepository {
           .select()
           .or('player1_id.eq.$userId,player2_id.eq.$userId')
           .order('created_at', ascending: false)
-          .limit(limit);
+          .range(offset, offset + limit - 1);
 
       return (response as List)
           .map((json) => PvPMatchModel.fromJson(json))

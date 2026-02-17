@@ -152,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: SafeArea(
           child: Column(
             children: [
-              const BrainAppBar(),
+              const BrainAppBar(currentPage: AppPage.profile),
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: loadProfile,

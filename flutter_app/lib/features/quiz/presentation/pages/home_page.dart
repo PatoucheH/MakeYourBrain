@@ -223,7 +223,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               // Custom AppBar
-              const BrainAppBar(),
+              const BrainAppBar(currentPage: AppPage.home),
 
               // Content
               Expanded(
