@@ -352,8 +352,6 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.trending_up, color: AppColors.success, size: 20),
-                const SizedBox(width: 8),
                 Text(
                   '${l10n.winRate}: ${winRate.toStringAsFixed(1)}%',
                   style: const TextStyle(
@@ -481,7 +479,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (isSearching)
+                if (isSearching) ...[
                   const SizedBox(
                     width: 24,
                     height: 24,
@@ -489,10 +487,9 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                       color: Colors.white,
                       strokeWidth: 2,
                     ),
-                  )
-                else
-                  const Icon(Icons.sports_esports, size: 28, color: Colors.white),
-                const SizedBox(width: 12),
+                  ),
+                  const SizedBox(width: 12),
+                ],
                 Text(
                   isSearching ? l10n.searchingMatch : l10n.findMatch,
                   style: const TextStyle(

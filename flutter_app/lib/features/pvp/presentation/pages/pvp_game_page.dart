@@ -196,10 +196,10 @@ class _PvPGamePageState extends State<PvPGamePage>
     try {
       final pvp = context.read<PvPProvider>();
       pvp.removeListener(_onProviderChanged);
-      // Si le joueur quitte en plein quiz (timer actif, questions en cours),
-      // auto-submit le round pour éviter qu'il puisse recommencer
-      if (_timerActive && !pvp.hasAnsweredAllQuestions && pvp.currentRound != null) {
-        debugPrint('[PvP] GamePage dispose - player left during active quiz, auto-finishing round');
+      // Si le joueur quitte en plein quiz et n'a pas encore soumis,
+      // auto-submit le round avec les réponses déjà données
+      if (!pvp.roundSubmitted && pvp.currentRound != null && pvp.isMyTurn) {
+        debugPrint('[PvP] GamePage dispose - player left during active quiz, auto-finishing round (${pvp.myAnswers.length} answers)');
         pvp.finishRound();
       }
       pvp.setOnGamePage(false);

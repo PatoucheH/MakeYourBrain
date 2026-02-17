@@ -253,8 +253,11 @@ class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
         pvp.startBackgroundChecks();
       }
     } else if (state == AppLifecycleState.paused) {
+      // Auto-soumettre le round en cours si le joueur quitte l'app pendant un quiz
+      final pvp = context.read<PvPProvider>();
+      pvp.autoSubmitIfInProgress();
       // Arrêter le polling quand l'app passe en arrière-plan
-      context.read<PvPProvider>().stopBackgroundChecks();
+      pvp.stopBackgroundChecks();
     }
   }
 
