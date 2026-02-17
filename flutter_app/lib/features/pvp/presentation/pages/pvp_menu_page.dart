@@ -8,6 +8,8 @@ import '../../../auth/data/repositories/auth_repository.dart';
 import '../../data/models/pvp_match_model.dart';
 import '../../data/providers/pvp_provider.dart';
 import '../../data/repositories/pvp_repository.dart';
+import '../../../lives/data/providers/lives_provider.dart';
+import '../../../lives/presentation/widgets/no_lives_dialog.dart';
 import 'pvp_game_page.dart';
 import 'pvp_leaderboard_page.dart';
 
@@ -535,6 +537,20 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
   }
 
   Future<void> _startMatchmaking(BuildContext context, PvPProvider pvpProvider) async {
+    final livesProvider = context.read<LivesProvider>();
+
+    if (livesProvider.currentLives <= 0) {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => const NoLivesDialog(),
+        );
+      }
+      return;
+    }
+
+    await livesProvider.useLife();
+
     await pvpProvider.joinMatchmaking();
     if (context.mounted && pvpProvider.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
