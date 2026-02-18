@@ -11,6 +11,7 @@ import 'core/providers/language_provider.dart';
 import 'core/theme/app_colors.dart';
 import 'l10n/app_localizations.dart';
 import 'features/lives/data/providers/lives_provider.dart';
+import 'shared/services/ad_service.dart';
 import 'features/pvp/data/providers/pvp_provider.dart';
 import 'features/pvp/presentation/widgets/matchmaking_overlay.dart';
 
@@ -21,6 +22,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await SupabaseService.initialize();
+  await AdService.initialize();
 
   runApp(
     MultiProvider(

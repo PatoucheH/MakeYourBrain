@@ -311,7 +311,10 @@ class _QuizPageState extends State<QuizPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: Text(l10n.backToThemes),
+                        child: Text(
+                          l10n.backToThemes,
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -410,30 +413,10 @@ class _QuizPageState extends State<QuizPage> {
                 const SizedBox(height: 20),
 
                 if (currentQuestion.explanation != null) ...[
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.explanation,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: isCorrect ? AppColors.success : AppColors.error,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          currentQuestion.explanation!,
-                          style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
-                        ),
-                      ],
-                    ),
+                  _ExplanationToggle(
+                    explanation: currentQuestion.explanation!,
+                    isCorrect: isCorrect,
+                    label: l10n.explanation,
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -781,6 +764,71 @@ class _QuizPageState extends State<QuizPage> {
             child: const LivesIndicator(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ExplanationToggle extends StatefulWidget {
+  final String explanation;
+  final bool isCorrect;
+  final String label;
+
+  const _ExplanationToggle({
+    required this.explanation,
+    required this.isCorrect,
+    required this.label,
+  });
+
+  @override
+  State<_ExplanationToggle> createState() => _ExplanationToggleState();
+}
+
+class _ExplanationToggleState extends State<_ExplanationToggle> {
+  bool _showExplanation = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = widget.isCorrect ? AppColors.success : AppColors.error;
+
+    return GestureDetector(
+      onTap: () => setState(() => _showExplanation = !_showExplanation),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.label,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: color,
+                  ),
+                ),
+                Icon(
+                  _showExplanation ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                  color: color,
+                ),
+              ],
+            ),
+            if (_showExplanation) ...[
+              const SizedBox(height: 8),
+              Text(
+                widget.explanation,
+                style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

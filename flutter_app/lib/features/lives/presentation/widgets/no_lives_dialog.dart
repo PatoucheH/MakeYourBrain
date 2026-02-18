@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../data/providers/lives_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/services/ad_service.dart';
 
 class NoLivesDialog extends StatefulWidget {
   final VoidCallback? onClose;
@@ -14,62 +15,55 @@ class NoLivesDialog extends StatefulWidget {
 }
 
 class _NoLivesDialogState extends State<NoLivesDialog> {
+  bool _isLoadingAd = false;
+
   Future<void> _watchAd(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final livesProvider = context.read<LivesProvider>();
+    final adService = AdService();
 
-    Navigator.pop(context);
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(color: AppColors.brainPurple),
-              const SizedBox(height: 20),
-              Text(
-                l10n.loadingAdd,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ],
+    if (!adService.isAdReady) {
+      // Pub pas encore prête, afficher un message et relancer le chargement
+      adService.loadRewardedAd();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.loadingAdd),
+            backgroundColor: AppColors.warning,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            duration: const Duration(seconds: 2),
           ),
-        ),
-      ),
-    );
-
-    await Future.delayed(const Duration(seconds: 3));
-
-    if (context.mounted) {
-      Navigator.of(context).pop();
+        );
+      }
+      return;
     }
 
-    await livesProvider.addLivesFromAd();
+    setState(() => _isLoadingAd = true);
+    Navigator.pop(context);
 
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.favorite, color: Colors.white),
-              const SizedBox(width: 8),
-              Text(l10n.winLifes),
-            ],
+    final rewarded = await adService.showRewardedAd();
+
+    if (rewarded) {
+      await livesProvider.addLivesFromAd();
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.favorite, color: Colors.white),
+                const SizedBox(width: 8),
+                Text(l10n.winLifes),
+              ],
+            ),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            duration: const Duration(seconds: 2),
           ),
-          backgroundColor: AppColors.success,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+        );
+      }
     }
   }
 
@@ -231,7 +225,10 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: Text(l10n.backToThemes),
+                          child: Text(
+                            l10n.backToThemes,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -251,7 +248,7 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
                             ],
                           ),
                           child: ElevatedButton.icon(
-                            onPressed: () => _watchAd(context),
+                            onPressed: _isLoadingAd ? null : () => _watchAd(context),
                             icon: const Icon(Icons.play_circle_outline, color: Colors.white),
                             label: Text(
                               l10n.watchAdd,
