@@ -1183,6 +1183,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back'**
   String get back;
+
+  /// No description provided for @dailyQuiz.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Quiz'**
+  String get dailyQuiz;
+
+  /// No description provided for @todaysConcept.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s concept'**
+  String get todaysConcept;
+
+  /// No description provided for @xpTriple.
+  ///
+  /// In en, this message translates to:
+  /// **'XP x3'**
+  String get xpTriple;
+
+  /// No description provided for @noLivesNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'No lives needed'**
+  String get noLivesNeeded;
+
+  /// No description provided for @dailyQuizCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Already completed!'**
+  String get dailyQuizCompleted;
+
+  /// No description provided for @startDailyQuiz.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Quiz'**
+  String get startDailyQuiz;
+
+  /// No description provided for @dailyQuizInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'The daily quiz earns you 3x more XP in this theme! No lives are needed and mistakes don\'t cost lives.'**
+  String get dailyQuizInfo;
+
+  /// No description provided for @noDailyQuiz.
+  ///
+  /// In en, this message translates to:
+  /// **'Come back tomorrow for a new concept!'**
+  String get noDailyQuiz;
 }
 
 class _AppLocalizationsDelegate

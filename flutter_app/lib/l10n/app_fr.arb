@@ -205,5 +205,13 @@
   "loadMore": "Charger plus",
   "home": "Accueil",
   "loadingQuestions": "Chargement des questions...",
-  "back": "Retour"
+  "back": "Retour",
+  "dailyQuiz": "Quiz du Jour",
+  "todaysConcept": "Concept du jour",
+  "xpTriple": "XP x3",
+  "noLivesNeeded": "Pas de vies",
+  "dailyQuizCompleted": "Déjà complété !",
+  "startDailyQuiz": "Lancer le Quiz",
+  "dailyQuizInfo": "Le quiz du jour vous fait gagner 3x plus d'XP dans ce thème ! Aucune vie n'est nécessaire et les erreurs ne retirent pas de vies.",
+  "noDailyQuiz": "Revenez demain pour un nouveau concept !"
 }

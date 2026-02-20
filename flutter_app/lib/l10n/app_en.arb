@@ -233,5 +233,13 @@
   "loadMore": "Load more",
   "home": "Home",
   "loadingQuestions": "Loading questions...",
-  "back": "Back"
+  "back": "Back",
+  "dailyQuiz": "Daily Quiz",
+  "todaysConcept": "Today's concept",
+  "xpTriple": "XP x3",
+  "noLivesNeeded": "No lives needed",
+  "dailyQuizCompleted": "Already completed!",
+  "startDailyQuiz": "Start Quiz",
+  "dailyQuizInfo": "The daily quiz earns you 3x more XP in this theme! No lives are needed and mistakes don't cost lives.",
+  "noDailyQuiz": "Come back tomorrow for a new concept!"
 }

@@ -14,6 +14,9 @@ import 'theme_detail_page.dart';
 import 'all_themes_page.dart';
 import 'add_theme_page.dart';
 import '../../../pvp/presentation/pages/pvp_menu_page.dart';
+import '../../../daily_concept/data/models/daily_concept_model.dart';
+import '../../../daily_concept/data/repositories/daily_concept_repository.dart';
+import '../../../daily_concept/presentation/pages/daily_concept_page.dart';
 
 /// Mettre à false pour désactiver la modal Beta
 const bool kShowBetaDialog = true;
@@ -30,6 +33,7 @@ class _HomePageState extends State<HomePage> {
   final _quizRepo = QuizRepository();
   final _prefsRepo = ThemePreferencesRepository();
   final _profileRepo = ProfileRepository();
+  final _dailyRepo = DailyConceptRepository();
 
   List<ThemeModel> favoriteThemes = [];
   List<String> favoriteThemeIds = [];
@@ -37,6 +41,7 @@ class _HomePageState extends State<HomePage> {
   bool isLoading = true;
   int currentStreak = 0;
   int pvpRating = 1000;
+  DailyConceptModel? dailyConcept;
 
   @override
   void initState() {
@@ -171,12 +176,20 @@ class _HomePageState extends State<HomePage> {
 
       final stats = await _authRepo.getUserStats();
 
+      DailyConceptModel? daily;
+      try {
+        daily = await _dailyRepo.getDailyConcept(userId, languageCode);
+      } catch (e) {
+        debugPrint('Error loading daily concept: $e');
+      }
+
       setState(() {
         favoriteThemes = preferred;
         favoriteThemeIds = preferredIds;
         themeProgress = progressMap;
         currentStreak = stats?.effectiveStreak ?? 0;
         pvpRating = stats?.pvpRating ?? 1000;
+        dailyConcept = daily;
         isLoading = false;
       });
     } catch (e) {
@@ -281,6 +294,12 @@ class _HomePageState extends State<HomePage> {
           _buildMascotCard(l10n),
           const SizedBox(height: 16),
 
+          // Daily Concept Card
+          if (dailyConcept != null) ...[
+            _buildDailyConceptCard(l10n),
+            const SizedBox(height: 16),
+          ],
+
           // PvP Arena Button
           _buildPvPButton(l10n),
           const SizedBox(height: 16),
@@ -317,6 +336,118 @@ class _HomePageState extends State<HomePage> {
             height: 80,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDailyConceptCard(AppLocalizations l10n) {
+    final concept = dailyConcept!;
+    final isCompleted = concept.alreadyCompleted;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DailyConceptPage(concept: concept),
+            ),
+          );
+          loadFavoriteThemes();
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: isCompleted
+                ? LinearGradient(
+                    colors: [Colors.grey.shade400, Colors.grey.shade500],
+                  )
+                : const LinearGradient(
+                    colors: [Color(0xFF1B8A3C), Color(0xFF52BE80)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: (isCompleted ? Colors.grey : const Color(0xFF1B8A3C))
+                    .withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  isCompleted ? Icons.check_circle : Icons.auto_awesome,
+                  color: Colors.white,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.dailyQuiz,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      concept.conceptName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (isCompleted)
+                      Text(
+                        l10n.dailyQuizCompleted,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              if (!isCompleted)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    l10n.xpTriple,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right, color: Colors.white, size: 24),
+            ],
+          ),
+        ),
       ),
     );
   }

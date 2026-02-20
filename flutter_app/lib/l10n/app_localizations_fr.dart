@@ -577,4 +577,29 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get back => 'Retour';
+
+  @override
+  String get dailyQuiz => 'Quiz du Jour';
+
+  @override
+  String get todaysConcept => 'Concept du jour';
+
+  @override
+  String get xpTriple => 'XP x3';
+
+  @override
+  String get noLivesNeeded => 'Pas de vies';
+
+  @override
+  String get dailyQuizCompleted => 'Déjà complété !';
+
+  @override
+  String get startDailyQuiz => 'Lancer le Quiz';
+
+  @override
+  String get dailyQuizInfo =>
+      'Le quiz du jour vous fait gagner 3x plus d\'XP dans ce thème ! Aucune vie n\'est nécessaire et les erreurs ne retirent pas de vies.';
+
+  @override
+  String get noDailyQuiz => 'Revenez demain pour un nouveau concept !';
 }

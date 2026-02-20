@@ -574,4 +574,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get back => 'Back';
+
+  @override
+  String get dailyQuiz => 'Daily Quiz';
+
+  @override
+  String get todaysConcept => 'Today\'s concept';
+
+  @override
+  String get xpTriple => 'XP x3';
+
+  @override
+  String get noLivesNeeded => 'No lives needed';
+
+  @override
+  String get dailyQuizCompleted => 'Already completed!';
+
+  @override
+  String get startDailyQuiz => 'Start Quiz';
+
+  @override
+  String get dailyQuizInfo =>
+      'The daily quiz earns you 3x more XP in this theme! No lives are needed and mistakes don\'t cost lives.';
+
+  @override
+  String get noDailyQuiz => 'Come back tomorrow for a new concept!';
 }

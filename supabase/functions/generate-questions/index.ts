@@ -467,8 +467,9 @@ RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
         // ===== ENREGISTRER LE CONCEPT (UNE SEULE FOIS) =====
         if (added === 0) {
           await supabaseAdmin.from('question_concepts').insert({
-            question_id: question.id,
             concept: conceptName,
+            concept_en: chosenConcept.concept,
+            concept_fr: chosenConcept.concept_fr || conceptName,
             theme_id: theme.id
           })
         }
