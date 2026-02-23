@@ -1,10 +1,26 @@
+import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 import '../../../../shared/services/supabase_service.dart';
+import '../../../../shared/services/notification_service.dart';
 import '../models/user_model.dart';
 
 class AuthRepository {
   final _supabase = SupabaseService().client;
+
+  Future<void> _savefcmToken() async {
+    final userId = getCurrentUserId();
+    if (userId == null) return;
+    final token = await NotificationService().getToken();
+    if (token == null) return;
+    final platform = Platform.isIOS ? 'ios' : 'android';
+    await _supabase.from('user_fcm_tokens').upsert({
+      'user_id': userId,
+      'token': token,
+      'platform': platform,
+      'updated_at': DateTime.now().toIso8601String(),
+    }, onConflict: 'user_id, token');
+  }
 
   // Inscription avec pseudo
   Future<void> signUp(String email, String password, {String? username}) async {
@@ -91,6 +107,7 @@ class AuthRepository {
       email: email,
       password: password,
     );
+    await _savefcmToken();
   }
 
   // Connexion avec Facebook
@@ -141,6 +158,7 @@ Future<bool> signInWithFacebook() async {
         }
       }
 
+      await _savefcmToken();
       return true;
     } catch (e) {
       debugPrint('Google sign in error: $e');
@@ -180,6 +198,7 @@ Future<bool> signInWithFacebook() async {
         }
       }
 
+      await _savefcmToken();
       return true;
     } catch (e) {
       debugPrint('Apple sign in error: $e');
@@ -228,6 +247,7 @@ Future<bool> signInWithFacebook() async {
       );
     }
 
+    await _savefcmToken();
     return UserModel.fromJson({
       ...response,
       'user_id': userId,
