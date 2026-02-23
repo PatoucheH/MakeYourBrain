@@ -108,6 +108,85 @@ Future<bool> signInWithFacebook() async {
   }
 }
 
+  // Connexion avec Google
+  Future<bool> signInWithGoogle() async {
+    try {
+      // Use Supabase Auth for Google Sign-In
+      final response = await _supabase.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'com.patou.makeyourbrain://login-callback',
+      );
+
+      if (!response) {
+        debugPrint('Google sign in cancelled by user');
+        return false;
+      }
+
+      // User will be automatically created in Supabase
+      // Check if user exists in user_stats, create if not
+      final userId = getCurrentUserId();
+      if (userId != null) {
+        final existingUser = await _supabase
+            .from('user_stats')
+            .select()
+            .eq('user_id', userId)
+            .maybeSingle();
+
+        if (existingUser == null) {
+          await _supabase.from('user_stats').insert({
+            'user_id': userId,
+            'username': (getCurrentUserEmail() ?? 'user').split('@')[0].toLowerCase(),
+            'preferred_language': 'en',
+          });
+        }
+      }
+
+      return true;
+    } catch (e) {
+      debugPrint('Google sign in error: $e');
+      return false;
+    }
+  }
+
+  // Connexion avec Apple
+  Future<bool> signInWithApple() async {
+    try {
+      // Use Supabase Auth for Apple Sign-In
+      final response = await _supabase.auth.signInWithOAuth(
+        OAuthProvider.apple,
+        redirectTo: kIsWeb ? null : 'com.patou.makeyourbrain://login-callback',
+      );
+
+      if (!response) {
+        debugPrint('Apple sign in cancelled by user');
+        return false;
+      }
+
+      // Check if user exists in user_stats, create if not
+      final userId = getCurrentUserId();
+      if (userId != null) {
+        final existingUser = await _supabase
+            .from('user_stats')
+            .select()
+            .eq('user_id', userId)
+            .maybeSingle();
+
+        if (existingUser == null) {
+          await _supabase.from('user_stats').insert({
+            'user_id': userId,
+            'username': (getCurrentUserEmail() ?? 'user').split('@')[0].toLowerCase(),
+            'preferred_language': 'en',
+          });
+        }
+      }
+
+      return true;
+    } catch (e) {
+      debugPrint('Apple sign in error: $e');
+      return false;
+    }
+  }
+
   // Déconnexion
   Future<void> signOut() async {
     await _supabase.auth.signOut();

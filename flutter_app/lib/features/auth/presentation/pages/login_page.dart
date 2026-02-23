@@ -55,17 +55,55 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> _loginWithFacebook() async {
+  // Future<void> _loginWithFacebook() async {
+  //   setState(() => _isLoading = true);
+  //   try {
+  //     final success = await _repository.signInWithFacebook();
+  //     if (!success) {
+  //       if (mounted) {
+  //         setState(() => _isLoading = false);
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(content: Text('Could not open Facebook login')),
+  //         );
+  //       }
+  //       return;
+  //     }
+  //     final subscription = _repository.authStateChanges.listen((state) {
+  //       if (state.event == AuthChangeEvent.signedIn && mounted) {
+  //         Navigator.of(context).pushReplacement(
+  //           MaterialPageRoute(builder: (context) => const HomePage()),
+  //         );
+  //       }
+  //     });
+  //     await Future.delayed(const Duration(seconds: 60));
+  //     subscription.cancel();
+  //     if (mounted && !_repository.isLoggedIn()) {
+  //       setState(() => _isLoading = false);
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Login timeout. Please try again.')),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     if (mounted) {
+  //       setState(() => _isLoading = false);
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Facebook login error: $e')),
+  //       );
+  //     }
+  //   }
+  // }
+
+  Future<void> _loginWithGoogle() async {
     setState(() => _isLoading = true);
 
     try {
-      final success = await _repository.signInWithFacebook();
+      final success = await _repository.signInWithGoogle();
 
       if (!success) {
         if (mounted) {
           setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not open Facebook login')),
+            const SnackBar(content: Text('Could not open Google login')),
           );
         }
         return;
@@ -92,7 +130,50 @@ class _LoginPageState extends State<LoginPage> {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Facebook login error: $e')),
+          SnackBar(content: Text('Google login error: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _loginWithApple() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final success = await _repository.signInWithApple();
+
+      if (!success) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open Apple login')),
+          );
+        }
+        return;
+      }
+
+      final subscription = _repository.authStateChanges.listen((state) {
+        if (state.event == AuthChangeEvent.signedIn && mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        }
+      });
+
+      await Future.delayed(const Duration(seconds: 60));
+      subscription.cancel();
+
+      if (mounted && !_repository.isLoggedIn()) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login timeout. Please try again.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Apple login error: $e')),
         );
       }
     }
@@ -167,12 +248,22 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Bouton Facebook
+                        // Bouton Google
                         _buildSocialButton(
-                          onPressed: _isLoading ? null : _loginWithFacebook,
-                          icon: Icons.facebook,
-                          label: 'Continue with Facebook',
-                          color: const Color(0xFF1877F2),
+                          onPressed: _isLoading ? null : _loginWithGoogle,
+                          icon: Icons.g_mobiledata,
+                          label: 'Continue with Google',
+                          color: const Color(0xFF4285F4),
+                          isLoading: _isLoading,
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Bouton Apple
+                        _buildSocialButton(
+                          onPressed: _isLoading ? null : _loginWithApple,
+                          icon: Icons.apple,
+                          label: 'Continue with Apple',
+                          color: const Color(0xFF000000),
                           isLoading: _isLoading,
                         ),
                         const SizedBox(height: 24),
