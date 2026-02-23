@@ -67,10 +67,10 @@ serve(async (req) => {
       const themeCounts = await Promise.all(
         allThemes.map(async (t) => {
           const { count } = await supabaseAdmin
-            .from('question_concepts')
+            .from('questions')
             .select('id', { count: 'exact', head: true })
             .eq('theme_id', t.id)
-          
+
           return { theme_id: t.id, icon: t.icon, concept_count: count || 0 }
         })
       )
