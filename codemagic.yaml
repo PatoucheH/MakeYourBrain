@@ -3,9 +3,15 @@ workflows:
     name: iOS Workflow
     max_build_duration: 120
     environment:
+      vars:
+        APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.patou.makeyourbrain
+        provisioning_profile: $CM_PROVISIONING_PROFILE
+        certificate: $CM_CERTIFICATE
+        certificate_password: $CM_CERTIFICATE_PASSWORD
     scripts:
       - name: Get Flutter packages
         script: |
