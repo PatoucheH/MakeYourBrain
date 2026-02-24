@@ -2,19 +2,13 @@ workflows:
   ios-workflow:
     name: iOS Workflow
     max_build_duration: 120
+    integrations:
+      app_store_connect: Codemagic
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.patou.makeyourbrain
     scripts:
-      - name: Set up keychain
-        script: |
-          keychain initialize
-      - name: Set up provisioning profile
-        script: |
-          PROFILES_HOME="$HOME/Library/MobileDevice/Provisioning Profiles"
-          mkdir -p "$PROFILES_HOME"
-          echo "$CM_PROVISIONING_PROFILE" | base64 --decode > "$PROFILES_HOME/profile.mobileprovision"
-      - name: Set up certificate
-        script: |
-          echo "$CM_CERTIFICATE" | base64 --decode > /tmp/certificate.p12
-          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CM_CERTIFICATE_PASSWORD"
       - name: Get Flutter packages
         script: |
           cd flutter_app
@@ -33,7 +27,5 @@ workflows:
       - flutter_app/build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        use_signing_certificate: true
         submit_to_testflight: true
