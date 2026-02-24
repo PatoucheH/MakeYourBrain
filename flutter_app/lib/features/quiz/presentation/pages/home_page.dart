@@ -42,13 +42,23 @@ class _HomePageState extends State<HomePage> {
   int currentStreak = 0;
   int pvpRating = 1000;
   DailyConceptModel? dailyConcept;
+  String? _lastLanguage;
 
   @override
   void initState() {
     super.initState();
-    loadFavoriteThemes();
     if (kShowBetaDialog) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _showBetaDialog());
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final lang = Provider.of<LanguageProvider>(context).currentLanguage;
+    if (_lastLanguage != lang) {
+      _lastLanguage = lang;
+      loadFavoriteThemes();
     }
   }
 

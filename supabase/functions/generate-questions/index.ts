@@ -332,7 +332,26 @@ RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
       throw new Error('Invalid questions format')
     }
 
-    // ===== ÉTAPE 3 : INSÉRER TOUTES LES QUESTIONS =====
+    // ===== ÉTAPE 3 : ENREGISTRER LE CONCEPT EN PREMIER =====
+    const { data: insertedConcept, error: conceptErr } = await supabaseAdmin
+      .from('question_concepts')
+      .insert({
+        concept: conceptName,
+        concept_en: chosenConcept.concept,
+        concept_fr: chosenConcept.concept_fr || conceptName,
+        theme_id: theme.id
+      })
+      .select()
+      .single()
+
+    if (conceptErr || !insertedConcept) {
+      throw new Error(`Erreur insertion concept: ${conceptErr?.message}`)
+    }
+
+    const conceptId = insertedConcept.id
+    console.log(`💾 Concept enregistré: "${conceptName}" (id: ${conceptId})`)
+
+    // ===== ÉTAPE 4 : INSÉRER TOUTES LES QUESTIONS =====
     let added = 0
     const difficultyCount = { easy: 0, medium: 0, hard: 0 }
 
@@ -384,6 +403,7 @@ RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
           .from('questions')
           .insert({
             theme_id: theme.id,
+            concept_id: conceptId,
             difficulty: difficulty,
             times_used: 0
           })
@@ -464,16 +484,6 @@ RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
           continue
         }
 
-        // ===== ENREGISTRER LE CONCEPT (UNE SEULE FOIS) =====
-        if (added === 0) {
-          await supabaseAdmin.from('question_concepts').insert({
-            concept: conceptName,
-            concept_en: chosenConcept.concept,
-            concept_fr: chosenConcept.concept_fr || conceptName,
-            theme_id: theme.id
-          })
-        }
-
         added++
         difficultyCount[difficulty]++
 
@@ -482,6 +492,12 @@ RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
       } catch (e) {
         console.error('❌ Erreur traitement question:', e)
       }
+    }
+
+    // Si aucune question valide, supprimer le concept orphelin
+    if (added === 0) {
+      await supabaseAdmin.from('question_concepts').delete().eq('id', conceptId)
+      throw new Error('Aucune question valide générée, concept supprimé')
     }
 
     console.log(`\n✅ ${themeName}: ${added} questions créées sur "${conceptName}"`)
