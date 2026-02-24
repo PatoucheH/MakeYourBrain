@@ -273,6 +273,32 @@ class PvPRepository {
     }
   }
 
+  /// Récupère le username et la langue préférée d'un joueur en un seul appel
+  Future<Map<String, String?>> getOpponentInfo(String userId) async {
+    try {
+      final response = await _supabase
+          .from('user_stats')
+          .select('username, preferred_language')
+          .eq('user_id', userId)
+          .maybeSingle();
+      return {
+        'username': response?['username'] as String?,
+        'language': response?['preferred_language'] as String?,
+      };
+    } catch (e) {
+      return {'username': null, 'language': null};
+    }
+  }
+
+  /// Envoie une push notification à un joueur via l'edge function (fire-and-forget)
+  Future<void> sendPvPNotification(String userId, String title, String body) async {
+    await _supabase.functions.invoke('send-notification', body: {
+      'userId': userId,
+      'title': title,
+      'body': body,
+    });
+  }
+
   /// Récupère les statistiques PvP d'un joueur
   Future<Map<String, dynamic>> getPlayerPvPStats(String userId) async {
     try {

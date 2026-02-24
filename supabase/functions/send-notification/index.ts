@@ -90,8 +90,6 @@ serve(async (req) => {
       )
     }
 
-    console.log(`📱 ${tokens.length} token(s) trouvé(s) pour l'utilisateur ${userId}`)
-
     // ===== GÉNÉRER L'ACCESS TOKEN OAUTH2 =====
     const serviceAccount = JSON.parse(Deno.env.get('FIREBASE_SERVICE_ACCOUNT') ?? '{}')
     const projectId = serviceAccount.project_id
@@ -117,12 +115,9 @@ serve(async (req) => {
         })
 
         const result = await response.json()
-        console.log(`📨 Token ${token.substring(0, 20)}...: ${response.status}`)
         return { token: token.substring(0, 20) + '...', status: response.status, result }
       })
     )
-
-    console.log(`✅ Notifications envoyées: ${results.length}`)
 
     return new Response(
       JSON.stringify({ success: true, sent: results.length, results }),

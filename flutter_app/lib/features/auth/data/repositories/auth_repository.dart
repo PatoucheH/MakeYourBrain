@@ -135,7 +135,6 @@ Future<bool> signInWithFacebook() async {
       );
 
       if (!response) {
-        debugPrint('Google sign in cancelled by user');
         return false;
       }
 
@@ -176,7 +175,6 @@ Future<bool> signInWithFacebook() async {
       );
 
       if (!response) {
-        debugPrint('Apple sign in cancelled by user');
         return false;
       }
 
