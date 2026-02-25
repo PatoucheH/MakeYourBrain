@@ -37,6 +37,7 @@ flutter:
 
 flutter_launcher_icons:
   android: true
-  ios: false
+  ios: true
+  remove_alpha_ios: true
   image_path: "assets/branding/logo/brainly_logo.png"
   android_background_color: "#6A1B9A"
