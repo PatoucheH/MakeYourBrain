@@ -240,8 +240,8 @@ Respond ONLY with valid JSON (no markdown):
     console.log(`📝 Génération de ${QUESTIONS_PER_CONCEPT} questions sur "${conceptName}"...`)
 
     // Calculer la répartition des difficultés
-    const easyCount = Math.ceil(QUESTIONS_PER_CONCEPT / 3)
-    const hardCount = Math.ceil(QUESTIONS_PER_CONCEPT / 3)
+    const easyCount = 6
+    const hardCount = 3
     const mediumCount = QUESTIONS_PER_CONCEPT - easyCount - hardCount
 
     const questionsPrompt = `Generate ${QUESTIONS_PER_CONCEPT} diverse and high-quality quiz questions about "${conceptName}" (theme: ${themeName}).
