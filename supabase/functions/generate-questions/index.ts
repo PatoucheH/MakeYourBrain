@@ -256,14 +256,19 @@ CRITICAL REQUIREMENTS:
 - Questions should range from basic facts to deeper analysis
 
 Difficulty guidelines:
-- EASY: Basic general knowledge, famous facts, common concepts (${easyCount} questions)
-  Example: "Who painted the Mona Lisa?" or "What is the capital of France?"
-- MEDIUM: Standard knowledge, requires some education, recognizable facts (${mediumCount} questions)
+- EASY: Requires genuine knowledge of the concept, not just common sense. The answer should not be guessable by someone unfamiliar with "${conceptName}". Ask about well-known but specific facts. (${easyCount} questions)
+  ✅ Good example: "What is the main weapon used by Link in The Legend of Zelda?" (specific but known by fans)
+  ❌ Bad example: "What color is the sky?" or "Who is the main character of Zelda?" (too trivial)
+- MEDIUM: Standard knowledge, requires familiarity with the topic. About 40-50% of people interested in the theme should know this. (${mediumCount} questions)
   Example: "What year did World War II end?" or "What is the process by which plants make food?"
-- HARD: Specific details, deeper knowledge, less commonly known facts (${hardCount} questions)
+- HARD: Specific details, deeper knowledge, less commonly known facts. Only enthusiasts or experts should know this. (${hardCount} questions)
   Example: "Which treaty ended World War I?" or "What is the smallest bone in the human body?"
 
-BALANCE: Questions should be challenging but fair. Most educated adults should be able to answer EASY questions, about 50% should know MEDIUM, and 20-30% should know HARD. Avoid extremely obscure or technical details.
+BALANCE: 
+- EASY should require real knowledge of "${conceptName}", not just common sense. Someone who knows nothing about this topic should NOT be able to guess easily.
+- MEDIUM should be known by about 40-50% of people with some interest in the topic.
+- HARD should be known by about 15-25% (enthusiasts and experts only).
+- NEVER generate trivially obvious questions like "What is X famous for?" or "Who is the creator of Y?"
 
 RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
 
