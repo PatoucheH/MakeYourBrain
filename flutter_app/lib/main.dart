@@ -16,9 +16,19 @@ import 'features/lives/data/providers/lives_provider.dart';
 import 'shared/services/ad_service.dart';
 import 'features/pvp/data/providers/pvp_provider.dart';
 import 'features/pvp/presentation/widgets/matchmaking_overlay.dart';
+import 'features/pvp/presentation/pages/pvp_menu_page.dart';
+import 'shared/services/notification_service.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+void _navigateToPvPFromNotification() {
+  final authRepo = AuthRepository();
+  if (!authRepo.isLoggedIn()) return;
+  navigatorKey.currentState?.push(
+    MaterialPageRoute(builder: (_) => const PvPMenuPage()),
+  );
+}
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -32,6 +42,24 @@ void main() async {
 
   await SupabaseService.initialize();
   await AdService.initialize();
+
+  // Demander les permissions et configurer l'affichage foreground
+  await NotificationService().initialize();
+
+  // Handler foreground : notification reçue app ouverte
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    debugPrint('📬 Notification foreground: ${message.notification?.title}');
+  });
+
+  // Token refresh → mettre à jour Supabase
+  NotificationService().listenToTokenRefresh(() async {
+    await AuthRepository().refreshFcmToken();
+  });
+
+  // Tap notification depuis background
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    _navigateToPvPFromNotification();
+  });
 
   runApp(
     MultiProvider(
@@ -384,6 +412,14 @@ class _AuthCheckerState extends State<AuthChecker> {
             : const ThemePreferencesPage();
         _isChecking = false;
       });
+
+      // Cold start depuis une notification (app fermée)
+      final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+      if (initialMessage != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _navigateToPvPFromNotification();
+        });
+      }
     } catch (e) {
       setState(() {
         _destination = const ThemePreferencesPage();

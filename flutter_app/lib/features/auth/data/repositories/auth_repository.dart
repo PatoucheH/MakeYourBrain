@@ -9,18 +9,24 @@ class AuthRepository {
   final _supabase = SupabaseService().client;
 
   Future<void> _savefcmToken() async {
-    final userId = getCurrentUserId();
-    if (userId == null) return;
-    final token = await NotificationService().getToken();
-    if (token == null) return;
-    final platform = Platform.isIOS ? 'ios' : 'android';
-    await _supabase.from('user_fcm_tokens').upsert({
-      'user_id': userId,
-      'token': token,
-      'platform': platform,
-      'updated_at': DateTime.now().toIso8601String(),
-    }, onConflict: 'user_id, token');
+    try {
+      final userId = getCurrentUserId();
+      if (userId == null) return;
+      final token = await NotificationService().getToken();
+      if (token == null) return;
+      final platform = Platform.isIOS ? 'ios' : 'android';
+      await _supabase.from('user_fcm_tokens').upsert({
+        'user_id': userId,
+        'token': token,
+        'platform': platform,
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'user_id, token');
+    } catch (e) {
+      debugPrint('❌ Failed to save FCM token: $e');
+    }
   }
+
+  Future<void> refreshFcmToken() => _savefcmToken();
 
   // Inscription avec pseudo
   Future<void> signUp(String email, String password, {String? username}) async {
