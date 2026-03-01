@@ -21,6 +21,10 @@ class AuthRepository {
         'platform': platform,
         'updated_at': DateTime.now().toIso8601String(),
       }, onConflict: 'user_id, token');
+      // Mettre à jour le timezone pour les notifications streak
+      await _supabase.from('user_stats').update({
+        'timezone_offset_hours': DateTime.now().timeZoneOffset.inHours,
+      }).eq('user_id', userId);
     } catch (e) {
       debugPrint('❌ Failed to save FCM token: $e');
     }

@@ -30,6 +30,23 @@ void _navigateToPvPFromNotification() {
   );
 }
 
+void _navigateToHome() {
+  final authRepo = AuthRepository();
+  if (!authRepo.isLoggedIn()) return;
+  navigatorKey.currentState?.pushAndRemoveUntil(
+    MaterialPageRoute(builder: (_) => const HomePage()),
+    (route) => false,
+  );
+}
+
+void _handleNotificationTap(RemoteMessage message) {
+  if (message.data['type'] == 'streak') {
+    _navigateToHome();
+  } else {
+    _navigateToPvPFromNotification();
+  }
+}
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -58,7 +75,7 @@ void main() async {
 
   // Tap notification depuis background
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    _navigateToPvPFromNotification();
+    _handleNotificationTap(message);
   });
 
   runApp(
@@ -417,7 +434,7 @@ class _AuthCheckerState extends State<AuthChecker> {
       final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
       if (initialMessage != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          _navigateToPvPFromNotification();
+          _handleNotificationTap(initialMessage);
         });
       }
     } catch (e) {
