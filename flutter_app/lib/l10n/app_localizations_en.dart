@@ -155,7 +155,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moreFeaturesComingSoon =>
-      'More features coming soon!\nLeaderboard, Time Challenge, Versus Mode...';
+      '🚀 More features coming soon!\nLeaderboard, Time Challenge, Versus Mode...';
 
   @override
   String get removeFromFavorites => 'Remove from favorites?';

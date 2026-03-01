@@ -155,7 +155,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get moreFeaturesComingSoon =>
-      'Plus de fonctionnalités bientôt !\nClassement, Défi Chrono, Mode Versus...';
+      '🚀 Plus de fonctionnalités bientôt !\nClassement, Défi Chrono, Mode Versus...';
 
   @override
   String get removeFromFavorites => 'Retirer des favoris ?';
