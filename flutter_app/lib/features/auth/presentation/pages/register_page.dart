@@ -132,7 +132,7 @@ class _RegisterPageState extends State<RegisterPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.registrationFailed}: $e')),
+          SnackBar(content: Text(l10n.registrationFailed)),
         );
       }
     } finally {

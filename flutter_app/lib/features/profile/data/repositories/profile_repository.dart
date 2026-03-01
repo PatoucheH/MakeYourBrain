@@ -23,6 +23,6 @@ class ProfileRepository {
         'p_user_id': userId,
         'p_timezone': utcOffset,
       }
-    );
+    ).timeout(const Duration(seconds: 15));
   }
 }

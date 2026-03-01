@@ -20,7 +20,7 @@ class AuthRepository {
         'token': token,
         'platform': platform,
         'updated_at': DateTime.now().toIso8601String(),
-      }, onConflict: 'user_id, token');
+      }, onConflict: 'user_id, token').timeout(const Duration(seconds: 15));
       // Mettre à jour le timezone pour les notifications streak
       await _supabase.from('user_stats').update({
         'timezone_offset_hours': DateTime.now().timeZoneOffset.inHours,

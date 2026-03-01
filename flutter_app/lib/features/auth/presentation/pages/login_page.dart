@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.loginFailed}: $e')),
+          SnackBar(content: Text(l10n.loginFailed)),
         );
       }
     } finally {
@@ -129,8 +129,9 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Google login error: $e')),
+          SnackBar(content: Text(l10n.loginFailed)),
         );
       }
     }
@@ -172,8 +173,9 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Apple login error: $e')),
+          SnackBar(content: Text(l10n.loginFailed)),
         );
       }
     }

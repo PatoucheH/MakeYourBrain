@@ -18,7 +18,7 @@ class PvPRepository {
       'p_user_id': userId,
       'p_rating': rating,
       'p_language': language,
-    });
+    }).timeout(const Duration(seconds: 15));
 
     if (response == null || (response is List && response.isEmpty)) {
       return {
@@ -50,7 +50,8 @@ class PvPRepository {
         .from('pvp_matches')
         .select()
         .eq('id', matchId)
-        .maybeSingle();
+        .maybeSingle()
+        .timeout(const Duration(seconds: 15));
 
     if (response == null) return null;
     return PvPMatchModel.fromJson(response);
@@ -187,7 +188,8 @@ class PvPRepository {
           .select()
           .or('player1_id.eq.$userId,player2_id.eq.$userId')
           .inFilter('status', ['waiting', 'player1_turn', 'player2_turn', 'player1_choosing_theme', 'player2_choosing_theme'])
-          .order('created_at', ascending: false);
+          .order('created_at', ascending: false)
+          .timeout(const Duration(seconds: 15));
 
       return (response as List)
           .map((json) => PvPMatchModel.fromJson(json))

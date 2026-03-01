@@ -2,11 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { create, getNumericDate } from "https://deno.land/x/djwt@v2.8/mod.ts"
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
+const jsonHeader = { 'Content-Type': 'application/json' }
 
 async function getAccessToken(serviceAccount: Record<string, string>): Promise<string> {
   const pemContents = serviceAccount.private_key
@@ -57,7 +53,7 @@ async function getAccessToken(serviceAccount: Record<string, string>): Promise<s
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { status: 200 })
   }
 
   try {
@@ -71,7 +67,7 @@ serve(async (req) => {
     if (!userId || !title || !body) {
       return new Response(
         JSON.stringify({ success: false, error: 'Missing required fields: userId, title, body' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        { headers: jsonHeader, status: 400 }
       )
     }
 
@@ -86,7 +82,7 @@ serve(async (req) => {
     if (!tokens || tokens.length === 0) {
       return new Response(
         JSON.stringify({ success: false, error: 'No FCM tokens found for this user' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }
+        { headers: jsonHeader, status: 404 }
       )
     }
 
@@ -121,14 +117,14 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true, sent: results.length, results }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: jsonHeader }
     )
 
   } catch (error) {
     console.error('💥 Erreur fatale:', error)
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      { headers: jsonHeader, status: 500 }
     )
   }
 })
