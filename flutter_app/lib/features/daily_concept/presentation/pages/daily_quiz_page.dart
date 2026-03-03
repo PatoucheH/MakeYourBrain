@@ -61,7 +61,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
       setState(() => isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading questions: $e')),
+          const SnackBar(content: Text('Unable to load questions. Please try again.')),
         );
       }
     }

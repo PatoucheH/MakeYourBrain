@@ -48,11 +48,42 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // ===== RÉCUPÉRER LES PARAMÈTRES (concept et theme_id optionnels) =====
+    // ===== RÉCUPÉRER ET VALIDER LES PARAMÈTRES =====
     const body = await req.json().catch(() => ({}))
-    const forcedConcept = body.concept ?? null
-    const forcedConceptFr = body.concept_fr ?? null
-    const forcedThemeId = body.theme_id ?? null
+
+    // Validation theme_id : doit être un UUID valide si fourni
+    const rawThemeId = body.theme_id ?? null
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    if (rawThemeId !== null && !UUID_REGEX.test(rawThemeId)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid theme_id format' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
+    }
+    const forcedThemeId = rawThemeId
+
+    // Validation concept : chaîne de 1 à 200 caractères, pas de balises HTML/scripts
+    const rawConcept = typeof body.concept === 'string' ? body.concept.trim() : null
+    const rawConceptFr = typeof body.concept_fr === 'string' ? body.concept_fr.trim() : null
+    const CONCEPT_MAX_LEN = 200
+    const HTML_REGEX = /<[^>]*>/
+    if (rawConcept !== null) {
+      if (rawConcept.length === 0 || rawConcept.length > CONCEPT_MAX_LEN || HTML_REGEX.test(rawConcept)) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid concept value' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        )
+      }
+    }
+    if (rawConceptFr !== null && (rawConceptFr.length > CONCEPT_MAX_LEN || HTML_REGEX.test(rawConceptFr))) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid concept_fr value' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
+    }
+
+    const forcedConcept = rawConcept
+    const forcedConceptFr = rawConceptFr
 
     if (forcedConcept) {
       console.log(`🎯 Mode manuel: Concept forcé = "${forcedConcept}"`)
@@ -556,10 +587,7 @@ RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
   } catch (error) {
     console.error('💥 Erreur fatale:', error)
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message 
-      }),
+      JSON.stringify({ success: false, error: 'Internal server error' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }
