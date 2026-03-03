@@ -3,6 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { create, getNumericDate } from "https://deno.land/x/djwt@v2.8/mod.ts"
 
 const jsonHeader = { 'Content-Type': 'application/json' }
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 function getJwtPayload(authHeader: string): Record<string, unknown> | null {
   const token = authHeader.replace('Bearer ', '')
@@ -79,6 +80,15 @@ serve(async (req) => {
     )
   }
 
+  // C1: L'appelant doit être un UUID valide extrait du JWT
+  const callerId = payload.sub as string
+  if (!callerId || !UUID_REGEX.test(callerId)) {
+    return new Response(
+      JSON.stringify({ success: false, error: 'Forbidden' }),
+      { headers: jsonHeader, status: 403 }
+    )
+  }
+
   try {
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -91,6 +101,30 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ success: false, error: 'Missing required fields: userId, title, body' }),
         { headers: jsonHeader, status: 400 }
+      )
+    }
+
+    // C1: Valider le format UUID du destinataire
+    if (!UUID_REGEX.test(userId)) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid user ID' }),
+        { headers: jsonHeader, status: 400 }
+      )
+    }
+
+    // C1: Vérifier qu'il existe un match PvP actif entre l'appelant et le destinataire
+    const { data: match } = await supabaseAdmin
+      .from('pvp_matches')
+      .select('id')
+      .or(`and(player1_id.eq.${callerId},player2_id.eq.${userId}),and(player1_id.eq.${userId},player2_id.eq.${callerId})`)
+      .neq('status', 'completed')
+      .neq('status', 'cancelled')
+      .maybeSingle()
+
+    if (!match) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Forbidden' }),
+        { headers: jsonHeader, status: 403 }
       )
     }
 
@@ -155,7 +189,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('💥 Erreur fatale:', error)
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: 'Internal server error' }),
       { headers: jsonHeader, status: 500 }
     )
   }

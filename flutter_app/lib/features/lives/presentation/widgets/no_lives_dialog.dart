@@ -40,6 +40,7 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
 
     setState(() => _isLoadingAd = true);
 
+    try {
     // Mémoriser les vies actuelles avant la pub
     final previousLives = livesProvider.currentLives;
 
@@ -80,6 +81,9 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
           ),
         );
       }
+    }
+    } finally {
+      if (mounted) setState(() => _isLoadingAd = false);
     }
   }
 

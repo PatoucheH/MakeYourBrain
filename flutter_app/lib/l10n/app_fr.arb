@@ -214,5 +214,8 @@
   "dailyQuizCompleted": "Déjà complété !",
   "startDailyQuiz": "Lancer le Quiz",
   "dailyQuizInfo": "Le quiz du jour vous fait gagner 3x plus d'XP dans ce thème ! Aucune vie n'est nécessaire et les erreurs ne retirent pas de vies.",
-  "noDailyQuiz": "Revenez demain pour un nouveau concept !"
+  "noDailyQuiz": "Revenez demain pour un nouveau concept !",
+  "loginTimeout": "La connexion a expiré. Veuillez réessayer.",
+  "couldNotOpenGoogleLogin": "Impossible d'ouvrir la connexion Google",
+  "couldNotOpenAppleLogin": "Impossible d'ouvrir la connexion Apple"
 }

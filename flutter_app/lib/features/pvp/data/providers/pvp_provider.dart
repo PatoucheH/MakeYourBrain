@@ -353,7 +353,7 @@ class PvPProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('[PvP] ERROR joinMatchmaking: $e');
-      errorMessage = 'Error joining matchmaking: $e';
+      errorMessage = 'Unable to join matchmaking. Please try again.';
       isSearchingMatch = false;
       isInQueue = false;
       notifyListeners();
@@ -535,7 +535,7 @@ class PvPProvider extends ChangeNotifier {
       errorMessage = null;
       notifyListeners();
     } catch (e) {
-      errorMessage = 'Error leaving matchmaking: $e';
+      errorMessage = 'Unable to leave matchmaking. Please try again.';
       notifyListeners();
     }
   }
@@ -587,7 +587,7 @@ class PvPProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('[PvP] ERROR loadMatch: $e');
-      errorMessage = 'Error loading match: $e';
+      errorMessage = 'Unable to load match. Please try again.';
       isLoading = false;
       notifyListeners();
     }
@@ -732,7 +732,7 @@ class PvPProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('[PvP] ERROR selectTheme: $e');
-      errorMessage = 'Error selecting theme: $e';
+      errorMessage = 'Unable to select theme. Please try again.';
       isLoading = false;
       notifyListeners();
     }
@@ -772,7 +772,7 @@ class PvPProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('[PvP] ERROR loadRound: $e');
-      errorMessage = 'Error loading round: $e';
+      errorMessage = 'Unable to load round. Please try again.';
       notifyListeners();
     }
   }
@@ -825,7 +825,7 @@ class PvPProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('[PvP] ERROR _startRoundWithRandomTheme: $e');
-      errorMessage = 'Error starting round 3: $e';
+      errorMessage = 'Unable to start round. Please try again.';
       isLoading = false;
       notifyListeners();
     }
@@ -900,7 +900,7 @@ class PvPProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('[PvP] ERROR startRound: $e');
-      errorMessage = 'Error starting round: $e';
+      errorMessage = 'Unable to start round. Please try again.';
       isLoading = false;
       notifyListeners();
     }
@@ -1060,7 +1060,7 @@ class PvPProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     } catch (e) {
-      errorMessage = 'Error submitting round: $e';
+      errorMessage = 'Unable to submit round. Please try again.';
       isLoading = false;
       notifyListeners();
     } finally {
@@ -1081,7 +1081,7 @@ class PvPProvider extends ChangeNotifier {
       );
       notifyListeners();
     } catch (e) {
-      errorMessage = 'Error completing match: $e';
+      errorMessage = 'Unable to complete match. Please try again.';
       notifyListeners();
     }
   }

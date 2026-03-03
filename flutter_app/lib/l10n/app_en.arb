@@ -242,5 +242,8 @@
   "dailyQuizCompleted": "Already completed!",
   "startDailyQuiz": "Start Quiz",
   "dailyQuizInfo": "The daily quiz earns you 3x more XP in this theme! No lives are needed and mistakes don't cost lives.",
-  "noDailyQuiz": "Come back tomorrow for a new concept!"
+  "noDailyQuiz": "Come back tomorrow for a new concept!",
+  "loginTimeout": "Login timeout. Please try again.",
+  "couldNotOpenGoogleLogin": "Could not open Google login",
+  "couldNotOpenAppleLogin": "Could not open Apple login"
 }

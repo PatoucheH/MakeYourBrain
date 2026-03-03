@@ -1237,6 +1237,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Come back tomorrow for a new concept!'**
   String get noDailyQuiz;
+
+  /// No description provided for @loginTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Login timeout. Please try again.'**
+  String get loginTimeout;
+
+  /// No description provided for @couldNotOpenGoogleLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open Google login'**
+  String get couldNotOpenGoogleLogin;
+
+  /// No description provided for @couldNotOpenAppleLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open Apple login'**
+  String get couldNotOpenAppleLogin;
 }
 
 class _AppLocalizationsDelegate

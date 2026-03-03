@@ -95,6 +95,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _loginWithGoogle() async {
     setState(() => _isLoading = true);
+    final l10n = AppLocalizations.of(context)!;
 
     try {
       final success = await _repository.signInWithGoogle();
@@ -103,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
         if (mounted) {
           setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not open Google login')),
+            SnackBar(content: Text(l10n.couldNotOpenGoogleLogin)),
           );
         }
         return;
@@ -123,13 +124,12 @@ class _LoginPageState extends State<LoginPage> {
       if (mounted && !_repository.isLoggedIn()) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login timeout. Please try again.')),
+          SnackBar(content: Text(l10n.loginTimeout)),
         );
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.loginFailed)),
         );
@@ -139,6 +139,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _loginWithApple() async {
     setState(() => _isLoading = true);
+    final l10n = AppLocalizations.of(context)!;
 
     try {
       final success = await _repository.signInWithApple();
@@ -147,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
         if (mounted) {
           setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not open Apple login')),
+            SnackBar(content: Text(l10n.couldNotOpenAppleLogin)),
           );
         }
         return;
@@ -167,13 +168,12 @@ class _LoginPageState extends State<LoginPage> {
       if (mounted && !_repository.isLoggedIn()) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login timeout. Please try again.')),
+          SnackBar(content: Text(l10n.loginTimeout)),
         );
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.loginFailed)),
         );

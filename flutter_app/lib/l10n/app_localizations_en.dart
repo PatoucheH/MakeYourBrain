@@ -602,4 +602,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noDailyQuiz => 'Come back tomorrow for a new concept!';
+
+  @override
+  String get loginTimeout => 'Login timeout. Please try again.';
+
+  @override
+  String get couldNotOpenGoogleLogin => 'Could not open Google login';
+
+  @override
+  String get couldNotOpenAppleLogin => 'Could not open Apple login';
 }

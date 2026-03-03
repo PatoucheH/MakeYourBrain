@@ -605,4 +605,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noDailyQuiz => 'Revenez demain pour un nouveau concept !';
+
+  @override
+  String get loginTimeout => 'La connexion a expiré. Veuillez réessayer.';
+
+  @override
+  String get couldNotOpenGoogleLogin => 'Impossible d\'ouvrir la connexion Google';
+
+  @override
+  String get couldNotOpenAppleLogin => 'Impossible d\'ouvrir la connexion Apple';
 }

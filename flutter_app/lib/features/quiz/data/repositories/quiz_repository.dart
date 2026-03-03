@@ -84,22 +84,11 @@ class QuizRepository {
 
     // Ajouter le bonus XP (pour les quiz chronométrés)
     if (bonusXp > 0) {
-      try {
-        await _supabase.rpc('add_bonus_xp', params: {
-          'p_user_id': userId,
-          'p_theme_id': themeId,
-          'p_bonus_xp': bonusXp,
-        });
-      } catch (e) {
-        final bonusCalls = bonusXp ~/ 10;
-        for (int i = 0; i < bonusCalls; i++) {
-          await _supabase.rpc('add_theme_xp', params: {
-            'p_user_id': userId,
-            'p_theme_id': themeId,
-            'p_is_correct': true,
-          });
-        }
-      }
+      await _supabase.rpc('add_bonus_xp', params: {
+        'p_user_id': userId,
+        'p_theme_id': themeId,
+        'p_bonus_xp': bonusXp,
+      });
     }
   }
 }

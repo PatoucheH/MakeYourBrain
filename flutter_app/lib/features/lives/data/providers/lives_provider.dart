@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../repositories/lives_repository.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
@@ -58,6 +59,7 @@ class LivesProvider extends ChangeNotifier {
   // Plus appelé directement — les vies sont accordées par le callback SSV AdMob.
   // Conservé comme fallback de débogage uniquement.
   Future<void> addLivesFromAd() async {
+    if (!kDebugMode) return;
     final userId = _authRepo.getCurrentUserId();
     if (userId == null) return;
 
