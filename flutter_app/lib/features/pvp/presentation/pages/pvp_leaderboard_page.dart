@@ -206,7 +206,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                                 final username = item['username'];
                                 final displayName = (username != null && username.toString().isNotEmpty)
                                     ? username.toString()
-                                    : (item['email'] ?? 'Unknown').toString().split('@').first;
+                                    : 'User';
 
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 10),

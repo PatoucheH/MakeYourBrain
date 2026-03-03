@@ -125,15 +125,16 @@ class AuthRepository {
     await _savefcmToken();
   }
 
-  // M5: Génère un pseudo unique et valide à partir de l'email OAuth.
-  // Sanitize l'email prefix et ajoute un suffixe unique pour éviter les conflits.
-  String _generateOAuthUsername(String? email, String userId) {
-    final prefix = (email ?? 'user').split('@')[0].toLowerCase();
-    final sanitized = prefix.replaceAll(RegExp(r'[^a-z0-9_]'), '_');
-    final truncated = sanitized.length > 15 ? sanitized.substring(0, 15) : sanitized;
-    final base = truncated.length < 2 ? 'user' : truncated;
-    final uniqueSuffix = userId.replaceAll('-', '').substring(0, 4);
-    return '${base}_$uniqueSuffix';
+  Future<bool> hasUsername() async {
+    final userId = getCurrentUserId();
+    if (userId == null) return false;
+    final data = await _supabase
+        .from('user_stats')
+        .select('username')
+        .eq('user_id', userId)
+        .maybeSingle();
+    final username = data?['username'] as String?;
+    return username != null && username.isNotEmpty;
   }
 
   // Connexion avec Facebook
@@ -177,7 +178,6 @@ Future<bool> signInWithFacebook() async {
         if (existingUser == null) {
           await _supabase.from('user_stats').insert({
             'user_id': userId,
-            'username': _generateOAuthUsername(getCurrentUserEmail(), userId),
             'preferred_language': 'en',
           });
         }
@@ -216,7 +216,6 @@ Future<bool> signInWithFacebook() async {
         if (existingUser == null) {
           await _supabase.from('user_stats').insert({
             'user_id': userId,
-            'username': _generateOAuthUsername(getCurrentUserEmail(), userId),
             'preferred_language': 'en',
           });
         }

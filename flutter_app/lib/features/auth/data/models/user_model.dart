@@ -105,12 +105,6 @@ class UserModel {
     );
   }
 
-  /// Retourne le nom d'affichage (pseudo ou email tronqué)
-  String get displayName {
-    if (username != null && username!.isNotEmpty) {
-      return username!;
-    }
-    // Retourne la partie avant @ de l'email
-    return email.split('@').first;
-  }
+  /// Retourne le nom d'affichage (pseudo ou 'User' par défaut)
+  String get displayName => username?.isNotEmpty == true ? username! : 'User';
 }

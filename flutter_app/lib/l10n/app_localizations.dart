@@ -1256,39 +1256,125 @@ abstract class AppLocalizations {
   /// **'Could not open Apple login'**
   String get couldNotOpenAppleLogin;
 
+  /// No description provided for @registerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the brain training community!'**
   String get registerSubtitle;
 
+  /// No description provided for @usernameCheckFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification failed'**
   String get usernameCheckFailed;
 
+  /// No description provided for @themeRemovedFromFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} removed from favorites'**
   String themeRemovedFromFavorites(String name);
 
+  /// No description provided for @themeRemoveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error removing theme'**
   String get themeRemoveError;
 
+  /// No description provided for @emailCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Email copied!'**
   String get emailCopied;
 
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
   String get continueWithGoogle;
 
+  /// No description provided for @continueWithApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
   String get continueWithApple;
 
+  /// No description provided for @orDivider.
+  ///
+  /// In en, this message translates to:
+  /// **'OR'**
   String get orDivider;
 
+  /// No description provided for @minutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m ago'**
   String minutesAgo(int minutes);
 
+  /// No description provided for @hoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h ago'**
   String hoursAgo(int hours);
 
+  /// No description provided for @daysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d ago'**
   String daysAgo(int days);
 
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
   String get yesterday;
 
+  /// No description provided for @noPlayersYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No players yet'**
   String get noPlayersYet;
 
+  /// No description provided for @errorLoadingFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading favorites'**
   String get errorLoadingFavorites;
 
+  /// No description provided for @errorLoadingLeaderboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading leaderboard'**
   String get errorLoadingLeaderboard;
 
+  /// No description provided for @dontHaveAccountPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account?'**
   String get dontHaveAccountPrefix;
 
+  /// No description provided for @alreadyHaveAccountPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
   String get alreadyHaveAccountPrefix;
+
+  /// No description provided for @chooseYourUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your username'**
+  String get chooseYourUsername;
+
+  /// No description provided for @chooseYourUsernameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This is how other players will see you'**
+  String get chooseYourUsernameHint;
+
+  /// No description provided for @confirmUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmUsername;
 }
 
 class _AppLocalizationsDelegate

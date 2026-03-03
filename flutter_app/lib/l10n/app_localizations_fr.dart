@@ -221,7 +221,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get winLifes => '+2 Vies ! Continuez à jouer';
 
   @override
-  String get adRewardPending => 'Récompense en cours de vérification, vos vies arrivent...';
+  String get adRewardPending =>
+      'Récompense en cours de vérification, vos vies arrivent...';
 
   @override
   String get noLife => 'Plus de vie !';
@@ -610,10 +611,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get loginTimeout => 'La connexion a expiré. Veuillez réessayer.';
 
   @override
-  String get couldNotOpenGoogleLogin => 'Impossible d\'ouvrir la connexion Google';
+  String get couldNotOpenGoogleLogin =>
+      'Impossible d\'ouvrir la connexion Google';
 
   @override
-  String get couldNotOpenAppleLogin => 'Impossible d\'ouvrir la connexion Apple';
+  String get couldNotOpenAppleLogin =>
+      'Impossible d\'ouvrir la connexion Apple';
 
   @override
   String get registerSubtitle => 'Rejoignez la communauté !';
@@ -622,7 +625,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get usernameCheckFailed => 'Erreur de vérification';
 
   @override
-  String themeRemovedFromFavorites(String name) => '$name retiré des favoris';
+  String themeRemovedFromFavorites(String name) {
+    return '$name retiré des favoris';
+  }
 
   @override
   String get themeRemoveError => 'Erreur lors de la suppression du thème';
@@ -640,13 +645,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get orDivider => 'OU';
 
   @override
-  String minutesAgo(int minutes) => 'il y a ${minutes}min';
+  String minutesAgo(int minutes) {
+    return 'il y a ${minutes}min';
+  }
 
   @override
-  String hoursAgo(int hours) => 'il y a ${hours}h';
+  String hoursAgo(int hours) {
+    return 'il y a ${hours}h';
+  }
 
   @override
-  String daysAgo(int days) => 'il y a ${days}j';
+  String daysAgo(int days) {
+    return 'il y a ${days}j';
+  }
 
   @override
   String get yesterday => 'Hier';
@@ -665,4 +676,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get alreadyHaveAccountPrefix => 'Déjà un compte ?';
+
+  @override
+  String get chooseYourUsername => 'Choisissez votre pseudo';
+
+  @override
+  String get chooseYourUsernameHint => 'C\'est comme ça que les autres joueurs vous verront';
+
+  @override
+  String get confirmUsername => 'Confirmer';
 }

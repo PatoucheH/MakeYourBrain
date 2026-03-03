@@ -290,5 +290,8 @@
   "errorLoadingFavorites": "Error loading favorites",
   "errorLoadingLeaderboard": "Error loading leaderboard",
   "dontHaveAccountPrefix": "Don't have an account?",
-  "alreadyHaveAccountPrefix": "Already have an account?"
+  "alreadyHaveAccountPrefix": "Already have an account?",
+  "chooseYourUsername": "Choose your username",
+  "chooseYourUsernameHint": "This is how other players will see you",
+  "confirmUsername": "Confirm"
 }

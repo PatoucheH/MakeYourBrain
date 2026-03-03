@@ -276,10 +276,9 @@ class _FollowListPageState extends State<FollowListPage>
         final item = searchResults[index];
         final userId = item['user_id'] as String;
         final username = item['username'];
-        final email = item['email'] ?? '';
         final displayName = (username != null && username.toString().isNotEmpty)
             ? username.toString()
-            : email.toString().split('@').first;
+            : 'User';
         final isFollowingUser = item['is_following'] == true;
         final isMe = userId == currentUserId;
 
@@ -344,10 +343,9 @@ class _FollowListPageState extends State<FollowListPage>
           final item = list[index];
           final userId = item['user_id'] as String;
           final username = item['username'];
-          final email = item['email'] ?? '';
           final displayName = (username != null && username.toString().isNotEmpty)
               ? username.toString()
-              : email.toString().split('@').first;
+              : 'User';
           final isMe = userId == currentUserId;
 
           // For followers tab, check is_followed_back

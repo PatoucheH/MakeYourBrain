@@ -221,7 +221,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get winLifes => '+2 Lives! Keep playing!';
 
   @override
-  String get adRewardPending => 'Reward is being verified, your lives will appear shortly.';
+  String get adRewardPending =>
+      'Reward is being verified, your lives will appear shortly.';
 
   @override
   String get noLife => 'No Lives Left!';
@@ -619,7 +620,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get usernameCheckFailed => 'Verification failed';
 
   @override
-  String themeRemovedFromFavorites(String name) => '$name removed from favorites';
+  String themeRemovedFromFavorites(String name) {
+    return '$name removed from favorites';
+  }
 
   @override
   String get themeRemoveError => 'Error removing theme';
@@ -637,13 +640,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orDivider => 'OR';
 
   @override
-  String minutesAgo(int minutes) => '${minutes}m ago';
+  String minutesAgo(int minutes) {
+    return '${minutes}m ago';
+  }
 
   @override
-  String hoursAgo(int hours) => '${hours}h ago';
+  String hoursAgo(int hours) {
+    return '${hours}h ago';
+  }
 
   @override
-  String daysAgo(int days) => '${days}d ago';
+  String daysAgo(int days) {
+    return '${days}d ago';
+  }
 
   @override
   String get yesterday => 'Yesterday';
@@ -658,8 +667,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorLoadingLeaderboard => 'Error loading leaderboard';
 
   @override
-  String get dontHaveAccountPrefix => "Don't have an account?";
+  String get dontHaveAccountPrefix => 'Don\'t have an account?';
 
   @override
   String get alreadyHaveAccountPrefix => 'Already have an account?';
+
+  @override
+  String get chooseYourUsername => 'Choose your username';
+
+  @override
+  String get chooseYourUsernameHint => 'This is how other players will see you';
+
+  @override
+  String get confirmUsername => 'Confirm';
 }

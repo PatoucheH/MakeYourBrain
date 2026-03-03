@@ -117,10 +117,9 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
   Widget _buildContent(AppLocalizations l10n, bool isOwnProfile) {
     final data = profileData!;
     final username = data['username'];
-    final email = data['email'] ?? '';
     final displayName = (username != null && username.toString().isNotEmpty)
         ? username.toString()
-        : email.toString().split('@').first;
+        : 'User';
 
     final totalQuestions = (data['total_questions'] as num?)?.toInt() ?? 0;
     final correctAnswers = (data['correct_answers'] as num?)?.toInt() ?? 0;

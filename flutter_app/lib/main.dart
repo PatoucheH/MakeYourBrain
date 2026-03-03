@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'shared/services/supabase_service.dart';
 import 'features/auth/presentation/pages/login_page.dart';
+import 'features/auth/presentation/pages/username_setup_page.dart';
 import 'features/quiz/presentation/pages/home_page.dart';
 import 'features/quiz/presentation/pages/theme_preferences_page.dart';
 import 'features/auth/data/repositories/auth_repository.dart';
@@ -420,6 +421,15 @@ class _AuthCheckerState extends State<AuthChecker> {
     }
 
     try {
+      final usernameSet = await _authRepo.hasUsername();
+      if (!usernameSet) {
+        setState(() {
+          _destination = const UsernameSetupPage();
+          _isChecking = false;
+        });
+        return;
+      }
+
       final userId = _authRepo.getCurrentUserId()!;
       final hasCompletedOnboarding = await _prefsRepo.hasCompletedOnboarding(userId);
 

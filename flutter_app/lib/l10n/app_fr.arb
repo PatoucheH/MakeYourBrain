@@ -262,5 +262,8 @@
   "errorLoadingFavorites": "Erreur de chargement des favoris",
   "errorLoadingLeaderboard": "Erreur de chargement du classement",
   "dontHaveAccountPrefix": "Pas de compte ?",
-  "alreadyHaveAccountPrefix": "Déjà un compte ?"
+  "alreadyHaveAccountPrefix": "Déjà un compte ?",
+  "chooseYourUsername": "Choisissez votre pseudo",
+  "chooseYourUsernameHint": "C'est comme ça que les autres joueurs vous verront",
+  "confirmUsername": "Confirmer"
 }
