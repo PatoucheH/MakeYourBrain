@@ -41,9 +41,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<!-- AdMob App ID - TODO: Remplace par ton vrai App ID AdMob -->
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY</string>
+	<string>ca-app-pub-6743392628237404~5250754107</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

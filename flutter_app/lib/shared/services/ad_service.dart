@@ -18,7 +18,7 @@ class AdService {
 
   static String get _iosRewardedAdUnitId => kDebugMode
     ? 'ca-app-pub-3940256099942544/1712485313' // ID de test
-    : 'ca-app-pub-6743392628237404/2396801579'; // Ton vrai ID prod
+    : 'ca-app-pub-6743392628237404/8998427429'; // Vrai ID prod iOS
 
   String get _rewardedAdUnitId {
     if (defaultTargetPlatform == TargetPlatform.android) {
