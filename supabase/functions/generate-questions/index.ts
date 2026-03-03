@@ -270,6 +270,14 @@ BALANCE:
 - HARD should be known by about 15-25% (enthusiasts and experts only).
 - NEVER generate trivially obvious questions like "What is X famous for?" or "Who is the creator of Y?"
 
+🚫 ABSOLUTE PROHIBITIONS:
+- NEVER generate a question where the answer is contained in or directly deducible from the question itself
+- NEVER generate a question where the answer is contained in or directly deducible from the concept name "${conceptName}"
+- NEVER ask "What does X mean?" or "What is the literal meaning of X?" if X is the concept name or closely related to it
+- NEVER ask questions whose answer requires zero prior knowledge of "${conceptName}" (e.g. language/translation questions)
+- NEVER ask questions where the correct answer appears word-for-word in the question text
+- Before finalizing each question, verify: "Could someone with NO knowledge of ${conceptName} guess this answer from the question alone?" — if YES, rewrite it
+
 RESPOND ONLY WITH VALID JSON (no markdown, no explanation):
 
 {
