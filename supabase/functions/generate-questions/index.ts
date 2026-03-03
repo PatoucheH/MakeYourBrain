@@ -14,9 +14,32 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
+function getJwtPayload(authHeader: string): Record<string, unknown> | null {
+  const token = authHeader.replace('Bearer ', '')
+  const parts = token.split('.')
+  if (parts.length !== 3) return null
+  try {
+    const base64Url = parts[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64 + '='.repeat((4 - base64.length % 4) % 4)
+    return JSON.parse(atob(padded))
+  } catch {
+    return null
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
+  }
+
+  // Réservé au cron / admin via service_role uniquement
+  const payload = getJwtPayload(req.headers.get('Authorization') ?? '')
+  if (!payload || payload.role !== 'service_role') {
+    return new Response(
+      JSON.stringify({ error: 'Forbidden' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+    )
   }
 
   try {

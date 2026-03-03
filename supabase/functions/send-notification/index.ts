@@ -4,6 +4,20 @@ import { create, getNumericDate } from "https://deno.land/x/djwt@v2.8/mod.ts"
 
 const jsonHeader = { 'Content-Type': 'application/json' }
 
+function getJwtPayload(authHeader: string): Record<string, unknown> | null {
+  const token = authHeader.replace('Bearer ', '')
+  const parts = token.split('.')
+  if (parts.length !== 3) return null
+  try {
+    const base64Url = parts[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64 + '='.repeat((4 - base64.length % 4) % 4)
+    return JSON.parse(atob(padded))
+  } catch {
+    return null
+  }
+}
+
 async function getAccessToken(serviceAccount: Record<string, string>): Promise<string> {
   const pemContents = serviceAccount.private_key
     .replace('-----BEGIN PRIVATE KEY-----', '')
@@ -54,6 +68,15 @@ async function getAccessToken(serviceAccount: Record<string, string>): Promise<s
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { status: 200 })
+  }
+
+  // Réservé aux utilisateurs authentifiés (pas à l'anon key)
+  const payload = getJwtPayload(req.headers.get('Authorization') ?? '')
+  if (!payload || payload.role !== 'authenticated') {
+    return new Response(
+      JSON.stringify({ success: false, error: 'Forbidden' }),
+      { headers: jsonHeader, status: 403 }
+    )
   }
 
   try {
