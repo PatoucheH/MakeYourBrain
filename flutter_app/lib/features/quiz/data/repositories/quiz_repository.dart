@@ -65,21 +65,22 @@ class QuizRepository {
     });
   }
 
-  // Ajouter l'XP à la fin du quiz pour toutes les bonnes réponses
+  // Ajouter l'XP à la fin du quiz — les paires (questionId, answerId) sont
+  // vérifiées côté serveur pour éviter la triche sur le nombre de bonnes réponses.
   Future<void> addQuizCompletionXp({
     required String userId,
     required String themeId,
-    required int correctAnswers,
+    required List<String> questionIds,
+    required List<String> answerIds,
     int bonusXp = 0,
   }) async {
-    // Appeler add_theme_xp pour chaque bonne réponse
-    for (int i = 0; i < correctAnswers; i++) {
-      await _supabase.rpc('add_theme_xp', params: {
-        'p_user_id': userId,
-        'p_theme_id': themeId,
-        'p_is_correct': true,
-      });
-    }
+    // Le RPC vérifie chaque paire (question_id, answer_id) contre la table answers
+    await _supabase.rpc('add_quiz_completion_xp', params: {
+      'p_user_id': userId,
+      'p_theme_id': themeId,
+      'p_question_ids': questionIds,
+      'p_answer_ids': answerIds,
+    });
 
     // Ajouter le bonus XP (pour les quiz chronométrés)
     if (bonusXp > 0) {
@@ -90,7 +91,6 @@ class QuizRepository {
           'p_bonus_xp': bonusXp,
         });
       } catch (e) {
-        // Fallback: add bonus XP by calling add_theme_xp multiple times (10 XP per call)
         final bonusCalls = bonusXp ~/ 10;
         for (int i = 0; i < bonusCalls; i++) {
           await _supabase.rpc('add_theme_xp', params: {

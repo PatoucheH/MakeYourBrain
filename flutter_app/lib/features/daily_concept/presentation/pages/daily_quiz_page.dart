@@ -33,6 +33,8 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
   bool isLoading = true;
   bool hasAnswered = false;
   String? selectedAnswerId;
+  final List<String> _questionIds = [];
+  final List<String> _answerIds = [];
 
   @override
   void initState() {
@@ -51,12 +53,6 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
         hardPercent: 20,
       );
 
-      final authRepo = AuthRepository();
-      final profileRepo = ProfileRepository();
-      if (authRepo.isLoggedIn()) {
-        await profileRepo.updateStreak(authRepo.getCurrentUserId()!);
-      }
-
       setState(() {
         questions = result;
         isLoading = false;
@@ -73,6 +69,9 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
 
   void selectAnswer(String answerId, bool isCorrect, String questionId) async {
     if (hasAnswered) return;
+
+    _questionIds.add(questionId);
+    _answerIds.add(answerId);
 
     setState(() {
       selectedAnswerId = answerId;
@@ -123,14 +122,24 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
     final percentage = (score / questions.length) * 100;
 
     final authRepo = AuthRepository();
-    if (authRepo.isLoggedIn() && score > 0) {
+    if (authRepo.isLoggedIn()) {
       try {
-        // XP x3 : on passe correctAnswers * 3
-        await _quizRepo.addQuizCompletionXp(
-          userId: authRepo.getCurrentUserId()!,
-          themeId: widget.concept.themeId,
-          correctAnswers: score * 3,
-        );
+        await ProfileRepository().updateStreak(authRepo.getCurrentUserId()!);
+      } catch (e) {
+        debugPrint('Error updating streak: $e');
+      }
+      try {
+        // Le RPC vérifie chaque paire (question, réponse) côté serveur.
+        // Le bonus x3 du daily est géré via bonusXp.
+        if (_questionIds.isNotEmpty) {
+          await _quizRepo.addQuizCompletionXp(
+            userId: authRepo.getCurrentUserId()!,
+            themeId: widget.concept.themeId,
+            questionIds: List.unmodifiable(_questionIds),
+            answerIds: List.unmodifiable(_answerIds),
+            bonusXp: score * 20, // équivalent au x3 (10 XP base × 2 bonus)
+          );
+        }
         // Marquer le quiz du jour comme complete
         await _dailyRepo.completeDailyConcept(authRepo.getCurrentUserId()!);
       } catch (e) {

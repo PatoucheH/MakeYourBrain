@@ -23,7 +23,6 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
     final adService = AdService();
 
     if (!adService.isAdReady) {
-      // Pub pas encore prête, afficher un message et relancer le chargement
       adService.loadRewardedAd();
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -40,27 +39,44 @@ class _NoLivesDialogState extends State<NoLivesDialog> {
     }
 
     setState(() => _isLoadingAd = true);
+
+    // Mémoriser les vies actuelles avant la pub
+    final previousLives = livesProvider.currentLives;
+
     Navigator.pop(context);
 
     final rewarded = await adService.showRewardedAd();
 
     if (rewarded) {
-      await livesProvider.addLivesFromAd();
+      // L'utilisateur a regardé la pub jusqu'au bout.
+      // Les vies sont accordées par le serveur via le callback SSV AdMob.
+      // On poll pendant 10 secondes maximum pour détecter la mise à jour.
+      bool livesGranted = false;
+      for (int i = 0; i < 5 && !livesGranted; i++) {
+        await Future.delayed(const Duration(seconds: 2));
+        await livesProvider.refresh();
+        if (livesProvider.currentLives > previousLives) {
+          livesGranted = true;
+        }
+      }
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.favorite, color: Colors.white),
+                Icon(
+                  livesGranted ? Icons.favorite : Icons.hourglass_empty,
+                  color: Colors.white,
+                ),
                 const SizedBox(width: 8),
-                Text(l10n.winLifes),
+                Text(livesGranted ? l10n.winLifes : l10n.adRewardPending),
               ],
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: livesGranted ? AppColors.success : AppColors.warning,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            duration: const Duration(seconds: 2),
+            duration: const Duration(seconds: 3),
           ),
         );
       }

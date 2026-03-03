@@ -512,6 +512,12 @@ abstract class AppLocalizations {
   /// **'+2 Lives! Keep playing!'**
   String get winLifes;
 
+  /// No description provided for @adRewardPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Reward is being verified, your lives will appear shortly.'**
+  String get adRewardPending;
+
   /// No description provided for @noLife.
   ///
   /// In en, this message translates to:

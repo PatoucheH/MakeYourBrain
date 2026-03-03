@@ -225,28 +225,29 @@ class PvPRepository {
         });
   }
 
-  /// Met à jour le statut d'un match
+  /// Met à jour le statut d'un match via RPC sécurisé (validation côté serveur)
   Future<void> updateMatchStatus(String matchId, String status) async {
-    await _supabase
-        .from('pvp_matches')
-        .update({'status': status})
-        .eq('id', matchId);
+    await _supabase.rpc('pvp_update_match_status', params: {
+      'p_match_id': matchId,
+      'p_status': status,
+    });
   }
 
-  /// Met à jour le statut et le round courant d'un match
+  /// Met à jour le statut et le round courant d'un match via RPC sécurisé
   Future<void> updateMatchStatusAndRound(String matchId, String status, int currentRound) async {
-    await _supabase
-        .from('pvp_matches')
-        .update({'status': status, 'current_round': currentRound})
-        .eq('id', matchId);
+    await _supabase.rpc('pvp_update_match_status', params: {
+      'p_match_id': matchId,
+      'p_status': status,
+      'p_round': currentRound,
+    });
   }
 
   /// Annule un match (si l'adversaire ne répond pas)
   Future<void> cancelMatch(String matchId) async {
-    await _supabase
-        .from('pvp_matches')
-        .update({'status': 'cancelled'})
-        .eq('id', matchId);
+    await _supabase.rpc('pvp_update_match_status', params: {
+      'p_match_id': matchId,
+      'p_status': 'cancelled',
+    });
   }
 
   /// Vérifie si un joueur est dans la file d'attente

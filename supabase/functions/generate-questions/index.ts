@@ -153,7 +153,6 @@ serve(async (req) => {
             message: 'Concept already exists for this theme',
             theme: themeName,
             concept: conceptName,
-            existing_concepts: conceptsList
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
         )

@@ -29,13 +29,11 @@ class LivesRepository {
     return response as bool;
   }
 
-  // Ajouter 2 vies après une pub
-  Future<int> addLivesFromAd(String userId) async {
-    final response = await _supabase.rpc('add_lives_from_ad', params: {
+  // Ajouter 2 vies après une pub (appelé uniquement via SSV désormais)
+  Future<void> addLivesFromAd(String userId) async {
+    await _supabase.rpc('add_lives_from_ad', params: {
       'p_user_id': userId,
     });
-
-    return response as int;
   }
 
   // Stream pour les mises à jour en temps réel

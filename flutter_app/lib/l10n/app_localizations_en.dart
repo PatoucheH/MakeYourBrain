@@ -221,6 +221,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get winLifes => '+2 Lives! Keep playing!';
 
   @override
+  String get adRewardPending => 'Reward is being verified, your lives will appear shortly.';
+
+  @override
   String get noLife => 'No Lives Left!';
 
   @override

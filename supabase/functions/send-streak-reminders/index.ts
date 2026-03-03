@@ -168,8 +168,8 @@ serve(async (req) => {
         : `You have a ${streak}-day streak. Play now before midnight!`
 
       await Promise.all(
-        tokens.map(({ token }) =>
-          fetch(fcmUrl, {
+        tokens.map(async ({ token }) => {
+          const response = await fetch(fcmUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -183,7 +183,16 @@ serve(async (req) => {
               },
             }),
           })
-        )
+
+          // Supprimer les tokens FCM invalides ou expirés
+          if (!response.ok) {
+            const result = await response.json()
+            const status = result?.error?.status
+            if (status === 'UNREGISTERED' || status === 'INVALID_ARGUMENT' || status === 'NOT_FOUND') {
+              await supabaseAdmin.from('user_fcm_tokens').delete().eq('token', token)
+            }
+          }
+        })
       )
 
       sent++

@@ -134,6 +134,15 @@ serve(async (req) => {
         })
 
         const result = await response.json()
+
+        // Supprimer les tokens FCM invalides ou expirés
+        if (!response.ok) {
+          const status = result?.error?.status
+          if (status === 'UNREGISTERED' || status === 'INVALID_ARGUMENT' || status === 'NOT_FOUND') {
+            await supabaseAdmin.from('user_fcm_tokens').delete().eq('token', token)
+          }
+        }
+
         return { token: token.substring(0, 20) + '...', status: response.status, result }
       })
     )

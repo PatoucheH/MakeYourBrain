@@ -399,3 +399,6 @@ verify_jwt = true
 
 [functions.send-streak-reminders]
 verify_jwt = true
+
+[functions.verify-ad-reward]
+verify_jwt = false

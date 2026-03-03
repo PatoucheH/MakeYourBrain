@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../../features/auth/data/repositories/auth_repository.dart';
 
 class AdService {
   static final AdService _instance = AdService._internal();
@@ -17,8 +18,7 @@ class AdService {
 
   static String get _iosRewardedAdUnitId => kDebugMode
     ? 'ca-app-pub-3940256099942544/1712485313' // ID de test
-    // TODO : Ton vrai ID prod iOS (à remplacer si tu publies sur iOS)
-    : 'ca-app-pub-6743392628237404/2396801579';
+    : 'ca-app-pub-6743392628237404/2396801579'; // Ton vrai ID prod
 
   String get _rewardedAdUnitId {
     if (defaultTargetPlatform == TargetPlatform.android) {
@@ -53,14 +53,21 @@ class AdService {
     if (!_isSupported || _isLoading || _rewardedAd != null) return;
     _isLoading = true;
 
+    final userId = AuthRepository().getCurrentUserId();
+
     RewardedAd.load(
       adUnitId: _rewardedAdUnitId,
       request: const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
+          if (userId != null) {
+            ad.setServerSideOptions(
+              ServerSideVerificationOptions(userId: userId),
+            );
+          }
           _rewardedAd = ad;
           _isLoading = false;
-          debugPrint('[AdService] Rewarded ad loaded');
+          debugPrint('[AdService] Rewarded ad loaded (SSV userId: $userId)');
         },
         onAdFailedToLoad: (error) {
           _rewardedAd = null;

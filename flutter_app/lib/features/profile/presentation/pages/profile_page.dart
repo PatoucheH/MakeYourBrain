@@ -73,7 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() => isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading profile: $e')),
+          const SnackBar(content: Text('Unable to load profile. Please try again.')),
         );
       }
     }

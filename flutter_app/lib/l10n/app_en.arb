@@ -70,6 +70,7 @@
   "points": "pts",
   "loadingAdd": "Loading add ....",
   "winLifes": "+2 Lives! Keep playing!",
+  "adRewardPending": "Reward is being verified, your lives will appear shortly.",
   "noLife": "No Lives Left!",
   "needLifes": "You need lives to play.",
   "nextLife": "Next life in:",

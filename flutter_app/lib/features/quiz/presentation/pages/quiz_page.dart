@@ -58,6 +58,8 @@ class _QuizPageState extends State<QuizPage> {
   bool isLoading = true;
   bool hasAnswered = false;
   String? selectedAnswerId;
+  final List<String> _questionIds = [];
+  final List<String> _answerIds = [];
 
   @override
   void initState() {
@@ -77,11 +79,6 @@ class _QuizPageState extends State<QuizPage> {
         mediumPercent: difficulty['medium']!,
         hardPercent: difficulty['hard']!,
       );
-      final authRepo = AuthRepository();
-      final profileRepo = ProfileRepository();
-      if (authRepo.isLoggedIn()) {
-        await profileRepo.updateStreak(authRepo.getCurrentUserId()!);
-      }
       setState(() {
         questions = result;
         isLoading = false;
@@ -92,7 +89,7 @@ class _QuizPageState extends State<QuizPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading questions: $e')),
+          const SnackBar(content: Text('Unable to load questions. Please try again.')),
         );
       }
     }
@@ -100,6 +97,9 @@ class _QuizPageState extends State<QuizPage> {
 
   void selectAnswer(String answerId, bool isCorrect, String questionId) async {
     if (hasAnswered) return;
+
+    _questionIds.add(questionId);
+    _answerIds.add(answerId);
 
     setState(() {
       selectedAnswerId = answerId;
@@ -165,15 +165,23 @@ class _QuizPageState extends State<QuizPage> {
     final percentage = (score / questions.length) * 100;
 
     final authRepo = AuthRepository();
-    if (authRepo.isLoggedIn() && score > 0) {
+    if (authRepo.isLoggedIn()) {
       try {
-        await _repository.addQuizCompletionXp(
-          userId: authRepo.getCurrentUserId()!,
-          themeId: widget.theme.id,
-          correctAnswers: score,
-        );
+        await ProfileRepository().updateStreak(authRepo.getCurrentUserId()!);
       } catch (e) {
-        debugPrint('Error adding XP: $e');
+        debugPrint('Error updating streak: $e');
+      }
+      if (_questionIds.isNotEmpty) {
+        try {
+          await _repository.addQuizCompletionXp(
+            userId: authRepo.getCurrentUserId()!,
+            themeId: widget.theme.id,
+            questionIds: List.unmodifiable(_questionIds),
+            answerIds: List.unmodifiable(_answerIds),
+          );
+        } catch (e) {
+          debugPrint('Error adding XP: $e');
+        }
       }
     }
 
@@ -327,6 +335,8 @@ class _QuizPageState extends State<QuizPage> {
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.of(context).pop();
+                            _questionIds.clear();
+                            _answerIds.clear();
                             setState(() {
                               currentQuestionIndex = 0;
                               score = 0;

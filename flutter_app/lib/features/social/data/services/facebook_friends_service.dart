@@ -41,7 +41,8 @@ class FacebookFriendsService {
 
       // Call Facebook Graph API to get friends who also use the app
       final response = await http.get(
-        Uri.parse('https://graph.facebook.com/v19.0/me/friends?fields=id,name&limit=500&access_token=$providerToken'),
+        Uri.parse('https://graph.facebook.com/v19.0/me/friends?fields=id,name&limit=500'),
+        headers: {'Authorization': 'Bearer $providerToken'},
       );
 
       if (response.statusCode != 200) {

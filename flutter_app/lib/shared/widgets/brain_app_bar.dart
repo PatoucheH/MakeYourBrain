@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../features/auth/data/repositories/auth_repository.dart';
@@ -6,6 +7,7 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/leaderboard/presentation/pages/leaderboard_page.dart';
 import '../../features/lives/presentation/widgets/lives_indicator.dart';
+import '../../features/pvp/data/providers/pvp_provider.dart';
 
 enum AppPage { home, profile, leaderboard, other }
 
@@ -160,6 +162,10 @@ class _BrainAppBarState extends State<BrainAppBar> {
                         builder: (context) => const LeaderboardPage()),
                   );
                 } else if (value == 'logout') {
+                  if (context.mounted) {
+                    context.read<PvPProvider>().stopBackgroundChecks();
+                    context.read<PvPProvider>().reset();
+                  }
                   await _authRepo.signOut();
                   if (context.mounted) {
                     Navigator.of(context).pushAndRemoveUntil(
