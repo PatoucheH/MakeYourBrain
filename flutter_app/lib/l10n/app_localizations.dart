@@ -1255,6 +1255,40 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not open Apple login'**
   String get couldNotOpenAppleLogin;
+
+  String get registerSubtitle;
+
+  String get usernameCheckFailed;
+
+  String themeRemovedFromFavorites(String name);
+
+  String get themeRemoveError;
+
+  String get emailCopied;
+
+  String get continueWithGoogle;
+
+  String get continueWithApple;
+
+  String get orDivider;
+
+  String minutesAgo(int minutes);
+
+  String hoursAgo(int hours);
+
+  String daysAgo(int days);
+
+  String get yesterday;
+
+  String get noPlayersYet;
+
+  String get errorLoadingFavorites;
+
+  String get errorLoadingLeaderboard;
+
+  String get dontHaveAccountPrefix;
+
+  String get alreadyHaveAccountPrefix;
 }
 
 class _AppLocalizationsDelegate

@@ -217,5 +217,50 @@
   "noDailyQuiz": "Revenez demain pour un nouveau concept !",
   "loginTimeout": "La connexion a expiré. Veuillez réessayer.",
   "couldNotOpenGoogleLogin": "Impossible d'ouvrir la connexion Google",
-  "couldNotOpenAppleLogin": "Impossible d'ouvrir la connexion Apple"
+  "couldNotOpenAppleLogin": "Impossible d'ouvrir la connexion Apple",
+  "registerSubtitle": "Rejoignez la communauté !",
+  "usernameCheckFailed": "Erreur de vérification",
+  "themeRemovedFromFavorites": "{name} retiré des favoris",
+  "@themeRemovedFromFavorites": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "themeRemoveError": "Erreur lors de la suppression du thème",
+  "emailCopied": "Email copié !",
+  "continueWithGoogle": "Continuer avec Google",
+  "continueWithApple": "Continuer avec Apple",
+  "orDivider": "OU",
+  "minutesAgo": "il y a {minutes}min",
+  "@minutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "il y a {hours}h",
+  "@hoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "daysAgo": "il y a {days}j",
+  "@daysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "yesterday": "Hier",
+  "noPlayersYet": "Aucun joueur pour l'instant",
+  "errorLoadingFavorites": "Erreur de chargement des favoris",
+  "errorLoadingLeaderboard": "Erreur de chargement du classement",
+  "dontHaveAccountPrefix": "Pas de compte ?",
+  "alreadyHaveAccountPrefix": "Déjà un compte ?"
 }

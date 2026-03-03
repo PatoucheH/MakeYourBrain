@@ -781,16 +781,17 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
+    final l10n = AppLocalizations.of(context)!;
 
     if (difference.inDays == 0) {
       if (difference.inHours == 0) {
-        return '${difference.inMinutes}m ago';
+        return l10n.minutesAgo(difference.inMinutes);
       }
-      return '${difference.inHours}h ago';
+      return l10n.hoursAgo(difference.inHours);
     } else if (difference.inDays == 1) {
-      return 'Yesterday';
+      return l10n.yesterday;
     } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
+      return l10n.daysAgo(difference.inDays);
     } else {
       return '${date.day}/${date.month}/${date.year}';
     }

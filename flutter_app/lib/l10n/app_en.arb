@@ -245,5 +245,50 @@
   "noDailyQuiz": "Come back tomorrow for a new concept!",
   "loginTimeout": "Login timeout. Please try again.",
   "couldNotOpenGoogleLogin": "Could not open Google login",
-  "couldNotOpenAppleLogin": "Could not open Apple login"
+  "couldNotOpenAppleLogin": "Could not open Apple login",
+  "registerSubtitle": "Join the brain training community!",
+  "usernameCheckFailed": "Verification failed",
+  "themeRemovedFromFavorites": "{name} removed from favorites",
+  "@themeRemovedFromFavorites": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "themeRemoveError": "Error removing theme",
+  "emailCopied": "Email copied!",
+  "continueWithGoogle": "Continue with Google",
+  "continueWithApple": "Continue with Apple",
+  "orDivider": "OR",
+  "minutesAgo": "{minutes}m ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{hours}h ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "daysAgo": "{days}d ago",
+  "@daysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "yesterday": "Yesterday",
+  "noPlayersYet": "No players yet",
+  "errorLoadingFavorites": "Error loading favorites",
+  "errorLoadingLeaderboard": "Error loading leaderboard",
+  "dontHaveAccountPrefix": "Don't have an account?",
+  "alreadyHaveAccountPrefix": "Already have an account?"
 }

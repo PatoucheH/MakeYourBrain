@@ -97,7 +97,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
       setState(() => isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading leaderboard: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.errorLoadingLeaderboard)),
         );
       }
     }
@@ -139,7 +139,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'No players yet',
+                  l10n.noPlayersYet,
                   style: TextStyle(
                     fontSize: 16,
                     color: AppColors.textSecondary,
@@ -280,7 +280,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
-                            'Lv ${item['level'] ?? 0}',
+                            '${l10n.level} ${item['level'] ?? 0}',
                             style: TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,
@@ -394,9 +394,9 @@ class _LeaderboardPageState extends State<LeaderboardPage>
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           if (myGlobalRank != null)
-            _buildRankItem('Global', myGlobalRank!, Icons.public, Colors.white),
+            _buildRankItem(l10n.global, myGlobalRank!, Icons.public, Colors.white),
           if (myWeeklyRank != null)
-            _buildRankItem('Weekly', myWeeklyRank!, Icons.calendar_today, const Color(0xFFFFD700)),
+            _buildRankItem(l10n.thisWeek, myWeeklyRank!, Icons.calendar_today, const Color(0xFFFFD700)),
           if (myThemeRank != null)
             _buildRankItem(l10n.yourThemeRank, myThemeRank!, Icons.style, AppColors.accentGreen),
         ],

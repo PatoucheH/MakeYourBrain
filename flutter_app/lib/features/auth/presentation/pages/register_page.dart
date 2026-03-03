@@ -33,12 +33,13 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     final normalized = username.toLowerCase().trim();
+    final l10n = AppLocalizations.of(context)!;
 
     // Validation locale
     if (normalized.length < 3) {
       setState(() {
         _isUsernameAvailable = false;
-        _usernameError = 'Minimum 3 caractères';
+        _usernameError = l10n.usernameMinLength;
       });
       return;
     }
@@ -46,7 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
     if (normalized.length > 20) {
       setState(() {
         _isUsernameAvailable = false;
-        _usernameError = 'Maximum 20 caractères';
+        _usernameError = l10n.usernameMaxLength;
       });
       return;
     }
@@ -55,7 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
     if (!validPattern.hasMatch(normalized)) {
       setState(() {
         _isUsernameAvailable = false;
-        _usernameError = 'Lettres, chiffres et _ uniquement';
+        _usernameError = l10n.usernameAllowedChars;
       });
       return;
     }
@@ -71,14 +72,14 @@ class _RegisterPageState extends State<RegisterPage> {
         setState(() {
           _isUsernameAvailable = isAvailable;
           _isCheckingUsername = false;
-          _usernameError = isAvailable ? null : 'Ce pseudo est déjà pris';
+          _usernameError = isAvailable ? null : l10n.usernameTaken;
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isCheckingUsername = false;
-          _usernameError = 'Erreur de vérification';
+          _usernameError = l10n.usernameCheckFailed;
         });
       }
     }
@@ -206,7 +207,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Join the brain training community!',
+                    l10n.registerSubtitle,
                     style: TextStyle(
                       fontSize: 16,
                       color: AppColors.textSecondary,
@@ -322,16 +323,16 @@ class _RegisterPageState extends State<RegisterPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Already have an account? ",
+                        '${l10n.alreadyHaveAccountPrefix} ',
                         style: TextStyle(color: AppColors.textSecondary),
                       ),
                       MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: GestureDetector(
                           onTap: () => Navigator.pop(context),
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.login,
+                            style: const TextStyle(
                               color: AppColors.brainPurple,
                               fontWeight: FontWeight.bold,
                             ),

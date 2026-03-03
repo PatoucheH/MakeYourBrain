@@ -254,7 +254,7 @@ class _LoginPageState extends State<LoginPage> {
                         _buildSocialButton(
                           onPressed: _isLoading ? null : _loginWithGoogle,
                           icon: Icons.g_mobiledata,
-                          label: 'Continue with Google',
+                          label: l10n.continueWithGoogle,
                           color: const Color(0xFF4285F4),
                           isLoading: _isLoading,
                         ),
@@ -264,7 +264,7 @@ class _LoginPageState extends State<LoginPage> {
                         _buildSocialButton(
                           onPressed: _isLoading ? null : _loginWithApple,
                           icon: Icons.apple,
-                          label: 'Continue with Apple',
+                          label: l10n.continueWithApple,
                           color: const Color(0xFF000000),
                           isLoading: _isLoading,
                         ),
@@ -289,7 +289,7 @@ class _LoginPageState extends State<LoginPage> {
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
-                                'OR',
+                                l10n.orDivider,
                                 style: TextStyle(
                                   color: AppColors.textSecondary,
                                   fontWeight: FontWeight.w600,
@@ -385,7 +385,7 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Don't have an account? ",
+                        '${l10n.dontHaveAccountPrefix} ',
                         style: TextStyle(color: AppColors.textSecondary),
                       ),
                       MouseRegion(
@@ -399,9 +399,9 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             );
                           },
-                          child: const Text(
-                            'Register',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.register,
+                            style: const TextStyle(
                               color: AppColors.brainPurple,
                               fontWeight: FontWeight.bold,
                             ),

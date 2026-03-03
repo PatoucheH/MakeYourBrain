@@ -614,4 +614,55 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get couldNotOpenAppleLogin => 'Impossible d\'ouvrir la connexion Apple';
+
+  @override
+  String get registerSubtitle => 'Rejoignez la communauté !';
+
+  @override
+  String get usernameCheckFailed => 'Erreur de vérification';
+
+  @override
+  String themeRemovedFromFavorites(String name) => '$name retiré des favoris';
+
+  @override
+  String get themeRemoveError => 'Erreur lors de la suppression du thème';
+
+  @override
+  String get emailCopied => 'Email copié !';
+
+  @override
+  String get continueWithGoogle => 'Continuer avec Google';
+
+  @override
+  String get continueWithApple => 'Continuer avec Apple';
+
+  @override
+  String get orDivider => 'OU';
+
+  @override
+  String minutesAgo(int minutes) => 'il y a ${minutes}min';
+
+  @override
+  String hoursAgo(int hours) => 'il y a ${hours}h';
+
+  @override
+  String daysAgo(int days) => 'il y a ${days}j';
+
+  @override
+  String get yesterday => 'Hier';
+
+  @override
+  String get noPlayersYet => 'Aucun joueur pour l\'instant';
+
+  @override
+  String get errorLoadingFavorites => 'Erreur de chargement des favoris';
+
+  @override
+  String get errorLoadingLeaderboard => 'Erreur de chargement du classement';
+
+  @override
+  String get dontHaveAccountPrefix => 'Pas de compte ?';
+
+  @override
+  String get alreadyHaveAccountPrefix => 'Déjà un compte ?';
 }

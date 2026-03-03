@@ -611,4 +611,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get couldNotOpenAppleLogin => 'Could not open Apple login';
+
+  @override
+  String get registerSubtitle => 'Join the brain training community!';
+
+  @override
+  String get usernameCheckFailed => 'Verification failed';
+
+  @override
+  String themeRemovedFromFavorites(String name) => '$name removed from favorites';
+
+  @override
+  String get themeRemoveError => 'Error removing theme';
+
+  @override
+  String get emailCopied => 'Email copied!';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
+  String get continueWithApple => 'Continue with Apple';
+
+  @override
+  String get orDivider => 'OR';
+
+  @override
+  String minutesAgo(int minutes) => '${minutes}m ago';
+
+  @override
+  String hoursAgo(int hours) => '${hours}h ago';
+
+  @override
+  String daysAgo(int days) => '${days}d ago';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String get noPlayersYet => 'No players yet';
+
+  @override
+  String get errorLoadingFavorites => 'Error loading favorites';
+
+  @override
+  String get errorLoadingLeaderboard => 'Error loading leaderboard';
+
+  @override
+  String get dontHaveAccountPrefix => "Don't have an account?";
+
+  @override
+  String get alreadyHaveAccountPrefix => 'Already have an account?';
 }

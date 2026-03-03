@@ -73,7 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() => isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unable to load profile. Please try again.')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.errorLoadingProfile)),
         );
       }
     }
@@ -93,7 +93,7 @@ class _ProfilePageState extends State<ProfilePage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.errorLoadingProfile}: $e')),
+          SnackBar(content: Text(l10n.errorLoadingProfile)),
         );
       }
     }
@@ -110,14 +110,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$themeName removed from favorites')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.themeRemovedFromFavorites(themeName))),
         );
         loadProfile();
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error removing theme : $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.themeRemoveError)),
         );
       }
     }
@@ -459,7 +459,7 @@ class _ProfilePageState extends State<ProfilePage> {
             } catch (e) {
               setDialogState(() {
                 isChecking = false;
-                errorMessage = 'Error checking username';
+                errorMessage = l10n.usernameCheckFailed;
               });
             }
           }

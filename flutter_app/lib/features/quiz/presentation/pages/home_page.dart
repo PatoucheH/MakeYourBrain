@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 Clipboard.setData(const ClipboardData(text: 'hugo.patou@hotmail.com'));
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Email copied!')),
+                  SnackBar(content: Text(l10n.emailCopied)),
                 );
               },
               child: Container(
@@ -206,7 +206,7 @@ class _HomePageState extends State<HomePage> {
       setState(() => isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading favorites: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.errorLoadingFavorites)),
         );
       }
     }

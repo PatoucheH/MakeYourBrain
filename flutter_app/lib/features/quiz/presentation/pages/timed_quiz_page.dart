@@ -120,7 +120,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unable to load questions. Please try again.')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.errorLoadingQuestions)),
         );
       }
     }
