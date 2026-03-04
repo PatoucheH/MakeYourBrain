@@ -434,6 +434,12 @@ abstract class AppLocalizations {
   /// **'No favorite themes yet.'**
   String get noFavoriteThemesProfile;
 
+  /// No description provided for @noEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'No email'**
+  String get noEmail;
+
   /// No description provided for @correctAnswer.
   ///
   /// In en, this message translates to:
@@ -1399,6 +1405,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hard'**
   String get hard;
+
+  /// No description provided for @emailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email address'**
+  String get emailInvalid;
+
+  /// No description provided for @passwordMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get passwordMinLength;
 }
 
 class _AppLocalizationsDelegate

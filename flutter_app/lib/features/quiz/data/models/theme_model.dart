@@ -17,20 +17,18 @@ class ThemeModel {
     required this.languageCode,
   });
 
-  // Créer un ThemeModel depuis JSON (Supabase)
   factory ThemeModel.fromJson(Map<String, dynamic> json) {
     return ThemeModel(
-      id: json['id'],
-      icon: json['icon'],
-      iconPath: json['icon_path'],
-      color: json['color'],
-      name: json['name'],
-      description: json['description'],
-      languageCode: json['language_code'],
+      id: json['id']?.toString() ?? '',
+      icon: json['icon']?.toString() ?? '📚',
+      iconPath: json['icon_path']?.toString(),
+      color: json['color']?.toString() ?? '#6366F1',
+      name: json['name']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      languageCode: json['language_code']?.toString() ?? 'en',
     );
   }
 
-  // Convertir en JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,

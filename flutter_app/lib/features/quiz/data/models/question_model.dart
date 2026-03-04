@@ -18,17 +18,17 @@ class QuestionModel {
   });
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
-    final answers = (json['answers'] as List)
+    final answers = ((json['answers'] as List?) ?? [])
         .map((a) => AnswerModel.fromJson(a))
         .toList()
       ..shuffle();
     return QuestionModel(
-      id: json['question_id'],
-      themeId: json['theme_id'],
-      difficulty: json['difficulty'],
-      questionText: json['question_text'],
-      explanation: json['explanation'],
-      languageCode: json['language_code'],
+      id: json['question_id']?.toString() ?? '',
+      themeId: json['theme_id']?.toString() ?? '',
+      difficulty: json['difficulty']?.toString() ?? 'easy',
+      questionText: json['question_text']?.toString() ?? '',
+      explanation: json['explanation']?.toString(),
+      languageCode: json['language_code']?.toString() ?? 'en',
       answers: answers,
     );
   }
@@ -49,10 +49,10 @@ class AnswerModel {
 
   factory AnswerModel.fromJson(Map<String, dynamic> json) {
     return AnswerModel(
-      id: json['answer_id'],
-      text: json['answer_text'],
-      isCorrect: json['is_correct'],
-      displayOrder: json['display_order'],
+      id: json['answer_id']?.toString() ?? '',
+      text: json['answer_text']?.toString() ?? '',
+      isCorrect: json['is_correct'] == true,
+      displayOrder: (json['display_order'] as int?) ?? 0,
     );
   }
 }

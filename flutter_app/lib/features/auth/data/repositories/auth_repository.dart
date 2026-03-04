@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 import '../../../../shared/services/supabase_service.dart';
@@ -49,11 +50,13 @@ class AuthRepository {
 
     // Créer l'entrée user_stats avec le pseudo si l'inscription réussit
     if (response.user != null && username != null && username.isNotEmpty) {
+      final deviceLang = PlatformDispatcher.instance.locale.languageCode;
       await _supabase.from('user_stats').insert({
         'user_id': response.user!.id,
         'username': username.toLowerCase().trim(),
-        'preferred_language': 'en',
+        'preferred_language': deviceLang == 'fr' ? 'fr' : 'en',
       });
+      await _savefcmToken();
     }
   }
 
@@ -176,9 +179,10 @@ Future<bool> signInWithFacebook() async {
             .maybeSingle();
 
         if (existingUser == null) {
+          final deviceLang = PlatformDispatcher.instance.locale.languageCode;
           await _supabase.from('user_stats').insert({
             'user_id': userId,
-            'preferred_language': 'en',
+            'preferred_language': deviceLang == 'fr' ? 'fr' : 'en',
           });
         }
       }
@@ -214,9 +218,10 @@ Future<bool> signInWithFacebook() async {
             .maybeSingle();
 
         if (existingUser == null) {
+          final deviceLang = PlatformDispatcher.instance.locale.languageCode;
           await _supabase.from('user_stats').insert({
             'user_id': userId,
-            'preferred_language': 'en',
+            'preferred_language': deviceLang == 'fr' ? 'fr' : 'en',
           });
         }
       }

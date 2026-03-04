@@ -274,7 +274,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            userStats?.email ?? 'No email',
+                            userStats?.email ?? l10n.noEmail,
                             style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 13,
@@ -304,7 +304,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                             items: const [
                               DropdownMenuItem(value: 'en', child: Text('English')),
-                              DropdownMenuItem(value: 'fr', child: Text('Francais')),
+                              DropdownMenuItem(value: 'fr', child: Text('Français')),
                             ],
                             onChanged: (value) {
                               if (value != null) updateLanguage(value);

@@ -22,7 +22,7 @@ class BrainAppBar extends StatefulWidget {
 
 class _BrainAppBarState extends State<BrainAppBar> {
   final _authRepo = AuthRepository();
-  int currentStreak = 0;
+  int? currentStreak;
 
   @override
   void initState() {
@@ -103,7 +103,7 @@ class _BrainAppBarState extends State<BrainAppBar> {
                 ),
                 const SizedBox(width: 2),
                 Text(
-                  '$currentStreak',
+                  currentStreak != null ? '$currentStreak' : '-',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,

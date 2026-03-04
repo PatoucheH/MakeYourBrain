@@ -182,6 +182,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noFavoriteThemesProfile => 'No favorite themes yet.';
 
   @override
+  String get noEmail => 'No email';
+
+  @override
   String get correctAnswer => '✅ Correct!';
 
   @override
@@ -692,4 +695,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hard => 'Hard';
+
+  @override
+  String get emailInvalid => 'Invalid email address';
+
+  @override
+  String get passwordMinLength => 'Password must be at least 6 characters';
 }

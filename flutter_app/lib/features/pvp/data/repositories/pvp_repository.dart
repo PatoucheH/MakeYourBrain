@@ -67,7 +67,7 @@ class PvPRepository {
       'p_limit': limit,
     });
 
-    return (response as List)
+    return (response as List? ?? [])
         .map((json) => QuestionModel.fromJson(json))
         .toList();
   }
@@ -82,7 +82,7 @@ class PvPRepository {
       'p_language_code': language,
     });
 
-    return (response as List)
+    return (response as List? ?? [])
         .map((json) => QuestionModel.fromJson(json))
         .toList();
   }
@@ -102,7 +102,7 @@ class PvPRepository {
       'p_theme_id': themeId,
     });
 
-    return response as String;
+    return response?.toString() ?? '';
   }
 
   /// Récupère un round spécifique d'un match
@@ -126,7 +126,7 @@ class PvPRepository {
         .eq('match_id', matchId)
         .order('round_number', ascending: true);
 
-    return (response as List)
+    return (response as List? ?? [])
         .map((json) => PvPRoundModel.fromJson(json))
         .toList();
   }
@@ -384,7 +384,7 @@ class PvPRepository {
       'p_avg_rating': avgRating,
     });
 
-    return (response as List)
+    return (response as List? ?? [])
         .map((json) => QuestionModel.fromJson(json))
         .toList();
   }

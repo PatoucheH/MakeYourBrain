@@ -34,7 +34,7 @@ class DailyConceptRepository {
       'p_hard_percent': hardPercent,
     });
 
-    return (response as List)
+    return ((response as List?) ?? [])
         .map((json) => QuestionModel.fromJson(json))
         .toList();
   }

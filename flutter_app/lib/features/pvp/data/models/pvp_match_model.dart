@@ -97,7 +97,7 @@ class PvPMatchModel {
       player2RatingBefore: json['player2_rating_before'],
       player1RatingChange: json['player1_rating_change'],
       player2RatingChange: json['player2_rating_change'],
-      createdAt: DateTime.parse(json['created_at']),
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
       startedAt: json['started_at'] != null
           ? DateTime.parse(json['started_at'])
           : null,
