@@ -486,7 +486,7 @@ class _LoginPageState extends State<LoginPage> {
               )
             : Icon(icon, size: 24),
         label: Text(
-          isLoading ? 'Connecting...' : label,
+          isLoading ? AppLocalizations.of(context)!.connecting : label,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         style: ElevatedButton.styleFrom(

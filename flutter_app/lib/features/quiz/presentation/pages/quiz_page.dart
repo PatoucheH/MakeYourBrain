@@ -79,14 +79,18 @@ class _QuizPageState extends State<QuizPage> {
         mediumPercent: difficulty['medium']!,
         hardPercent: difficulty['hard']!,
       );
-      setState(() {
-        questions = result;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          questions = result;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.errorLoadingQuestions)),
@@ -95,7 +99,7 @@ class _QuizPageState extends State<QuizPage> {
     }
   }
 
-  void selectAnswer(String answerId, bool isCorrect, String questionId) async {
+  Future<void> selectAnswer(String answerId, bool isCorrect, String questionId) async {
     if (hasAnswered) return;
 
     _questionIds.add(questionId);
@@ -159,7 +163,7 @@ class _QuizPageState extends State<QuizPage> {
     }
   }
 
-  void showResultDialog() async {
+  Future<void> showResultDialog() async {
     final l10n = AppLocalizations.of(context)!;
     final xpEarned = score * 10;
     final percentage = (score / questions.length) * 100;
@@ -434,7 +438,7 @@ class _QuizPageState extends State<QuizPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.of(context).pop();
                       if (currentQuestionIndex < questions.length - 1) {
                         setState(() {
@@ -443,7 +447,7 @@ class _QuizPageState extends State<QuizPage> {
                           selectedAnswerId = null;
                         });
                       } else {
-                        showResultDialog();
+                        await showResultDialog();
                       }
                     },
                     style: ElevatedButton.styleFrom(

@@ -82,6 +82,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
         }
       }
 
+      if (!mounted) return;
       setState(() {
         globalLeaderboard = global;
         weeklyLeaderboard = weekly;
@@ -94,6 +95,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
         isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

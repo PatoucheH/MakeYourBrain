@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/language_provider.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/repositories/quiz_repository.dart';
 import '../../data/repositories/theme_preferences_repository.dart';
 import '../../data/models/theme_model.dart';
@@ -30,12 +33,15 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
 
   Future<void> loadThemes() async {
     try {
-      final result = await _quizRepo.getThemes('en');
+      final languageCode = context.read<LanguageProvider>().currentLanguage;
+      final result = await _quizRepo.getThemes(languageCode);
+      if (!mounted) return;
       setState(() {
         themes = result;
         isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => isLoading = false);
     }
   }
@@ -43,7 +49,7 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
   Future<void> savePreferences() async {
     if (selectedThemeIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select at least one theme')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.noFavoriteThemes)),
       );
       return;
     }

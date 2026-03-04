@@ -48,6 +48,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
         if (followIndex >= 0) followRank = followIndex + 1;
       }
 
+      if (!mounted) return;
       setState(() {
         leaderboard = data;
         followingLeaderboard = followingData;
@@ -56,6 +57,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
         isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => isLoading = false);
     }
   }

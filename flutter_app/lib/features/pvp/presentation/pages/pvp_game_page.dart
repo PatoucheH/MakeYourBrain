@@ -167,11 +167,11 @@ class _PvPGamePageState extends State<PvPGamePage>
   String _getDifficultyLabel(String difficulty, AppLocalizations l10n) {
     switch (difficulty.toLowerCase()) {
       case 'easy':
-        return 'Easy';
+        return l10n.easy;
       case 'medium':
-        return 'Medium';
+        return l10n.medium;
       case 'hard':
-        return 'Hard';
+        return l10n.hard;
       default:
         return difficulty;
     }
@@ -540,7 +540,7 @@ class _PvPGamePageState extends State<PvPGamePage>
               boxShadow: AppColors.softShadow,
             ),
             child: Text(
-              'Round $currentRound/3',
+              '${l10n.round} $currentRound/3',
               style: const TextStyle(
                 color: AppColors.brainPurple,
                 fontSize: 16,
@@ -626,7 +626,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                   boxShadow: AppColors.softShadow,
                 ),
                 child: Text(
-                  'Round $currentRound/3',
+                  '${l10n.round} $currentRound/3',
                   style: const TextStyle(
                     color: AppColors.brainPurple,
                     fontSize: 15,

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../main.dart';
+import '../../../lives/data/providers/lives_provider.dart';
 import '../../data/providers/pvp_provider.dart';
 import '../pages/pvp_game_page.dart';
 
@@ -15,12 +16,17 @@ class MatchmakingOverlay extends StatefulWidget {
 
 class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
   bool _isMinimized = false;
+  bool _hadMatchFound = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<PvPProvider>().addListener(_onProviderChanged);
+      if (!mounted) return;
+      final pvp = context.read<PvPProvider>();
+      // Initialiser à l'état courant pour éviter un faux positif au premier changement
+      _hadMatchFound = pvp.matchFound || pvp.matchFoundWaiting;
+      pvp.addListener(_onProviderChanged);
     });
   }
 
@@ -35,6 +41,15 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
   void _onProviderChanged() {
     if (!mounted) return;
     final pvp = context.read<PvPProvider>();
+
+    // Consommer une vie au moment où le match est effectivement trouvé (pas avant).
+    // La transition false→true ne se produit que depuis une recherche active.
+    final hasMatchFound = pvp.matchFound || pvp.matchFoundWaiting;
+    if (hasMatchFound && !_hadMatchFound) {
+      context.read<LivesProvider>().useLife();
+    }
+    _hadMatchFound = hasMatchFound;
+
     // Dé-minimiser pour toute nouvelle notification
     if ((pvp.matchFound || pvp.matchFoundWaiting || pvp.yourTurnNotification || pvp.matchCompletedNotification) && _isMinimized) {
       setState(() => _isMinimized = false);

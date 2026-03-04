@@ -47,7 +47,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
           orElse: () => {},
         );
 
-        if (themeProgress.isNotEmpty) {
+        if (themeProgress.isNotEmpty && mounted) {
           setState(() {
             level = themeProgress['level'] ?? 1;
             xp = themeProgress['xp'] ?? 0;
@@ -58,7 +58,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
     } catch (e) {
       debugPrint('Error loading theme progress: $e');
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -74,7 +74,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final themeColor = _getColorForLevel(level);
-    final progressPercent = xp / xpForNextLevel;
+    final progressPercent = xpForNextLevel > 0 ? xp / xpForNextLevel : 0.0;
 
     return Scaffold(
       body: Container(

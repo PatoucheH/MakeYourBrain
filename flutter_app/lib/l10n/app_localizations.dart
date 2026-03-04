@@ -1362,6 +1362,12 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Choose your username'**
+  /// No description provided for @connecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting...'**
+  String get connecting;
+
   String get chooseYourUsername;
 
   /// No description provided for @chooseYourUsernameHint.
@@ -1375,6 +1381,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Confirm'**
   String get confirmUsername;
+
+  /// No description provided for @easy.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy'**
+  String get easy;
+
+  /// No description provided for @medium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get medium;
+
+  /// No description provided for @hard.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard'**
+  String get hard;
 }
 
 class _AppLocalizationsDelegate

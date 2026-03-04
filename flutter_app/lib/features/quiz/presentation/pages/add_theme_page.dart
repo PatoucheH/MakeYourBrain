@@ -43,17 +43,17 @@ class _AddThemePageState extends State<AddThemePage> {
           .where((theme) => !widget.currentPreferences.contains(theme.id))
           .toList();
       
+      if (!mounted) return;
       setState(() {
         availableThemes = available;
         isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading themes: $e')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.errorLoadingThemes)),
+      );
     }
   }
 

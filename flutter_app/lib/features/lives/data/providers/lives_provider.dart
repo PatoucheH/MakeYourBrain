@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import '../repositories/lives_repository.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 

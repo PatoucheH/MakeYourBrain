@@ -5,20 +5,29 @@ class ThemePreferencesRepository {
 
   // Sauvegarder les thèmes préférés
   Future<void> savePreferences(String userId, List<String> themeIds) async {
-    // Supprimer les anciennes préférences
-    await _supabase
-        .from('user_theme_preferences')
-        .delete()
-        .eq('user_id', userId);
-
-    // Insérer les nouvelles
+    // Upsert new preferences FIRST — if this fails, the old ones are preserved
     if (themeIds.isNotEmpty) {
-      await _supabase.from('user_theme_preferences').insert(
+      await _supabase.from('user_theme_preferences').upsert(
         themeIds.map((themeId) => {
           'user_id': userId,
           'theme_id': themeId,
         }).toList(),
+        onConflict: 'user_id,theme_id',
       );
+    }
+
+    // Delete only preferences that are no longer in the new list
+    if (themeIds.isEmpty) {
+      await _supabase
+          .from('user_theme_preferences')
+          .delete()
+          .eq('user_id', userId);
+    } else {
+      await _supabase
+          .from('user_theme_preferences')
+          .delete()
+          .eq('user_id', userId)
+          .not('theme_id', 'in', '(${themeIds.join(',')})');
     }
 
     // Marquer l'onboarding comme complété

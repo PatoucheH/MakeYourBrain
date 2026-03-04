@@ -75,19 +75,21 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
       final history = results[1] as List<PvPMatchModel>;
       final active = results[2] as List<PvPMatchModel>;
 
-      setState(() {
-        rating = stats['rating'] ?? 1000;
-        wins = stats['wins'] ?? 0;
-        losses = stats['losses'] ?? 0;
-        draws = stats['draws'] ?? 0;
-        matchHistory = history;
-        activeMatches = active;
-        _hasMoreHistory = history.length >= _historyPageSize;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          rating = stats['rating'] ?? 1000;
+          wins = stats['wins'] ?? 0;
+          losses = stats['losses'] ?? 0;
+          draws = stats['draws'] ?? 0;
+          matchHistory = history;
+          activeMatches = active;
+          _hasMoreHistory = history.length >= _historyPageSize;
+          isLoading = false;
+        });
+      }
     } catch (e) {
       debugPrint('Error loading PvP data: $e');
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -96,6 +98,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
     final userId = _authRepo.getCurrentUserId();
     if (userId == null) return;
 
+    if (!mounted) return;
     setState(() => _isLoadingMore = true);
     try {
       final moreMatches = await _pvpRepo.getMyMatches(
@@ -103,14 +106,16 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
         limit: _historyPageSize,
         offset: matchHistory.length,
       );
-      setState(() {
-        matchHistory.addAll(moreMatches);
-        _hasMoreHistory = moreMatches.length >= _historyPageSize;
-        _isLoadingMore = false;
-      });
+      if (mounted) {
+        setState(() {
+          matchHistory.addAll(moreMatches);
+          _hasMoreHistory = moreMatches.length >= _historyPageSize;
+          _isLoadingMore = false;
+        });
+      }
     } catch (e) {
       debugPrint('Error loading more history: $e');
-      setState(() => _isLoadingMore = false);
+      if (mounted) setState(() => _isLoadingMore = false);
     }
     
   }
@@ -255,7 +260,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Round ${match.currentRound}/3 - ${l10n.score}: ${match.getPlayerScore(userId ?? '')} - ${userId == match.player1Id ? match.player2TotalScore : match.player1TotalScore}',
+                        '${l10n.round} ${match.currentRound}/3 - ${l10n.score}: ${match.getPlayerScore(userId ?? '')} - ${userId == match.player1Id ? match.player2TotalScore : match.player1TotalScore}',
                         style: const TextStyle(
                           fontSize: 14,
                           color: AppColors.textSecondary,
@@ -548,8 +553,6 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
       }
       return;
     }
-
-    await livesProvider.useLife();
 
     await pvpProvider.joinMatchmaking();
     if (context.mounted && pvpProvider.errorMessage != null) {

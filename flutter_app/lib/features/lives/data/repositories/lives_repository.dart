@@ -10,7 +10,8 @@ class LivesRepository {
       'p_user_id': userId,
     });
 
-    if (response == null || (response as List).isEmpty) {
+    final data = response as List?;
+    if (data == null || data.isEmpty) {
       return {
         'current_lives': 10,
         'max_lives': 10,
@@ -18,7 +19,7 @@ class LivesRepository {
       };
     }
 
-    return response.first;
+    return data.first as Map<String, dynamic>;
   }
 
   // Utiliser une vie (retourne false si plus de vies)
@@ -27,7 +28,7 @@ class LivesRepository {
       'p_user_id': userId,
     });
 
-    return response as bool;
+    return response == true;
   }
 
   // Ajouter 2 vies après une pub (debug uniquement — en prod, les vies sont accordées via SSV AdMob)

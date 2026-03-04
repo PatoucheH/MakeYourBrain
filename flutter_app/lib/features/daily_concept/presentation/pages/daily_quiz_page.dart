@@ -32,6 +32,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
   int score = 0;
   bool isLoading = true;
   bool hasAnswered = false;
+  bool _completed = false; // guard : XP + complétion ne se déclenchent qu'une fois
   String? selectedAnswerId;
   final List<String> _questionIds = [];
   final List<String> _answerIds = [];
@@ -53,11 +54,13 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
         hardPercent: 20,
       );
 
+      if (!mounted) return;
       setState(() {
         questions = result;
         isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -67,7 +70,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
     }
   }
 
-  void selectAnswer(String answerId, bool isCorrect, String questionId) async {
+  Future<void> selectAnswer(String answerId, bool isCorrect, String questionId) async {
     if (hasAnswered) return;
 
     _questionIds.add(questionId);
@@ -116,7 +119,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
     }
   }
 
-  void _showResultDialog() async {
+  Future<void> _showResultDialog() async {
     final l10n = AppLocalizations.of(context)!;
     final xpEarned = score * 10 * 3; // XP x3
     final percentage = (score / questions.length) * 100;
@@ -274,7 +277,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                       onPressed: () {
                         Navigator.of(context).pop(); // ferme dialog
                         Navigator.of(context).pop(); // ferme daily quiz
-                        Navigator.of(context).pop(); // ferme daily concept page
+                        Navigator.of(context).pop(true); // ferme daily concept page, signale la complétion
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
@@ -364,7 +367,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.of(context).pop();
                       if (currentQuestionIndex < questions.length - 1) {
                         setState(() {
@@ -372,8 +375,9 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                           hasAnswered = false;
                           selectedAnswerId = null;
                         });
-                      } else {
-                        _showResultDialog();
+                      } else if (!_completed) {
+                        setState(() => _completed = true);
+                        await _showResultDialog();
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -557,9 +561,9 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Text(
-                              'XP x3',
-                              style: TextStyle(
+                            child: Text(
+                              l10n.xpTriple,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                                 fontSize: 12,
@@ -718,14 +722,14 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
               borderRadius: BorderRadius.circular(20),
               boxShadow: AppColors.softShadow,
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.star_rounded, color: Colors.white, size: 18),
-                SizedBox(width: 4),
+                const Icon(Icons.star_rounded, color: Colors.white, size: 18),
+                const SizedBox(width: 4),
                 Text(
-                  'XP x3',
-                  style: TextStyle(
+                  l10n.xpTriple,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,

@@ -150,7 +150,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
     showResultDialog();
   }
 
-  void selectAnswer(String answerId, bool isCorrect, String questionId) async {
+  Future<void> selectAnswer(String answerId, bool isCorrect, String questionId) async {
     if (hasAnswered || isQuizEnded) return;
 
     _questionIds.add(questionId);
@@ -206,7 +206,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
     }
   }
 
-  void showResultDialog() async {
+  Future<void> showResultDialog() async {
     final l10n = AppLocalizations.of(context)!;
     final timeBonus = _getTimeBonus();
     final percentage = questions.isEmpty ? 0.0 : (score / questions.length) * 100;

@@ -58,6 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
           .toList();
       final counts = await _followRepo.getFollowCounts(userId);
 
+      if (!mounted) return;
       setState(() {
         userStats = stats;
         selectedLanguage = currentLang;
@@ -70,6 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
         isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -771,7 +773,7 @@ class _ProfilePageState extends State<ProfilePage> {
         final level = theme['level'] ?? 1;
         final xp = theme['xp'] ?? 0;
         final xpForNextLevel = theme['xp_for_next_level'] ?? 100;
-        final xpProgress = xp / xpForNextLevel;
+        final xpProgress = xpForNextLevel > 0 ? xp / xpForNextLevel : 0.0;
         final total = theme['total_questions'] ?? 0;
         final correct = theme['correct_answers'] ?? 0;
         final themeColor = _getColorForLevel(level);
@@ -984,7 +986,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   builder: (context) => AlertDialog(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     title: Text(l10n.removeFromFavorites),
-                    content: Text('Remove ${theme.name} from your favorite themes?'),
+                    content: Text(AppLocalizations.of(context)!.removeFavoriteConfirm(theme.name)),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),

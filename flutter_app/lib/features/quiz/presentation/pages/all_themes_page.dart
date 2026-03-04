@@ -46,18 +46,21 @@ class _AllThemesPageState extends State<AllThemesPage> {
           progressMap[p['theme_id']] = p;
         }
 
+        if (!mounted) return;
         setState(() {
           themes = themesResult;
           themeProgress = progressMap;
           isLoading = false;
         });
       } else {
+        if (!mounted) return;
         setState(() {
           themes = themesResult;
           isLoading = false;
         });
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() => isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -120,7 +123,7 @@ class _AllThemesPageState extends State<AllThemesPage> {
     final xp = progress?['xp'] ?? 0;
     final xpForNextLevel = progress?['xp_for_next_level'] ?? 100;
     final themeColor = _getColorForLevel(level);
-    final progressPercent = xp / xpForNextLevel;
+    final progressPercent = xpForNextLevel > 0 ? xp / xpForNextLevel : 0.0;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),

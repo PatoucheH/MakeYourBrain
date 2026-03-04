@@ -50,15 +50,17 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
         pvpProvider.getUsedThemeIds(),
       ]);
 
-      setState(() {
-        allThemes = results[0] as List<ThemeModel>;
-        favoriteThemeIds = results[1] as List<String>;
-        usedThemeIds = results[2] as List<String>;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          allThemes = results[0] as List<ThemeModel>;
+          favoriteThemeIds = results[1] as List<String>;
+          usedThemeIds = results[2] as List<String>;
+          isLoading = false;
+        });
+      }
     } catch (e) {
       debugPrint('Error loading themes: $e');
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -153,7 +155,7 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
                   boxShadow: AppColors.softShadow,
                 ),
                 child: Text(
-                  'Round ${widget.roundNumber}/3',
+                  '${AppLocalizations.of(context)!.round} ${widget.roundNumber}/3',
                   style: const TextStyle(
                     color: AppColors.brainPurple,
                     fontSize: 16,

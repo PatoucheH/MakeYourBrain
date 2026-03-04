@@ -193,17 +193,19 @@ class _HomePageState extends State<HomePage> {
         debugPrint('Error loading daily concept: $e');
       }
 
-      setState(() {
-        favoriteThemes = preferred;
-        favoriteThemeIds = preferredIds;
-        themeProgress = progressMap;
-        currentStreak = stats?.effectiveStreak ?? 0;
-        pvpRating = stats?.pvpRating ?? 1000;
-        dailyConcept = daily;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          favoriteThemes = preferred;
+          favoriteThemeIds = preferredIds;
+          themeProgress = progressMap;
+          currentStreak = stats?.effectiveStreak ?? 0;
+          pvpRating = stats?.pvpRating ?? 1000;
+          dailyConcept = daily;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.errorLoadingFavorites)),
@@ -358,12 +360,24 @@ class _HomePageState extends State<HomePage> {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () async {
-          await Navigator.push(
+          final completed = await Navigator.push<bool>(
             context,
             MaterialPageRoute(
               builder: (context) => DailyConceptPage(concept: concept),
             ),
           );
+          // Mise à jour optimiste immédiate : bloque la ré-entrée pendant le refresh réseau
+          if (completed == true && mounted && dailyConcept != null) {
+            setState(() {
+              dailyConcept = DailyConceptModel(
+                conceptName: dailyConcept!.conceptName,
+                conceptDescription: dailyConcept!.conceptDescription,
+                themeId: dailyConcept!.themeId,
+                conceptDate: dailyConcept!.conceptDate,
+                alreadyCompleted: true,
+              );
+            });
+          }
           loadFavoriteThemes();
         },
         child: Container(
@@ -735,7 +749,7 @@ class _HomePageState extends State<HomePage> {
     final xp = progress?['xp'] ?? 0;
     final xpForNextLevel = progress?['xp_for_next_level'] ?? 100;
     final themeColor = _getColorForLevel(level);
-    final progressPercent = xp / xpForNextLevel;
+    final progressPercent = xpForNextLevel > 0 ? xp / xpForNextLevel : 0.0;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),

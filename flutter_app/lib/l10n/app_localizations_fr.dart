@@ -678,6 +678,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get alreadyHaveAccountPrefix => 'Déjà un compte ?';
 
   @override
+  String get connecting => 'Connexion...';
+
+  @override
   String get chooseYourUsername => 'Choisissez votre pseudo';
 
   @override
@@ -685,4 +688,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get confirmUsername => 'Confirmer';
+
+  @override
+  String get easy => 'Facile';
+
+  @override
+  String get medium => 'Moyen';
+
+  @override
+  String get hard => 'Difficile';
 }

@@ -320,6 +320,7 @@ class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
 
   Future<void> _initialize() async {
     await context.read<LanguageProvider>().initialize();
+    if (!mounted) return;
     setState(() => _isInitialized = true);
   }
 
@@ -422,6 +423,7 @@ class _AuthCheckerState extends State<AuthChecker> {
 
     try {
       final usernameSet = await _authRepo.hasUsername();
+      if (!mounted) return;
       if (!usernameSet) {
         setState(() {
           _destination = const UsernameSetupPage();
@@ -432,6 +434,7 @@ class _AuthCheckerState extends State<AuthChecker> {
 
       final userId = _authRepo.getCurrentUserId()!;
       final hasCompletedOnboarding = await _prefsRepo.hasCompletedOnboarding(userId);
+      if (!mounted) return;
 
       setState(() {
         _destination = hasCompletedOnboarding
@@ -442,12 +445,13 @@ class _AuthCheckerState extends State<AuthChecker> {
 
       // Cold start depuis une notification (app fermée)
       final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-      if (initialMessage != null) {
+      if (initialMessage != null && mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _handleNotificationTap(initialMessage);
         });
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _destination = const ThemePreferencesPage();
         _isChecking = false;

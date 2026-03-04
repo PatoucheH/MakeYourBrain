@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/providers/lives_provider.dart';
@@ -199,7 +200,16 @@ class LivesIndicator extends StatelessWidget {
     final rewarded = await adService.showRewardedAd();
 
     if (rewarded) {
-      await livesProvider.addLivesFromAd();
+      if (kDebugMode) {
+        // En debug : ajout direct car le SSV des ads test n'est pas fiable
+        await livesProvider.addLivesFromAd();
+      } else {
+        // En prod : les vies sont accordées par le callback SSV AdMob (verify-ad-reward).
+        // On attend quelques secondes puis on rafraîchit pour afficher les vies mises à jour.
+        await Future.delayed(const Duration(seconds: 3));
+        if (!context.mounted) return;
+        await livesProvider.refresh();
+      }
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
