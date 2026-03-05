@@ -12,7 +12,7 @@ class PvPProvider extends ChangeNotifier {
 
   /// Appelle notifyListeners() uniquement si le provider n'est pas encore disposé.
   void _safeNotify() {
-    if (!_disposed) _safeNotify();
+    if (!_disposed) notifyListeners();
   }
 
   final PvPRepository _pvpRepository;

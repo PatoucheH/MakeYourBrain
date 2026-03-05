@@ -36,9 +36,11 @@ class QuizRepository {
           'p_hard_percent': hardPercent,
         });
 
-    return (response as List? ?? [])
-        .map((json) => QuestionModel.fromJson(json))
-        .toList();
+    return QuestionModel.ensureAnswerVariety(
+      (response as List? ?? [])
+          .map((json) => QuestionModel.fromJson(json))
+          .toList(),
+    );
   }
 
   // Sauvegarder la réponse d'un user (sans XP - l'XP est ajouté à la fin du quiz)

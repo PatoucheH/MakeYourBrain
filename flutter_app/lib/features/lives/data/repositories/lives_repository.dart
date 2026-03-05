@@ -35,7 +35,7 @@ class LivesRepository {
   Future<void> addLivesFromAd(String userId) async {
     assert(kDebugMode, 'addLivesFromAd must only be called in debug mode');
     if (!kDebugMode) return;
-    await _supabase.rpc('add_lives_from_ad', params: {
+    await _supabase.rpc('debug_add_lives', params: {
       'p_user_id': userId,
     });
   }

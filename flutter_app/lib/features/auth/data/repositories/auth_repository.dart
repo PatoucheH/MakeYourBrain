@@ -36,7 +36,7 @@ class AuthRepository {
       }, onConflict: 'user_id, token').timeout(const Duration(seconds: 15));
       // Mettre à jour le timezone pour les notifications streak
       await _supabase.from('user_stats').update({
-        'timezone_offset_hours': DateTime.now().timeZoneOffset.inMinutes / 60.0,
+        'timezone_offset_hours': DateTime.now().timeZoneOffset.inHours,
       }).eq('user_id', userId);
     } catch (e) {
       debugPrint('❌ Failed to save FCM token: $e');
@@ -192,11 +192,10 @@ Future<bool> signInWithFacebook() async {
 
         if (existingUser == null) {
           final lang = await _getPreferredLanguage();
-          final offsetMinutes = DateTime.now().timeZoneOffset.inMinutes;
           await _supabase.from('user_stats').insert({
             'user_id': userId,
             'preferred_language': lang,
-            'timezone_offset_hours': offsetMinutes / 60.0,
+            'timezone_offset_hours': DateTime.now().timeZoneOffset.inHours,
           });
         }
       }
@@ -233,11 +232,10 @@ Future<bool> signInWithFacebook() async {
 
         if (existingUser == null) {
           final lang = await _getPreferredLanguage();
-          final offsetMinutes = DateTime.now().timeZoneOffset.inMinutes;
           await _supabase.from('user_stats').insert({
             'user_id': userId,
             'preferred_language': lang,
-            'timezone_offset_hours': offsetMinutes / 60.0,
+            'timezone_offset_hours': DateTime.now().timeZoneOffset.inHours,
           });
         }
       }

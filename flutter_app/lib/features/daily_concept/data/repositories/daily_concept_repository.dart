@@ -42,7 +42,9 @@ class DailyConceptRepository {
       });
 
       if (response is! List) return [];
-      return response.map((json) => QuestionModel.fromJson(json)).toList();
+      return QuestionModel.ensureAnswerVariety(
+        response.map((json) => QuestionModel.fromJson(json)).toList(),
+      );
     } catch (e) {
       debugPrint('Error loading daily questions: $e');
       return [];

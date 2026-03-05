@@ -460,8 +460,12 @@ class _AuthCheckerState extends State<AuthChecker> {
       }
     } catch (e) {
       if (!mounted) return;
+      // Sur erreur (ex: pas de réseau au démarrage), un user authentifié
+      // va sur HomePage. Seul un user non connecté va sur LoginPage.
       setState(() {
-        _destination = const ThemePreferencesPage();
+        _destination = _authRepo.isLoggedIn()
+            ? const HomePage()
+            : const LoginPage();
         _isChecking = false;
       });
     }

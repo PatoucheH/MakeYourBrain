@@ -1,3 +1,5 @@
+import 'dart:math';
+
 class QuestionModel {
   final String id;
   final String themeId;
@@ -31,6 +33,45 @@ class QuestionModel {
       languageCode: json['language_code']?.toString() ?? 'en',
       answers: answers,
     );
+  }
+
+  QuestionModel _withAnswers(List<AnswerModel> newAnswers) {
+    return QuestionModel(
+      id: id,
+      themeId: themeId,
+      difficulty: difficulty,
+      questionText: questionText,
+      explanation: explanation,
+      languageCode: languageCode,
+      answers: newAnswers,
+    );
+  }
+
+  /// Garantit que la bonne réponse ne soit pas au même index
+  /// deux questions de suite dans la liste.
+  static List<QuestionModel> ensureAnswerVariety(List<QuestionModel> questions) {
+    if (questions.length <= 1) return questions;
+    final rng = Random();
+    final result = List<QuestionModel>.from(questions);
+    for (int i = 1; i < result.length; i++) {
+      final prevCorrectIdx =
+          result[i - 1].answers.indexWhere((a) => a.isCorrect);
+      final currAnswers = List<AnswerModel>.from(result[i].answers);
+      final currCorrectIdx = currAnswers.indexWhere((a) => a.isCorrect);
+      if (prevCorrectIdx == currCorrectIdx &&
+          currAnswers.length > 1 &&
+          currCorrectIdx != -1) {
+        int newIdx;
+        do {
+          newIdx = rng.nextInt(currAnswers.length);
+        } while (newIdx == currCorrectIdx);
+        final tmp = currAnswers[currCorrectIdx];
+        currAnswers[currCorrectIdx] = currAnswers[newIdx];
+        currAnswers[newIdx] = tmp;
+        result[i] = result[i]._withAnswers(currAnswers);
+      }
+    }
+    return result;
   }
 }
 

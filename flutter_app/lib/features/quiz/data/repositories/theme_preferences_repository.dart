@@ -54,13 +54,20 @@ class ThemePreferencesRepository {
   }
 
   // Vérifier si onboarding complété
+  // Retourne true par défaut sur erreur réseau — un user authentifié
+  // existant ne doit pas être renvoyé vers l'onboarding à cause d'un
+  // problème de connexion au démarrage.
   Future<bool> hasCompletedOnboarding(String userId) async {
-    final response = await _supabase
-        .from('user_stats')
-        .select('has_completed_onboarding')
-        .eq('user_id', userId)
-        .maybeSingle();
+    try {
+      final response = await _supabase
+          .from('user_stats')
+          .select('has_completed_onboarding')
+          .eq('user_id', userId)
+          .maybeSingle();
 
-    return response?['has_completed_onboarding'] ?? false;
+      return response?['has_completed_onboarding'] == true;
+    } catch (_) {
+      return true;
+    }
   }
 }

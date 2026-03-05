@@ -78,7 +78,9 @@ class PvPRepository {
       });
 
       if (response is! List) return [];
-      return response.map((json) => QuestionModel.fromJson(json)).toList();
+      return QuestionModel.ensureAnswerVariety(
+        response.map((json) => QuestionModel.fromJson(json)).toList(),
+      );
     } catch (e) {
       debugPrint('Error getting questions for round: $e');
       return [];
@@ -97,7 +99,9 @@ class PvPRepository {
       });
 
       if (response is! List) return [];
-      return response.map((json) => QuestionModel.fromJson(json)).toList();
+      return QuestionModel.ensureAnswerVariety(
+        response.map((json) => QuestionModel.fromJson(json)).toList(),
+      );
     } catch (e) {
       debugPrint('Error getting questions by ids: $e');
       return [];
@@ -446,7 +450,9 @@ class PvPRepository {
       });
 
       if (response is! List) return [];
-      return response.map((json) => QuestionModel.fromJson(json)).toList();
+      return QuestionModel.ensureAnswerVariety(
+        response.map((json) => QuestionModel.fromJson(json)).toList(),
+      );
     } catch (e) {
       debugPrint('Error getting questions by theme: $e');
       return [];
