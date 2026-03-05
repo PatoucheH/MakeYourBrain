@@ -174,7 +174,7 @@ GoogleService-Info.plist
 firebase_options.dart
 
 # Configuration Supabase locale
-**/lib/config/supabase_config.dart
+# **/lib/config/supabase_config.dart
 **/lib/core/config/supabase_credentials.dart
 
 # ===========================
