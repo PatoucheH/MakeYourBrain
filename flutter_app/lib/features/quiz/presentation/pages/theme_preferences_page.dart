@@ -68,7 +68,7 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving preferences: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.errorSavingPreferences)),
         );
       }
     } finally {
@@ -78,9 +78,10 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Choose Your Interests'),
+        title: Text(l10n.chooseYourInterests),
         automaticallyImplyLeading: false,
       ),
       body: isLoading
@@ -91,9 +92,9 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
                     children: [
-                      const Text(
-                        '🎯 What topics interest you?',
-                        style: TextStyle(
+                      Text(
+                        l10n.whatTopicsInterestYou,
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
@@ -101,7 +102,7 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Select your favorite themes to get personalized quizzes',
+                        l10n.selectFavoriteThemesHint,
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey.shade600,
@@ -177,7 +178,7 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                       child: isSaving
                           ? const CircularProgressIndicator()
                           : Text(
-                              'Continue (${selectedThemeIds.length} selected)',
+                              l10n.continueWithCount(selectedThemeIds.length),
                               style: const TextStyle(fontSize: 18),
                             ),
                     ),

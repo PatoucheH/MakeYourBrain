@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 import '../../../../shared/services/supabase_service.dart';
@@ -24,7 +23,7 @@ class AuthRepository {
       }, onConflict: 'user_id, token').timeout(const Duration(seconds: 15));
       // Mettre à jour le timezone pour les notifications streak
       await _supabase.from('user_stats').update({
-        'timezone_offset_hours': DateTime.now().timeZoneOffset.inHours,
+        'timezone_offset_hours': DateTime.now().timeZoneOffset.inMinutes / 60.0,
       }).eq('user_id', userId);
     } catch (e) {
       debugPrint('❌ Failed to save FCM token: $e');

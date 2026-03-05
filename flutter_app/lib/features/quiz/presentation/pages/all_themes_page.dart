@@ -62,11 +62,9 @@ class _AllThemesPageState extends State<AllThemesPage> {
     } catch (e) {
       if (!mounted) return;
       setState(() => isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading themes: $e')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.errorLoadingThemes)),
+      );
     }
   }
 

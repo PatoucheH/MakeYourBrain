@@ -9,15 +9,19 @@ class ProfileRepository {
       params: {'p_user_id': userId}
     );
     
-    return List<Map<String, dynamic>>.from(response ?? []);
+    if (response is! List) return [];
+    return List<Map<String, dynamic>>.from(response);
   }
 
   // Mettre à jour le streak
   Future<void> updateStreak(String userId) async {
-    final offsetHours = DateTime.now().timeZoneOffset.inHours;
-    // Convert offset to POSIX timezone format (e.g., +02, -05)
-    final sign = offsetHours >= 0 ? '+' : '';
-    final utcOffset = 'UTC$sign$offsetHours';
+    final offsetMinutes = DateTime.now().timeZoneOffset.inMinutes;
+    final offsetHours = offsetMinutes ~/ 60;
+    final remainingMins = offsetMinutes.abs() % 60;
+    final sign = offsetMinutes >= 0 ? '+' : '-';
+    final utcOffset = remainingMins == 0
+        ? 'UTC$sign${offsetHours.abs()}'
+        : 'UTC$sign${offsetHours.abs()}:${remainingMins.toString().padLeft(2, '0')}';
     await _supabase.rpc('update_user_streak',
       params: {
         'p_user_id': userId,

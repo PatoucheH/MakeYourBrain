@@ -40,7 +40,11 @@ class LanguageProvider extends ChangeNotifier {
     
     // Sauvegarder en DB si connecté
     if (_authRepo.isLoggedIn()) {
-      await _authRepo.updateLanguage(languageCode);
+      try {
+        await _authRepo.updateLanguage(languageCode);
+      } catch (e) {
+        debugPrint('[LanguageProvider] Failed to sync language to server: $e');
+      }
     }
     
     notifyListeners();

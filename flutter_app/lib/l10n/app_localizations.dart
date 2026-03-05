@@ -110,6 +110,12 @@ abstract class AppLocalizations {
   /// **'Login'**
   String get login;
 
+  /// No description provided for @connecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting...'**
+  String get connecting;
+
   /// No description provided for @register.
   ///
   /// In en, this message translates to:
@@ -433,12 +439,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No favorite themes yet.'**
   String get noFavoriteThemesProfile;
-
-  /// No description provided for @noEmail.
-  ///
-  /// In en, this message translates to:
-  /// **'No email'**
-  String get noEmail;
 
   /// No description provided for @correctAnswer.
   ///
@@ -1368,12 +1368,6 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Choose your username'**
-  /// No description provided for @connecting.
-  ///
-  /// In en, this message translates to:
-  /// **'Connecting...'**
-  String get connecting;
-
   String get chooseYourUsername;
 
   /// No description provided for @chooseYourUsernameHint.
@@ -1406,6 +1400,12 @@ abstract class AppLocalizations {
   /// **'Hard'**
   String get hard;
 
+  /// No description provided for @noEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'No email'**
+  String get noEmail;
+
   /// No description provided for @emailInvalid.
   ///
   /// In en, this message translates to:
@@ -1417,6 +1417,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password must be at least 6 characters'**
   String get passwordMinLength;
+
+  /// No description provided for @themeAddedToFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} added to favorites! ⭐'**
+  String themeAddedToFavorites(String name);
+
+  /// No description provided for @errorAddingTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Error adding theme'**
+  String get errorAddingTheme;
+
+  /// No description provided for @chooseYourInterests.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Your Interests'**
+  String get chooseYourInterests;
+
+  /// No description provided for @whatTopicsInterestYou.
+  ///
+  /// In en, this message translates to:
+  /// **'🎯 What topics interest you?'**
+  String get whatTopicsInterestYou;
+
+  /// No description provided for @selectFavoriteThemesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your favorite themes to get personalized quizzes'**
+  String get selectFavoriteThemesHint;
+
+  /// No description provided for @continueWithCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue ({count} selected)'**
+  String continueWithCount(int count);
+
+  /// No description provided for @errorSavingPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving preferences'**
+  String get errorSavingPreferences;
+
+  /// No description provided for @errorSelectingTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Error selecting theme'**
+  String get errorSelectingTheme;
+
+  /// No description provided for @xpBonus.
+  ///
+  /// In en, this message translates to:
+  /// **'+{amount} XP'**
+  String xpBonus(int amount);
 }
 
 class _AppLocalizationsDelegate

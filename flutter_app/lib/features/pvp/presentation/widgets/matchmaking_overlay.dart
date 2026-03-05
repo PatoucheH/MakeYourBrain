@@ -382,7 +382,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
-                value: pvp.matchFoundCountdown / 5,
+                value: (pvp.matchFoundCountdown / 5).clamp(0.0, 1.0),
                 backgroundColor: Colors.white.withValues(alpha: 0.2),
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 minHeight: 4,

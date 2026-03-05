@@ -432,7 +432,15 @@ class _AuthCheckerState extends State<AuthChecker> {
         return;
       }
 
-      final userId = _authRepo.getCurrentUserId()!;
+      final userId = _authRepo.getCurrentUserId();
+      if (userId == null) {
+        if (!mounted) return;
+        setState(() {
+          _destination = const ThemePreferencesPage();
+          _isChecking = false;
+        });
+        return;
+      }
       final hasCompletedOnboarding = await _prefsRepo.hasCompletedOnboarding(userId);
       if (!mounted) return;
 

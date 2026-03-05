@@ -10,6 +10,7 @@ class AdService {
 
   RewardedAd? _rewardedAd;
   bool _isLoading = false;
+  bool _isShowing = false;
   static bool _isSupported = false;
 
   static String get _androidRewardedAdUnitId => kDebugMode
@@ -87,7 +88,12 @@ class AdService {
       loadRewardedAd();
       return false;
     }
+    if (_isShowing) {
+      debugPrint('[AdService] Ad already showing');
+      return false;
+    }
 
+    _isShowing = true;
     final completer = Completer<bool>();
     bool rewarded = false;
 
@@ -96,6 +102,7 @@ class AdService {
         debugPrint('[AdService] Ad dismissed, rewarded=$rewarded');
         ad.dispose();
         _rewardedAd = null;
+        _isShowing = false;
         loadRewardedAd();
         if (!completer.isCompleted) {
           completer.complete(rewarded);
@@ -105,6 +112,7 @@ class AdService {
         debugPrint('[AdService] Failed to show rewarded ad: ${error.message}');
         ad.dispose();
         _rewardedAd = null;
+        _isShowing = false;
         loadRewardedAd();
         if (!completer.isCompleted) {
           completer.complete(false);

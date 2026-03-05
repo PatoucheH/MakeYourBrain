@@ -12,7 +12,7 @@ class QuizRepository {
         .select()
         .eq('language_code', languageCode);
 
-    return (response as List)
+    return (response as List? ?? [])
         .map((json) => ThemeModel.fromJson(json))
         .toList();
   }
@@ -36,7 +36,7 @@ class QuizRepository {
           'p_hard_percent': hardPercent,
         });
 
-    return (response as List)
+    return (response as List? ?? [])
         .map((json) => QuestionModel.fromJson(json))
         .toList();
   }

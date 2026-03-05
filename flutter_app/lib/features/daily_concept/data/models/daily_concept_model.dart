@@ -18,7 +18,7 @@ class DailyConceptModel {
       conceptName: json['concept_name'] ?? '',
       conceptDescription: json['concept_description'] ?? '',
       themeId: json['theme_id'] ?? '',
-      conceptDate: DateTime.parse(json['concept_date']),
+      conceptDate: DateTime.tryParse(json['concept_date']?.toString() ?? '') ?? DateTime.now(),
       alreadyCompleted: json['already_completed'] ?? false,
     );
   }

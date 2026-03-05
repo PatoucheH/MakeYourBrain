@@ -27,6 +27,9 @@ class NotificationService {
   }
 
   void listenToTokenRefresh(VoidCallback onRefresh) {
-    _messaging.onTokenRefresh.listen((_) => onRefresh());
+    _messaging.onTokenRefresh.listen(
+      (_) => onRefresh(),
+      onError: (e) => debugPrint('[NotificationService] Token refresh error: $e'),
+    );
   }
 }

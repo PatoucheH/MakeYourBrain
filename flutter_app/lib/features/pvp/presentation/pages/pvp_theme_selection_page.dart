@@ -80,7 +80,7 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
         setState(() => isSelecting = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(AppLocalizations.of(context)!.errorSelectingTheme),
             backgroundColor: AppColors.error,
           ),
         );

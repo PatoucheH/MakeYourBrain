@@ -100,7 +100,8 @@ class _UsernameSetupPageState extends State<UsernameSetupPage> {
       if (!mounted) return;
 
       if (success) {
-        final userId = _authRepo.getCurrentUserId()!;
+        final userId = _authRepo.getCurrentUserId();
+        if (userId == null) return;
         final hasCompletedOnboarding = await _prefsRepo.hasCompletedOnboarding(userId);
         if (!mounted) return;
 

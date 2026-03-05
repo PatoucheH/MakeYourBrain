@@ -171,7 +171,7 @@ class PvPRepository {
           .order('created_at', ascending: false)
           .range(offset, offset + limit - 1);
 
-      return (response as List)
+      return (response as List? ?? [])
           .map((json) => PvPMatchModel.fromJson(json))
           .toList();
     } catch (e) {
@@ -191,7 +191,7 @@ class PvPRepository {
           .order('created_at', ascending: false)
           .timeout(const Duration(seconds: 15));
 
-      return (response as List)
+      return (response as List? ?? [])
           .map((json) => PvPMatchModel.fromJson(json))
           .toList();
     } catch (e) {

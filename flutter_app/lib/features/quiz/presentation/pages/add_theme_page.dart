@@ -59,14 +59,15 @@ class _AddThemePageState extends State<AddThemePage> {
 
   Future<void> addThemeToPreferences(ThemeModel theme) async {
     try {
-      final userId = _authRepo.getCurrentUserId()!;
+      final userId = _authRepo.getCurrentUserId();
+      if (userId == null) return;
       final updatedPreferences = [...widget.currentPreferences, theme.id];
       
       await _prefsRepo.savePreferences(userId, updatedPreferences);
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${theme.name} added to favorites! ⭐')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.themeAddedToFavorites(theme.name))),
         );
         
         Navigator.pop(context, true);
@@ -74,7 +75,7 @@ class _AddThemePageState extends State<AddThemePage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error adding theme: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.errorAddingTheme)),
         );
       }
     }

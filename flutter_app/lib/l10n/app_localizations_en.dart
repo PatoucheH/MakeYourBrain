@@ -15,6 +15,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login => 'Login';
 
   @override
+  String get connecting => 'Connecting...';
+
+  @override
   String get register => 'Register';
 
   @override
@@ -180,9 +183,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noFavoriteThemesProfile => 'No favorite themes yet.';
-
-  @override
-  String get noEmail => 'No email';
 
   @override
   String get correctAnswer => '✅ Correct!';
@@ -676,9 +676,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alreadyHaveAccountPrefix => 'Already have an account?';
 
   @override
-  String get connecting => 'Connecting...';
-
-  @override
   String get chooseYourUsername => 'Choose your username';
 
   @override
@@ -697,8 +694,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hard => 'Hard';
 
   @override
+  String get noEmail => 'No email';
+
+  @override
   String get emailInvalid => 'Invalid email address';
 
   @override
   String get passwordMinLength => 'Password must be at least 6 characters';
+
+  @override
+  String themeAddedToFavorites(String name) {
+    return '$name added to favorites! ⭐';
+  }
+
+  @override
+  String get errorAddingTheme => 'Error adding theme';
+
+  @override
+  String get chooseYourInterests => 'Choose Your Interests';
+
+  @override
+  String get whatTopicsInterestYou => '🎯 What topics interest you?';
+
+  @override
+  String get selectFavoriteThemesHint =>
+      'Select your favorite themes to get personalized quizzes';
+
+  @override
+  String continueWithCount(int count) {
+    return 'Continue ($count selected)';
+  }
+
+  @override
+  String get errorSavingPreferences => 'Error saving preferences';
+
+  @override
+  String get errorSelectingTheme => 'Error selecting theme';
+
+  @override
+  String xpBonus(int amount) {
+    return '+$amount XP';
+  }
 }

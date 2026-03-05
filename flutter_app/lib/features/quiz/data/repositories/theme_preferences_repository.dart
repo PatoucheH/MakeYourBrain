@@ -47,8 +47,9 @@ class ThemePreferencesRepository {
         .select('theme_id')
         .eq('user_id', userId);
 
-    return (response as List)
-        .map((item) => item['theme_id'] as String)
+    return (response as List? ?? [])
+        .map((item) => item['theme_id']?.toString() ?? '')
+        .where((id) => id.isNotEmpty)
         .toList();
   }
 

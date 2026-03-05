@@ -9,9 +9,13 @@ class SupabaseService {
   SupabaseClient get client => Supabase.instance.client;
 
   static Future<void> initialize() async {
-    await Supabase.initialize(
-      url: SupabaseConfig.url,
-      anonKey: SupabaseConfig.anonKey,
-    );
+    try {
+      await Supabase.initialize(
+        url: SupabaseConfig.url,
+        anonKey: SupabaseConfig.anonKey,
+      );
+    } catch (e) {
+      throw Exception('Failed to initialize Supabase: $e');
+    }
   }
 }
