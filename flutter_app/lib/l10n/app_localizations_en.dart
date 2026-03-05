@@ -15,9 +15,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login => 'Login';
 
   @override
-  String get connecting => 'Connecting...';
-
-  @override
   String get register => 'Register';
 
   @override
@@ -131,9 +128,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get explanation => '💡 Explanation:';
-
-  @override
-  String get explanationLabel => 'Explanation';
 
   @override
   String get createAccount => 'Create Account';
@@ -677,6 +671,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmUsername => 'Confirm';
+
+  @override
+  String get connecting => 'Connecting...';
+
+  @override
+  String get explanationLabel => 'Explanation';
 
   @override
   String get easy => 'Easy';

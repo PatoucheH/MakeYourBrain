@@ -15,9 +15,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get login => 'Connexion';
 
   @override
-  String get connecting => 'Connexion en cours...';
-
-  @override
   String get register => 'S\'inscrire';
 
   @override
@@ -131,9 +128,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get explanation => '💡 Explication :';
-
-  @override
-  String get explanationLabel => 'Explication';
 
   @override
   String get createAccount => 'Créer un Compte';
@@ -685,6 +679,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get confirmUsername => 'Confirmer';
 
   @override
+  String get connecting => 'Connexion en cours...';
+
+  @override
+  String get explanationLabel => 'Explication';
+
+  @override
   String get easy => 'Facile';
 
   @override
@@ -700,8 +700,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get emailInvalid => 'Adresse email invalide';
 
   @override
-  String get passwordMinLength =>
-      'Le mot de passe doit contenir au moins 6 caractères';
+  String get passwordMinLength => 'Le mot de passe doit contenir au moins 6 caractères';
 
   @override
   String themeAddedToFavorites(String name) {
@@ -712,25 +711,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String get errorAddingTheme => 'Erreur lors de l\'ajout du thème';
 
   @override
-  String get chooseYourInterests => 'Choisissez vos centres d\'intérêt';
+  String get chooseYourInterests => 'Choisissez vos intérêts';
 
   @override
   String get whatTopicsInterestYou => '🎯 Quels sujets vous intéressent ?';
 
   @override
   String get selectFavoriteThemesHint =>
-      'Sélectionnez vos thèmes favoris pour des quiz personnalisés';
+      'Sélectionnez vos thèmes favoris pour obtenir des quiz personnalisés';
 
   @override
   String continueWithCount(int count) {
-    return 'Continuer ($count sélectionné(s))';
+    return 'Continuer ($count sélectionné)';
   }
 
   @override
-  String get errorSavingPreferences => 'Erreur lors de l\'enregistrement';
+  String get errorSavingPreferences => 'Erreur lors de la sauvegarde des préférences';
 
   @override
-  String get errorSelectingTheme => 'Erreur lors de la sélection';
+  String get errorSelectingTheme => 'Erreur lors de la sélection du thème';
 
   @override
   String xpBonus(int amount) {
