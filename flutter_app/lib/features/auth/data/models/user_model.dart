@@ -40,7 +40,7 @@ class UserModel {
       currentStreak: json['current_streak'] ?? 0,
       bestStreak: json['best_streak'] ?? 0,
       lastPlayedAt: json['last_played_at'] != null
-          ? DateTime.parse(json['last_played_at'])
+          ? DateTime.tryParse(json['last_played_at'].toString())
           : null,
       pvpRating: json['pvp_rating'] ?? 1000,
       pvpWins: json['pvp_wins'] ?? 0,

@@ -41,7 +41,6 @@
   "noQuestionsAvailable": "Aucune question disponible pour ce thème",
   "explanation": "💡 Explication :",
   "createAccount": "Créer un Compte",
-  "selected": "Sélectionné",
   "myFavoriteThemes": "Mes Thèmes Favoris",
   "addTheme": "Ajouter un Thème",
   "allThemes": "Tous les Thèmes",
@@ -64,7 +63,6 @@
   "global": "Mondial",
   "thisWeek": "Cette Semaine",
   "yourGlobalRank": "Votre Rang Mondial",
-  "yourWeeklyRank": "Votre Rang Hebdo",
   "yourThemeRank": "Votre Rang",
   "accuracy": "précision",
   "points": "pts",
@@ -159,7 +157,6 @@
   "unfollowSuccess": "Vous ne suivez plus cet utilisateur",
   "cannotFollowYourself": "Vous ne pouvez pas vous suivre vous-même",
   "social": "Social",
-  "viewAll": "Voir tout",
   "selectThemeForRound": "Choisissez le thème du Round {round}",
   "@selectThemeForRound": {
     "placeholders": {

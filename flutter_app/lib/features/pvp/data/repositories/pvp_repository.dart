@@ -14,47 +14,56 @@ class PvPRepository {
     int rating,
     String language,
   ) async {
-    final response = await _supabase.rpc('pvp_join_queue', params: {
-      'p_user_id': userId,
-      'p_rating': rating,
-      'p_language': language,
-    }).timeout(const Duration(seconds: 15));
+    try {
+      final response = await _supabase.rpc('pvp_join_queue', params: {
+        'p_user_id': userId,
+        'p_rating': rating,
+        'p_language': language,
+      }).timeout(const Duration(seconds: 15));
 
-    if (response == null || (response is List && response.isEmpty)) {
+      if (response == null || (response is List && response.isEmpty)) {
+        return {'matchFound': false, 'matchId': null, 'opponentId': null};
+      }
+
+      final data = response is List ? response.first : response;
       return {
-        'matchFound': false,
-        'matchId': null,
-        'opponentId': null,
+        'matchFound': data['match_found'] ?? false,
+        'matchId': data['match_id'],
+        'opponentId': data['opponent_id'],
       };
+    } catch (e) {
+      debugPrint('Error joining matchmaking: $e');
+      return {'matchFound': false, 'matchId': null, 'opponentId': null};
     }
-
-    final data = response is List ? response.first : response;
-
-    return {
-      'matchFound': data['match_found'] ?? false,
-      'matchId': data['match_id'],
-      'opponentId': data['opponent_id'],
-    };
   }
 
   /// Quitte la file d'attente de matchmaking
   Future<void> leaveMatchmaking(String userId) async {
-    await _supabase.rpc('pvp_leave_queue', params: {
-      'p_user_id': userId,
-    });
+    try {
+      await _supabase.rpc('pvp_leave_queue', params: {
+        'p_user_id': userId,
+      });
+    } catch (e) {
+      debugPrint('Error leaving matchmaking: $e');
+    }
   }
 
   /// Récupère un match par son ID
   Future<PvPMatchModel?> getMatch(String matchId) async {
-    final response = await _supabase
-        .from('pvp_matches')
-        .select()
-        .eq('id', matchId)
-        .maybeSingle()
-        .timeout(const Duration(seconds: 15));
+    try {
+      final response = await _supabase
+          .from('pvp_matches')
+          .select()
+          .eq('id', matchId)
+          .maybeSingle()
+          .timeout(const Duration(seconds: 15));
 
-    if (response == null) return null;
-    return PvPMatchModel.fromJson(response);
+      if (response == null) return null;
+      return PvPMatchModel.fromJson(response);
+    } catch (e) {
+      debugPrint('Error getting match: $e');
+      return null;
+    }
   }
 
   /// Récupère des questions aléatoires pour un round PvP
@@ -62,14 +71,18 @@ class PvPRepository {
     String language,
     int limit,
   ) async {
-    final response = await _supabase.rpc('pvp_get_random_questions', params: {
-      'p_language_code': language,
-      'p_limit': limit,
-    });
+    try {
+      final response = await _supabase.rpc('pvp_get_random_questions', params: {
+        'p_language_code': language,
+        'p_limit': limit,
+      });
 
-    return (response as List? ?? [])
-        .map((json) => QuestionModel.fromJson(json))
-        .toList();
+      if (response is! List) return [];
+      return response.map((json) => QuestionModel.fromJson(json)).toList();
+    } catch (e) {
+      debugPrint('Error getting questions for round: $e');
+      return [];
+    }
   }
 
   /// Récupère des questions par leurs IDs pour un round PvP
@@ -77,14 +90,18 @@ class PvPRepository {
     List<String> questionIds,
     String language,
   ) async {
-    final response = await _supabase.rpc('pvp_get_questions_by_ids', params: {
-      'p_question_ids': questionIds,
-      'p_language_code': language,
-    });
+    try {
+      final response = await _supabase.rpc('pvp_get_questions_by_ids', params: {
+        'p_question_ids': questionIds,
+        'p_language_code': language,
+      });
 
-    return (response as List? ?? [])
-        .map((json) => QuestionModel.fromJson(json))
-        .toList();
+      if (response is! List) return [];
+      return response.map((json) => QuestionModel.fromJson(json)).toList();
+    } catch (e) {
+      debugPrint('Error getting questions by ids: $e');
+      return [];
+    }
   }
 
   /// Crée un nouveau round pour un match
@@ -95,40 +112,52 @@ class PvPRepository {
     List<String> questionIds, {
     String? themeId,
   }) async {
-    final response = await _supabase.rpc('pvp_create_round', params: {
-      'p_match_id': matchId,
-      'p_round_number': roundNumber,
-      'p_question_ids': questionIds,
-      'p_theme_id': themeId,
-    });
-
-    return response?.toString() ?? '';
+    try {
+      final response = await _supabase.rpc('pvp_create_round', params: {
+        'p_match_id': matchId,
+        'p_round_number': roundNumber,
+        'p_question_ids': questionIds,
+        'p_theme_id': themeId,
+      });
+      return response?.toString() ?? '';
+    } catch (e) {
+      debugPrint('Error creating round: $e');
+      return '';
+    }
   }
 
   /// Récupère un round spécifique d'un match
   Future<PvPRoundModel?> getRound(String matchId, int roundNumber) async {
-    final response = await _supabase
-        .from('pvp_rounds')
-        .select()
-        .eq('match_id', matchId)
-        .eq('round_number', roundNumber)
-        .maybeSingle();
+    try {
+      final response = await _supabase
+          .from('pvp_rounds')
+          .select()
+          .eq('match_id', matchId)
+          .eq('round_number', roundNumber)
+          .maybeSingle();
 
-    if (response == null) return null;
-    return PvPRoundModel.fromJson(response);
+      if (response == null) return null;
+      return PvPRoundModel.fromJson(response);
+    } catch (e) {
+      debugPrint('Error getting round: $e');
+      return null;
+    }
   }
 
   /// Récupère tous les rounds d'un match
   Future<List<PvPRoundModel>> getRounds(String matchId) async {
-    final response = await _supabase
-        .from('pvp_rounds')
-        .select()
-        .eq('match_id', matchId)
-        .order('round_number', ascending: true);
+    try {
+      final response = await _supabase
+          .from('pvp_rounds')
+          .select()
+          .eq('match_id', matchId)
+          .order('round_number', ascending: true);
 
-    return (response as List? ?? [])
-        .map((json) => PvPRoundModel.fromJson(json))
-        .toList();
+      return response.map((json) => PvPRoundModel.fromJson(json)).toList();
+    } catch (e) {
+      debugPrint('Error getting rounds: $e');
+      return [];
+    }
   }
 
   /// Soumet les réponses d'un joueur pour un round
@@ -139,22 +168,29 @@ class PvPRepository {
     List<PvPAnswerModel> answers,
     int score,
   ) async {
-    final answersJson = answers.map((a) => a.toJson()).toList();
-
-    await _supabase.rpc('pvp_submit_round_answers', params: {
-      'p_match_id': matchId,
-      'p_round_number': roundNumber,
-      'p_user_id': userId,
-      'p_answers': answersJson,
-      'p_score': score,
-    });
+    try {
+      final answersJson = answers.map((a) => a.toJson()).toList();
+      await _supabase.rpc('pvp_submit_round_answers', params: {
+        'p_match_id': matchId,
+        'p_round_number': roundNumber,
+        'p_user_id': userId,
+        'p_answers': answersJson,
+        'p_score': score,
+      });
+    } catch (e) {
+      debugPrint('Error submitting round answers: $e');
+    }
   }
 
   /// Termine un match et calcule le gagnant
   Future<void> completeMatch(String matchId) async {
-    await _supabase.rpc('pvp_complete_match', params: {
-      'p_match_id': matchId,
-    });
+    try {
+      await _supabase.rpc('pvp_complete_match', params: {
+        'p_match_id': matchId,
+      });
+    } catch (e) {
+      debugPrint('Error completing match: $e');
+    }
   }
 
   /// Récupère l'historique des matchs d'un joueur
@@ -227,38 +263,54 @@ class PvPRepository {
 
   /// Met à jour le statut d'un match via RPC sécurisé (validation côté serveur)
   Future<void> updateMatchStatus(String matchId, String status) async {
-    await _supabase.rpc('pvp_update_match_status', params: {
-      'p_match_id': matchId,
-      'p_status': status,
-    });
+    try {
+      await _supabase.rpc('pvp_update_match_status', params: {
+        'p_match_id': matchId,
+        'p_status': status,
+      });
+    } catch (e) {
+      debugPrint('Error updating match status: $e');
+    }
   }
 
   /// Met à jour le statut et le round courant d'un match via RPC sécurisé
   Future<void> updateMatchStatusAndRound(String matchId, String status, int currentRound) async {
-    await _supabase.rpc('pvp_update_match_status', params: {
-      'p_match_id': matchId,
-      'p_status': status,
-      'p_round': currentRound,
-    });
+    try {
+      await _supabase.rpc('pvp_update_match_status', params: {
+        'p_match_id': matchId,
+        'p_status': status,
+        'p_round': currentRound,
+      });
+    } catch (e) {
+      debugPrint('Error updating match status and round: $e');
+    }
   }
 
   /// Annule un match (si l'adversaire ne répond pas)
   Future<void> cancelMatch(String matchId) async {
-    await _supabase.rpc('pvp_update_match_status', params: {
-      'p_match_id': matchId,
-      'p_status': 'cancelled',
-    });
+    try {
+      await _supabase.rpc('pvp_update_match_status', params: {
+        'p_match_id': matchId,
+        'p_status': 'cancelled',
+      });
+    } catch (e) {
+      debugPrint('Error cancelling match: $e');
+    }
   }
 
   /// Vérifie si un joueur est dans la file d'attente
   Future<bool> isInQueue(String userId) async {
-    final response = await _supabase
-        .from('pvp_matchmaking_queue')
-        .select('id')
-        .eq('user_id', userId)
-        .maybeSingle();
-
-    return response != null;
+    try {
+      final response = await _supabase
+          .from('pvp_matchmaking_queue')
+          .select('id')
+          .eq('user_id', userId)
+          .maybeSingle();
+      return response != null;
+    } catch (e) {
+      debugPrint('Error checking queue status: $e');
+      return false;
+    }
   }
 
   /// Récupère le username d'un joueur
@@ -293,13 +345,17 @@ class PvPRepository {
     }
   }
 
-  /// Envoie une push notification à un joueur via l'edge function (fire-and-forget)
-  Future<void> sendPvPNotification(String userId, String title, String body) async {
-    await _supabase.functions.invoke('send-notification', body: {
-      'userId': userId,
-      'title': title,
-      'body': body,
-    });
+  /// Envoie une push notification à un joueur via l'edge function (fire-and-forget).
+  /// [notificationType] doit être l'un de : 'match_found', 'your_turn', 'match_over'
+  Future<void> sendPvPNotification(String userId, String notificationType) async {
+    try {
+      await _supabase.functions.invoke('send-notification', body: {
+        'userId': userId,
+        'notificationType': notificationType,
+      });
+    } catch (e) {
+      debugPrint('Error sending PvP notification: $e');
+    }
   }
 
   /// Récupère les statistiques PvP d'un joueur
@@ -357,17 +413,21 @@ class PvPRepository {
 
   /// Vérifie le statut de la queue au retour dans l'app
   Future<Map<String, dynamic>> checkQueueStatus(String userId) async {
-    final response = await _supabase.rpc('pvp_check_queue_status', params: {
-      'p_user_id': userId,
-    });
-
-    final data = response is Map<String, dynamic> ? response : {};
-    return {
-      'inQueue': data['in_queue'] ?? false,
-      'matchFound': data['match_found'] ?? false,
-      'matchId': data['match_id'],
-      'timeInQueue': data['time_in_queue'],
-    };
+    try {
+      final response = await _supabase.rpc('pvp_check_queue_status', params: {
+        'p_user_id': userId,
+      });
+      final data = response is Map<String, dynamic> ? response : <String, dynamic>{};
+      return {
+        'inQueue': data['in_queue'] ?? false,
+        'matchFound': data['match_found'] ?? false,
+        'matchId': data['match_id'],
+        'timeInQueue': data['time_in_queue'],
+      };
+    } catch (e) {
+      debugPrint('Error checking queue status: $e');
+      return {'inQueue': false, 'matchFound': false, 'matchId': null, 'timeInQueue': null};
+    }
   }
 
   /// Récupère des questions aléatoires pour un thème spécifique
@@ -377,16 +437,20 @@ class PvPRepository {
     int limit, {
     int avgRating = 1000,
   }) async {
-    final response = await _supabase.rpc('pvp_get_random_questions_by_theme', params: {
-      'p_theme_id': themeId,
-      'p_language_code': language,
-      'p_limit': limit,
-      'p_avg_rating': avgRating,
-    });
+    try {
+      final response = await _supabase.rpc('pvp_get_random_questions_by_theme', params: {
+        'p_theme_id': themeId,
+        'p_language_code': language,
+        'p_limit': limit,
+        'p_avg_rating': avgRating,
+      });
 
-    return (response as List? ?? [])
-        .map((json) => QuestionModel.fromJson(json))
-        .toList();
+      if (response is! List) return [];
+      return response.map((json) => QuestionModel.fromJson(json)).toList();
+    } catch (e) {
+      debugPrint('Error getting questions by theme: $e');
+      return [];
+    }
   }
 
   /// Récupère un thème aléatoire excluant certains thèmes
@@ -394,12 +458,16 @@ class PvPRepository {
     String language,
     List<String> excludeThemeIds,
   ) async {
-    final response = await _supabase.rpc('pvp_get_random_theme', params: {
-      'p_language_code': language,
-      'p_exclude_theme_ids': excludeThemeIds,
-    });
-
-    return response as String?;
+    try {
+      final response = await _supabase.rpc('pvp_get_random_theme', params: {
+        'p_language_code': language,
+        'p_exclude_theme_ids': excludeThemeIds,
+      });
+      return response?.toString();
+    } catch (e) {
+      debugPrint('Error getting random theme: $e');
+      return null;
+    }
   }
 
   static int _toInt(dynamic value, int fallback) {

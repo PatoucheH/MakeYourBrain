@@ -95,16 +95,34 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { userId, title, body } = await req.json()
+    const ALLOWED_NOTIFICATION_TYPES = ['match_found', 'your_turn', 'match_over'] as const
+    type NotificationType = typeof ALLOWED_NOTIFICATION_TYPES[number]
 
-    if (!userId || !title || !body) {
+    const NOTIFICATION_CONTENT: Record<NotificationType, { en: { title: string; body: string }; fr: { title: string; body: string } }> = {
+      match_found: {
+        en: { title: 'Match found!', body: 'An opponent is waiting! Open the app to play.' },
+        fr: { title: 'Match trouvé !', body: 'Un adversaire t\'attend ! Ouvre l\'app pour jouer.' },
+      },
+      your_turn: {
+        en: { title: 'Your turn!', body: 'Your opponent has played. It\'s your turn!' },
+        fr: { title: 'C\'est ton tour !', body: 'Ton adversaire a joué. À toi de jouer !' },
+      },
+      match_over: {
+        en: { title: 'Match over!', body: 'Your match result is available!' },
+        fr: { title: 'Match terminé !', body: 'Le résultat de ta partie est disponible !' },
+      },
+    }
+
+    const { userId, notificationType } = await req.json()
+
+    if (!userId || !notificationType) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Missing required fields: userId, title, body' }),
+        JSON.stringify({ success: false, error: 'Missing required fields: userId, notificationType' }),
         { headers: jsonHeader, status: 400 }
       )
     }
 
-    // C1: Valider le format UUID du destinataire
+    // Valider le format UUID du destinataire
     if (!UUID_REGEX.test(userId)) {
       return new Response(
         JSON.stringify({ success: false, error: 'Invalid user ID' }),
@@ -112,7 +130,16 @@ serve(async (req) => {
       )
     }
 
-    // C1: Vérifier qu'il existe un match PvP actif entre l'appelant et le destinataire
+    // Valider le type de notification (whitelist stricte — pas de texte libre)
+    if (!ALLOWED_NOTIFICATION_TYPES.includes(notificationType as NotificationType)) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid notification type' }),
+        { headers: jsonHeader, status: 400 }
+      )
+    }
+
+    // Vérifier qu'il existe un match PvP actif entre l'appelant et le destinataire
+    // et que l'appelant (callerId) est bien un des deux joueurs (pas le destinataire)
     const { data: match } = await supabaseAdmin
       .from('pvp_matches')
       .select('id')
@@ -121,12 +148,22 @@ serve(async (req) => {
       .neq('status', 'cancelled')
       .maybeSingle()
 
-    if (!match) {
+    if (!match || callerId === userId) {
       return new Response(
         JSON.stringify({ success: false, error: 'Forbidden' }),
         { headers: jsonHeader, status: 403 }
       )
     }
+
+    // Récupérer la langue préférée du destinataire pour localiser la notification
+    const { data: recipientStats } = await supabaseAdmin
+      .from('user_stats')
+      .select('preferred_language')
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    const lang = recipientStats?.preferred_language === 'fr' ? 'fr' : 'en'
+    const { title, body } = NOTIFICATION_CONTENT[notificationType as NotificationType][lang]
 
     // ===== RÉCUPÉRER LES TOKENS FCM DE L'UTILISATEUR =====
     const { data: tokens, error: tokensError } = await supabaseAdmin

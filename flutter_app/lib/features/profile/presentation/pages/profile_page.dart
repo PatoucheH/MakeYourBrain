@@ -302,9 +302,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             underline: const SizedBox(),
                             icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                            items: const [
-                              DropdownMenuItem(value: 'en', child: Text('English')),
-                              DropdownMenuItem(value: 'fr', child: Text('Français')),
+                            items: [
+                              DropdownMenuItem(value: 'en', child: Text(context.read<LanguageProvider>().getLanguageName('en'))),
+                              DropdownMenuItem(value: 'fr', child: Text(context.read<LanguageProvider>().getLanguageName('fr'))),
                             ],
                             onChanged: (value) {
                               if (value != null) updateLanguage(value);

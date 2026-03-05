@@ -133,10 +133,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get explanation => '💡 Explication :';
 
   @override
-  String get createAccount => 'Créer un Compte';
+  String get explanationLabel => 'Explication';
 
   @override
-  String get selected => 'Sélectionné';
+  String get createAccount => 'Créer un Compte';
 
   @override
   String get myFavoriteThemes => 'Mes Thèmes Favoris';
@@ -207,9 +207,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get yourGlobalRank => 'Votre Rang Mondial';
-
-  @override
-  String get yourWeeklyRank => 'Votre Rang Hebdo';
 
   @override
   String get yourThemeRank => 'Votre Rang';
@@ -503,9 +500,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get social => 'Social';
-
-  @override
-  String get viewAll => 'Voir tout';
 
   @override
   String selectThemeForRound(int round) {

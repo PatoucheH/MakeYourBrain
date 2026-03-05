@@ -41,7 +41,6 @@
   "noQuestionsAvailable": "No questions available for this theme",
   "explanation": "💡 Explanation:",
   "createAccount": "Create Account",
-  "selected": "Selected",
   "myFavoriteThemes": "My Favorite Themes",
   "addTheme": "Add Theme",
   "allThemes": "All Themes",
@@ -64,7 +63,6 @@
   "global": "Global",
   "thisWeek": "This Week",
   "yourGlobalRank": "Your Global Rank",
-  "yourWeeklyRank": "Your Weekly Rank",
   "yourThemeRank": "Your Rank",
   "accuracy": "accuracy",
   "points": "pts",
@@ -187,7 +185,6 @@
   "unfollowSuccess": "You unfollowed this user",
   "cannotFollowYourself": "You cannot follow yourself",
   "social": "Social",
-  "viewAll": "View all",
   "selectThemeForRound": "Select Theme for Round {round}",
   "@selectThemeForRound": {
     "placeholders": {

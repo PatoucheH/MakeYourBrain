@@ -344,17 +344,17 @@ abstract class AppLocalizations {
   /// **'💡 Explanation:'**
   String get explanation;
 
+  /// No description provided for @explanationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Explanation'**
+  String get explanationLabel;
+
   /// No description provided for @createAccount.
   ///
   /// In en, this message translates to:
   /// **'Create Account'**
   String get createAccount;
-
-  /// No description provided for @selected.
-  ///
-  /// In en, this message translates to:
-  /// **'Selected'**
-  String get selected;
 
   /// No description provided for @myFavoriteThemes.
   ///
@@ -487,12 +487,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Global Rank'**
   String get yourGlobalRank;
-
-  /// No description provided for @yourWeeklyRank.
-  ///
-  /// In en, this message translates to:
-  /// **'Your Weekly Rank'**
-  String get yourWeeklyRank;
 
   /// No description provided for @yourThemeRank.
   ///
@@ -1051,12 +1045,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Social'**
   String get social;
-
-  /// No description provided for @viewAll.
-  ///
-  /// In en, this message translates to:
-  /// **'View all'**
-  String get viewAll;
 
   /// No description provided for @selectThemeForRound.
   ///

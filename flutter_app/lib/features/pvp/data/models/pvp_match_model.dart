@@ -85,25 +85,21 @@ class PvPMatchModel {
 
   factory PvPMatchModel.fromJson(Map<String, dynamic> json) {
     return PvPMatchModel(
-      id: json['id'],
-      player1Id: json['player1_id'],
-      player2Id: json['player2_id'],
+      id: json['id']?.toString() ?? '',
+      player1Id: json['player1_id']?.toString() ?? '',
+      player2Id: json['player2_id']?.toString(),
       status: PvPMatchStatus.fromString(json['status'] ?? 'waiting'),
       currentRound: json['current_round'] ?? 1,
       player1TotalScore: json['player1_total_score'] ?? 0,
       player2TotalScore: json['player2_total_score'] ?? 0,
-      winnerId: json['winner_id'],
+      winnerId: json['winner_id']?.toString(),
       player1RatingBefore: json['player1_rating_before'] ?? 1000,
       player2RatingBefore: json['player2_rating_before'],
       player1RatingChange: json['player1_rating_change'],
       player2RatingChange: json['player2_rating_change'],
       createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
-      startedAt: json['started_at'] != null
-          ? DateTime.parse(json['started_at'])
-          : null,
-      completedAt: json['completed_at'] != null
-          ? DateTime.parse(json['completed_at'])
-          : null,
+      startedAt: DateTime.tryParse(json['started_at']?.toString() ?? ''),
+      completedAt: DateTime.tryParse(json['completed_at']?.toString() ?? ''),
     );
   }
 

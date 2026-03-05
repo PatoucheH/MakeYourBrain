@@ -106,7 +106,8 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     final email = _emailController.text.trim();
-    if (!email.contains('@') || !email.contains('.')) {
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
+    if (!emailRegex.hasMatch(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.emailInvalid)),
       );

@@ -24,6 +24,13 @@ serve(async (req) => {
     return new Response('OK', { status: 200 })
   }
 
+  // Valider que user_id est bien un UUID (format attendu par la base)
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (!UUID_REGEX.test(userId)) {
+    console.error('SSV: user_id invalide (non-UUID):', userId)
+    return new Response('Forbidden', { status: 403 })
+  }
+
   try {
     // 1. Vérifier la signature ECDSA d'AdMob
     const isValid = await verifyAdMobSignature(url.search, signature, keyId)

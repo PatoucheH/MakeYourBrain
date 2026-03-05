@@ -8,6 +8,13 @@ import '../models/pvp_round_model.dart';
 import '../repositories/pvp_repository.dart';
 
 class PvPProvider extends ChangeNotifier {
+  bool _disposed = false;
+
+  /// Appelle notifyListeners() uniquement si le provider n'est pas encore disposé.
+  void _safeNotify() {
+    if (!_disposed) _safeNotify();
+  }
+
   final PvPRepository _pvpRepository;
   final AuthRepository _authRepository;
   final ProfileRepository _profileRepository;
@@ -179,7 +186,7 @@ class PvPProvider extends ChangeNotifier {
           matchCompletedNotification = true;
           matchCompletedDidWin = freshMatch.winnerId == null ? null : freshMatch.winnerId == userId;
           await _ensureOpponentInfo(freshMatch, userId);
-          notifyListeners();
+          _safeNotify();
           _startAutoDismissTimer();
           return;
         }
@@ -202,7 +209,7 @@ class PvPProvider extends ChangeNotifier {
             matchCompletedNotification = true;
             matchCompletedDidWin = completedMatch.winnerId == null ? null : completedMatch.winnerId == userId;
             await _ensureOpponentInfo(completedMatch, userId);
-            notifyListeners();
+            _safeNotify();
             _startAutoDismissTimer();
             return;
           }
@@ -228,7 +235,7 @@ class PvPProvider extends ChangeNotifier {
             matchFoundWaiting = false;
             yourTurnNotification = true;
             notificationRoundNumber = match.currentRound;
-            notifyListeners();
+            _safeNotify();
             _startAutoDismissTimer();
           }
           return;
@@ -244,7 +251,7 @@ class PvPProvider extends ChangeNotifier {
         _previousIsMyTurn = isMyTurn || isMyThemeChoice;
         // Toujours relancer le watcher pour compenser les déconnexions silencieuses
         _watchMatch(match.id);
-        if (isNewMatch) notifyListeners();
+        if (isNewMatch) _safeNotify();
       }
 
       // ── 6. Aucun match actif ni courant → vérifier la queue ──
@@ -260,7 +267,7 @@ class PvPProvider extends ChangeNotifier {
             if (isMyTurn || isMyThemeChoice) {
               yourTurnNotification = true;
               notificationRoundNumber = currentMatch!.currentRound;
-              notifyListeners();
+              _safeNotify();
               _startAutoDismissTimer();
             }
           }
@@ -274,16 +281,14 @@ class PvPProvider extends ChangeNotifier {
   }
 
   /// Envoie une push notification à l'adversaire (fire-and-forget).
-  /// Un échec réseau ne bloque jamais le flux de jeu.
-  void _notifyOpponent(String titleFr, String titleEn, String bodyFr, String bodyEn) {
+  /// [notificationType] : 'match_found' | 'your_turn' | 'match_over'
+  /// Le contenu est généré côté serveur selon la langue du destinataire.
+  void _notifyOpponent(String notificationType) {
     final userId = currentUserId;
     if (userId == null || currentMatch == null) return;
     final opponentId = currentMatch!.getOpponentId(userId);
     if (opponentId == null) return;
-    final lang = opponentLanguage ?? 'en';
-    final title = lang == 'fr' ? titleFr : titleEn;
-    final body  = lang == 'fr' ? bodyFr  : bodyEn;
-    _pvpRepository.sendPvPNotification(opponentId, title, body).catchError((_) {});
+    _pvpRepository.sendPvPNotification(opponentId, notificationType).catchError((_) {});
   }
 
   Future<void> _ensureOpponentInfo(PvPMatchModel match, String userId) async {
@@ -311,7 +316,7 @@ class PvPProvider extends ChangeNotifier {
       matchCompletedDidWin = null;
       notificationRoundNumber = null;
       _matchFoundTimer?.cancel();
-      if (hadNotification) notifyListeners();
+      if (hadNotification) _safeNotify();
     }
   }
 
@@ -323,7 +328,7 @@ class PvPProvider extends ChangeNotifier {
     final userId = currentUserId;
     if (userId == null) {
       errorMessage = 'User not logged in';
-      notifyListeners();
+      _safeNotify();
       return;
     }
 
@@ -332,7 +337,7 @@ class PvPProvider extends ChangeNotifier {
       isInQueue = false;
       searchDuration = 0;
       errorMessage = null;
-      notifyListeners();
+      _safeNotify();
 
       final stats = await _pvpRepository.getPlayerPvPStats(userId);
       final rating = stats['rating'] as int;
@@ -350,13 +355,13 @@ class PvPProvider extends ChangeNotifier {
         _startSearchDurationTimer();
       }
 
-      notifyListeners();
+      _safeNotify();
     } catch (e) {
       debugPrint('[PvP] ERROR joinMatchmaking: $e');
       errorMessage = 'Unable to join matchmaking. Please try again.';
       isSearchingMatch = false;
       isInQueue = false;
-      notifyListeners();
+      _safeNotify();
     }
   }
 
@@ -371,7 +376,7 @@ class PvPProvider extends ChangeNotifier {
     _searchDurationTimer?.cancel();
     _searchDurationTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       searchDuration++;
-      notifyListeners();
+      _safeNotify();
     });
   }
 
@@ -412,7 +417,7 @@ class PvPProvider extends ChangeNotifier {
         _stopSearchTimers();
         isSearchingMatch = false;
         isInQueue = false;
-        notifyListeners();
+        _safeNotify();
       }
     } catch (e) {
       debugPrint('Error checking for match: $e');
@@ -434,7 +439,7 @@ class PvPProvider extends ChangeNotifier {
     isInQueue = false;
     isSearchingMatch = false;
     // Notifier immédiatement pour que l'UI masque le popup de recherche
-    notifyListeners();
+    _safeNotify();
 
     try {
       if (foundMatchId != null) {
@@ -450,24 +455,20 @@ class PvPProvider extends ChangeNotifier {
         return;
       }
 
-      _notifyOpponent(
-        'Match trouvé !', 'Match found!',
-        'Un adversaire t\'attend ! Ouvre l\'app pour jouer.',
-        'An opponent is waiting! Open the app to play.',
-      );
+      _notifyOpponent('match_found');
 
       if (isMyTurn || isMyThemeChoice) {
         // C'est à moi de jouer → countdown 5s puis auto-nav
         _previousIsMyTurn = true;
         matchFound = true;
         matchFoundCountdown = 5;
-        notifyListeners();
+        _safeNotify();
         _startMatchFoundCountdown();
       } else {
         // L'adversaire joue → notification "Match Trouvé - En attente"
         _previousIsMyTurn = false;
         matchFoundWaiting = true;
-        notifyListeners();
+        _safeNotify();
         _startAutoDismissTimer();
       }
     } catch (e) {
@@ -481,7 +482,7 @@ class PvPProvider extends ChangeNotifier {
     _matchFoundTimer?.cancel();
     _matchFoundTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       matchFoundCountdown--;
-      notifyListeners();
+      _safeNotify();
       if (matchFoundCountdown <= 0) {
         timer.cancel();
         // Ne pas clear les flags ici - l'overlay gère la navigation
@@ -499,7 +500,7 @@ class PvPProvider extends ChangeNotifier {
     notificationRoundNumber = null;
     _matchFoundTimer?.cancel();
     _notificationAutoDismissTimer?.cancel();
-    notifyListeners();
+    _safeNotify();
   }
 
   /// Démarre un timer de 15s pour auto-dismiss les notifications
@@ -513,7 +514,7 @@ class PvPProvider extends ChangeNotifier {
         matchCompletedNotification = false;
         matchCompletedDidWin = null;
         notificationRoundNumber = null;
-        notifyListeners();
+        _safeNotify();
       }
     });
   }
@@ -533,10 +534,10 @@ class PvPProvider extends ChangeNotifier {
       matchFound = false;
       foundMatchId = null;
       errorMessage = null;
-      notifyListeners();
+      _safeNotify();
     } catch (e) {
       errorMessage = 'Unable to leave matchmaking. Please try again.';
-      notifyListeners();
+      _safeNotify();
     }
   }
 
@@ -559,13 +560,13 @@ class PvPProvider extends ChangeNotifier {
     try {
       isLoading = true;
       errorMessage = null;
-      notifyListeners();
+      _safeNotify();
 
       currentMatch = await _pvpRepository.getMatch(matchId);
       if (currentMatch == null) {
         errorMessage = 'Match not found';
         isLoading = false;
-        notifyListeners();
+        _safeNotify();
         return;
       }
 
@@ -584,12 +585,12 @@ class PvPProvider extends ChangeNotifier {
       _watchMatch(matchId);
 
       isLoading = false;
-      notifyListeners();
+      _safeNotify();
     } catch (e) {
       debugPrint('[PvP] ERROR loadMatch: $e');
       errorMessage = 'Unable to load match. Please try again.';
       isLoading = false;
-      notifyListeners();
+      _safeNotify();
     }
   }
 
@@ -628,7 +629,7 @@ class PvPProvider extends ChangeNotifier {
           if (currentUserId != null) {
             await _ensureOpponentInfo(match, currentUserId!);
           }
-          notifyListeners();
+          _safeNotify();
           _startAutoDismissTimer();
           return;
         }
@@ -669,7 +670,7 @@ class PvPProvider extends ChangeNotifier {
           currentRound = await _pvpRepository.getRound(matchId, match.currentRound);
         }
 
-        notifyListeners();
+        _safeNotify();
       },
       onError: (e) {
         debugPrint('Error watching match: $e');
@@ -686,7 +687,7 @@ class PvPProvider extends ChangeNotifier {
 
     try {
       isLoading = true;
-      notifyListeners();
+      _safeNotify();
 
       final userStats = await _authRepository.getUserStats();
       final language = userStats?.preferredLanguage ?? 'en';
@@ -729,12 +730,12 @@ class PvPProvider extends ChangeNotifier {
 
       _updateIsMyTurn();
       isLoading = false;
-      notifyListeners();
+      _safeNotify();
     } catch (e) {
       debugPrint('[PvP] ERROR selectTheme: $e');
       errorMessage = 'Unable to select theme. Please try again.';
       isLoading = false;
-      notifyListeners();
+      _safeNotify();
     }
   }
 
@@ -769,11 +770,11 @@ class PvPProvider extends ChangeNotifier {
         await _loadQuestionsFromRound();
       }
 
-      notifyListeners();
+      _safeNotify();
     } catch (e) {
       debugPrint('[PvP] ERROR loadRound: $e');
       errorMessage = 'Unable to load round. Please try again.';
-      notifyListeners();
+      _safeNotify();
     }
   }
 
@@ -782,7 +783,7 @@ class PvPProvider extends ChangeNotifier {
 
     try {
       isLoading = true;
-      notifyListeners();
+      _safeNotify();
 
       final userStats = await _authRepository.getUserStats();
       final language = userStats?.preferredLanguage ?? 'en';
@@ -822,12 +823,12 @@ class PvPProvider extends ChangeNotifier {
       consecutiveWrong = 0;
 
       isLoading = false;
-      notifyListeners();
+      _safeNotify();
     } catch (e) {
       debugPrint('[PvP] ERROR _startRoundWithRandomTheme: $e');
       errorMessage = 'Unable to start round. Please try again.';
       isLoading = false;
-      notifyListeners();
+      _safeNotify();
     }
   }
 
@@ -856,7 +857,7 @@ class PvPProvider extends ChangeNotifier {
 
     try {
       isLoading = true;
-      notifyListeners();
+      _safeNotify();
 
       final userStats = await _authRepository.getUserStats();
       final language = userStats?.preferredLanguage ?? 'en';
@@ -897,12 +898,12 @@ class PvPProvider extends ChangeNotifier {
       consecutiveWrong = 0;
 
       isLoading = false;
-      notifyListeners();
+      _safeNotify();
     } catch (e) {
       debugPrint('[PvP] ERROR startRound: $e');
       errorMessage = 'Unable to start round. Please try again.';
       isLoading = false;
-      notifyListeners();
+      _safeNotify();
     }
   }
 
@@ -948,7 +949,7 @@ class PvPProvider extends ChangeNotifier {
 
     myAnswers.add(answer);
     currentQuestionIndex++;
-    notifyListeners();
+    _safeNotify();
 
     if (hasAnsweredAllQuestions) {
       submitRound();
@@ -969,7 +970,7 @@ class PvPProvider extends ChangeNotifier {
 
     myAnswers.add(answer);
     currentQuestionIndex++;
-    notifyListeners();
+    _safeNotify();
 
     if (hasAnsweredAllQuestions) {
       submitRound();
@@ -979,7 +980,7 @@ class PvPProvider extends ChangeNotifier {
   void finishRound() {
     if (roundSubmitted) return;
     roundSubmitted = true;
-    notifyListeners();
+    _safeNotify();
     // Si un submit est déjà en cours (ex: dernière réponse a déclenché submitRound),
     // on ne relance pas - le round sera soumis avec les réponses actuelles
     if (!_isSubmittingRound) {
@@ -1001,7 +1002,7 @@ class PvPProvider extends ChangeNotifier {
 
     try {
       isLoading = true;
-      notifyListeners();
+      _safeNotify();
 
       final score = myRoundScore;
 
@@ -1049,20 +1050,16 @@ class PvPProvider extends ChangeNotifier {
         final newStatus = isPlayer1 ? 'player2_turn' : 'player1_turn';
         await _pvpRepository.updateMatchStatus(currentMatch!.id, newStatus);
         currentMatch = await _pvpRepository.getMatch(currentMatch!.id);
-        _notifyOpponent(
-          'C\'est ton tour !', 'Your turn!',
-          'Round ${currentRound!.roundNumber} – À toi de jouer !',
-          'Round ${currentRound!.roundNumber} – Your turn to play!',
-        );
+        _notifyOpponent('your_turn');
       }
 
       _updateIsMyTurn();
       isLoading = false;
-      notifyListeners();
+      _safeNotify();
     } catch (e) {
       errorMessage = 'Unable to submit round. Please try again.';
       isLoading = false;
-      notifyListeners();
+      _safeNotify();
     } finally {
       _isSubmittingRound = false;
     }
@@ -1074,15 +1071,11 @@ class PvPProvider extends ChangeNotifier {
     try {
       await _pvpRepository.completeMatch(currentMatch!.id);
       currentMatch = await _pvpRepository.getMatch(currentMatch!.id);
-      _notifyOpponent(
-        'Match terminé !', 'Match over!',
-        'Le résultat de ta partie est disponible !',
-        'Your match result is available!',
-      );
-      notifyListeners();
+      _notifyOpponent('match_over');
+      _safeNotify();
     } catch (e) {
       errorMessage = 'Unable to complete match. Please try again.';
-      notifyListeners();
+      _safeNotify();
     }
   }
 
@@ -1182,11 +1175,12 @@ class PvPProvider extends ChangeNotifier {
     _notifiedCompletedMatchIds.clear();
 
     // NE PAS arrêter le background timer : il doit continuer à tourner
-    notifyListeners();
+    _safeNotify();
   }
 
   @override
   void dispose() {
+    _disposed = true;
     _matchSubscription?.cancel();
     _stopSearchTimers();
     _backgroundCheckTimer?.cancel();

@@ -1,3 +1,4 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../shared/services/supabase_service.dart';
 
 class LeaderboardRepository {
@@ -9,7 +10,7 @@ class LeaderboardRepository {
         .from('leaderboard_global')
         .select()
         .limit(limit);
-    
+
     return List<Map<String, dynamic>>.from(response);
   }
 
@@ -23,7 +24,7 @@ class LeaderboardRepository {
         .select()
         .eq('theme_id', themeId)
         .limit(limit);
-    
+
     return List<Map<String, dynamic>>.from(response);
   }
 
@@ -33,11 +34,13 @@ class LeaderboardRepository {
         .from('leaderboard_weekly')
         .select()
         .limit(limit);
-    
+
     return List<Map<String, dynamic>>.from(response);
   }
 
-  // Position d'un user dans le leaderboard global
+  // Position d'un user dans le leaderboard global.
+  // .count(CountOption.exact) → le serveur retourne le COUNT dans les headers,
+  // aucune donnée volumineuse n'est traitée côté client.
   Future<int?> getUserGlobalRank(String userId) async {
     final userRow = await _supabase
         .from('leaderboard_global')
@@ -46,14 +49,15 @@ class LeaderboardRepository {
         .maybeSingle();
     if (userRow == null) return null;
     final userXp = (userRow['total_xp'] as num?)?.toInt() ?? 0;
-    final higherRanked = await _supabase
+    final countResponse = await _supabase
         .from('leaderboard_global')
         .select('user_id')
-        .gt('total_xp', userXp);
-    return (higherRanked as List).length + 1;
+        .gt('total_xp', userXp)
+        .count(CountOption.exact);
+    return countResponse.count + 1;
   }
 
-  // Position d'un user dans un thème
+  // Position d'un user dans un thème.
   Future<int?> getUserThemeRank(String userId, String themeId) async {
     final userRow = await _supabase
         .from('leaderboard_by_theme')
@@ -63,11 +67,12 @@ class LeaderboardRepository {
         .maybeSingle();
     if (userRow == null) return null;
     final userXp = (userRow['xp'] as num?)?.toInt() ?? 0;
-    final higherRanked = await _supabase
+    final countResponse = await _supabase
         .from('leaderboard_by_theme')
         .select('user_id')
         .eq('theme_id', themeId)
-        .gt('xp', userXp);
-    return (higherRanked as List).length + 1;
+        .gt('xp', userXp)
+        .count(CountOption.exact);
+    return countResponse.count + 1;
   }
 }

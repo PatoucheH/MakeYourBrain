@@ -1,12 +1,25 @@
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../shared/services/supabase_service.dart';
 import '../../../../shared/services/notification_service.dart';
 import '../models/user_model.dart';
 
 class AuthRepository {
   final _supabase = SupabaseService().client;
+
+  /// Retourne la langue préférée sauvegardée dans SharedPreferences,
+  /// avec fallback sur la locale du device.
+  Future<String> _getPreferredLanguage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getString('app_language');
+      if (saved != null) return saved;
+    } catch (_) {}
+    final deviceLang = PlatformDispatcher.instance.locale.languageCode;
+    return deviceLang == 'fr' ? 'fr' : 'en';
+  }
 
   Future<void> _savefcmToken() async {
     try {
@@ -49,11 +62,11 @@ class AuthRepository {
 
     // Créer l'entrée user_stats avec le pseudo si l'inscription réussit
     if (response.user != null && username != null && username.isNotEmpty) {
-      final deviceLang = PlatformDispatcher.instance.locale.languageCode;
+      final lang = await _getPreferredLanguage();
       await _supabase.from('user_stats').insert({
         'user_id': response.user!.id,
         'username': username.toLowerCase().trim(),
-        'preferred_language': deviceLang == 'fr' ? 'fr' : 'en',
+        'preferred_language': lang,
       });
       await _savefcmToken();
     }
@@ -178,10 +191,12 @@ Future<bool> signInWithFacebook() async {
             .maybeSingle();
 
         if (existingUser == null) {
-          final deviceLang = PlatformDispatcher.instance.locale.languageCode;
+          final lang = await _getPreferredLanguage();
+          final offsetMinutes = DateTime.now().timeZoneOffset.inMinutes;
           await _supabase.from('user_stats').insert({
             'user_id': userId,
-            'preferred_language': deviceLang == 'fr' ? 'fr' : 'en',
+            'preferred_language': lang,
+            'timezone_offset_hours': offsetMinutes / 60.0,
           });
         }
       }
@@ -217,10 +232,12 @@ Future<bool> signInWithFacebook() async {
             .maybeSingle();
 
         if (existingUser == null) {
-          final deviceLang = PlatformDispatcher.instance.locale.languageCode;
+          final lang = await _getPreferredLanguage();
+          final offsetMinutes = DateTime.now().timeZoneOffset.inMinutes;
           await _supabase.from('user_stats').insert({
             'user_id': userId,
-            'preferred_language': deviceLang == 'fr' ? 'fr' : 'en',
+            'preferred_language': lang,
+            'timezone_offset_hours': offsetMinutes / 60.0,
           });
         }
       }

@@ -17,10 +17,10 @@ class PvPAnswerModel {
 
   factory PvPAnswerModel.fromJson(Map<String, dynamic> json) {
     return PvPAnswerModel(
-      questionId: json['question_id'],
-      answerId: json['answer_id'],
-      isCorrect: json['is_correct'] ?? false,
-      difficulty: json['difficulty'] ?? 'easy',
+      questionId: json['question_id']?.toString() ?? '',
+      answerId: json['answer_id']?.toString() ?? '',
+      isCorrect: json['is_correct'] == true,
+      difficulty: json['difficulty']?.toString() ?? 'easy',
       points: json['points'] ?? 0,
       timeSpent: json['time_spent'] ?? 0,
     );
@@ -84,28 +84,25 @@ class PvPRoundModel {
   });
 
   factory PvPRoundModel.fromJson(Map<String, dynamic> json) {
+    final q = json['question_ids'];
+    final p1a = json['player1_answers'];
+    final p2a = json['player2_answers'];
     return PvPRoundModel(
-      id: json['id'],
-      matchId: json['match_id'],
+      id: json['id']?.toString() ?? '',
+      matchId: json['match_id']?.toString() ?? '',
       roundNumber: json['round_number'] ?? 1,
-      themeId: json['theme_id'],
-      questionIds: List<String>.from(json['question_ids'] ?? []),
+      themeId: json['theme_id']?.toString(),
+      questionIds: q is List ? List<String>.from(q.map((e) => e.toString())) : [],
       player1Score: json['player1_score'] ?? 0,
       player2Score: json['player2_score'] ?? 0,
-      player1Answers: (json['player1_answers'] as List<dynamic>?)
-              ?.map((answer) => PvPAnswerModel.fromJson(answer))
-              .toList() ??
-          [],
-      player2Answers: (json['player2_answers'] as List<dynamic>?)
-              ?.map((answer) => PvPAnswerModel.fromJson(answer))
-              .toList() ??
-          [],
-      player1CompletedAt: json['player1_completed_at'] != null
-          ? DateTime.parse(json['player1_completed_at'])
-          : null,
-      player2CompletedAt: json['player2_completed_at'] != null
-          ? DateTime.parse(json['player2_completed_at'])
-          : null,
+      player1Answers: p1a is List
+          ? p1a.map((a) => PvPAnswerModel.fromJson(a as Map<String, dynamic>)).toList()
+          : [],
+      player2Answers: p2a is List
+          ? p2a.map((a) => PvPAnswerModel.fromJson(a as Map<String, dynamic>)).toList()
+          : [],
+      player1CompletedAt: DateTime.tryParse(json['player1_completed_at']?.toString() ?? ''),
+      player2CompletedAt: DateTime.tryParse(json['player2_completed_at']?.toString() ?? ''),
     );
   }
 

@@ -139,7 +139,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                                   const Icon(Icons.menu_book, color: AppColors.brainPurple, size: 22),
                                   const SizedBox(width: 8),
                                   Text(
-                                    l10n.explanation.replaceAll('💡 ', '').replaceAll(' :', ''),
+                                    l10n.explanationLabel,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
