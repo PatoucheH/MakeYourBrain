@@ -290,5 +290,43 @@
   "alreadyHaveAccountPrefix": "Already have an account?",
   "chooseYourUsername": "Choose your username",
   "chooseYourUsernameHint": "This is how other players will see you",
-  "confirmUsername": "Confirm"
+  "confirmUsername": "Confirm",
+  "connecting": "Connecting...",
+  "explanationLabel": "Explanation",
+  "easy": "Easy",
+  "medium": "Medium",
+  "hard": "Hard",
+  "noEmail": "No email",
+  "emailInvalid": "Invalid email address",
+  "passwordMinLength": "Password must be at least 6 characters",
+  "themeAddedToFavorites": "{name} added to favorites! ⭐",
+  "@themeAddedToFavorites": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorAddingTheme": "Error adding theme",
+  "chooseYourInterests": "Choose Your Interests",
+  "whatTopicsInterestYou": "🎯 What topics interest you?",
+  "selectFavoriteThemesHint": "Select your favorite themes to get personalized quizzes",
+  "continueWithCount": "Continue ({count} selected)",
+  "@continueWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "errorSavingPreferences": "Error saving preferences",
+  "errorSelectingTheme": "Error selecting theme",
+  "xpBonus": "+{amount} XP",
+  "@xpBonus": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -262,5 +262,43 @@
   "alreadyHaveAccountPrefix": "Déjà un compte ?",
   "chooseYourUsername": "Choisissez votre pseudo",
   "chooseYourUsernameHint": "C'est comme ça que les autres joueurs vous verront",
-  "confirmUsername": "Confirmer"
+  "confirmUsername": "Confirmer",
+  "connecting": "Connexion en cours...",
+  "explanationLabel": "Explication",
+  "easy": "Facile",
+  "medium": "Moyen",
+  "hard": "Difficile",
+  "noEmail": "Aucun email",
+  "emailInvalid": "Adresse email invalide",
+  "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+  "themeAddedToFavorites": "{name} ajouté aux favoris ! ⭐",
+  "@themeAddedToFavorites": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorAddingTheme": "Erreur lors de l'ajout du thème",
+  "chooseYourInterests": "Choisissez vos intérêts",
+  "whatTopicsInterestYou": "🎯 Quels sujets vous intéressent ?",
+  "selectFavoriteThemesHint": "Sélectionnez vos thèmes favoris pour obtenir des quiz personnalisés",
+  "continueWithCount": "Continuer ({count} sélectionné)",
+  "@continueWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "errorSavingPreferences": "Erreur lors de la sauvegarde des préférences",
+  "errorSelectingTheme": "Erreur lors de la sélection du thème",
+  "xpBonus": "+{amount} XP",
+  "@xpBonus": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  }
 }

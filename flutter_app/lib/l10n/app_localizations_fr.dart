@@ -700,7 +700,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get emailInvalid => 'Adresse email invalide';
 
   @override
-  String get passwordMinLength => 'Le mot de passe doit contenir au moins 6 caractères';
+  String get passwordMinLength =>
+      'Le mot de passe doit contenir au moins 6 caractères';
 
   @override
   String themeAddedToFavorites(String name) {
@@ -726,7 +727,8 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get errorSavingPreferences => 'Erreur lors de la sauvegarde des préférences';
+  String get errorSavingPreferences =>
+      'Erreur lors de la sauvegarde des préférences';
 
   @override
   String get errorSelectingTheme => 'Erreur lors de la sélection du thème';
