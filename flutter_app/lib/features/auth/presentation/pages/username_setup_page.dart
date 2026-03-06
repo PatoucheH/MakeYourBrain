@@ -165,7 +165,7 @@ class _UsernameSetupPageState extends State<UsernameSetupPage> {
                       child: Image.asset(
                         'assets/branding/mascot/brainly_thinking.png',
                         height: 80,
-                        errorBuilder: (_, _, _) => const Icon(
+                        errorBuilder: (context, error, stackTrace) => const Icon(
                           Icons.person_outline,
                           size: 80,
                           color: AppColors.brainPurple,

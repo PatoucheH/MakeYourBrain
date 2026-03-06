@@ -170,7 +170,7 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
             Image.asset(
               'assets/branding/mascot/brainly_happy.png',
               height: 64,
-              errorBuilder: (_, _, _) => Container(
+              errorBuilder: (context, error, stackTrace) => Container(
                 width: 64,
                 height: 64,
                 decoration: const BoxDecoration(

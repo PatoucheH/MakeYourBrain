@@ -253,7 +253,7 @@ class _FollowListPageState extends State<FollowListPage>
             Image.asset(
               'assets/branding/mascot/brainly_thinking.png',
               height: 80,
-              errorBuilder: (_, _, _) => const Icon(
+              errorBuilder: (context, error, stackTrace) => const Icon(
                 Icons.search_off,
                 size: 64,
                 color: AppColors.textLight,
@@ -315,7 +315,7 @@ class _FollowListPageState extends State<FollowListPage>
               Image.asset(
                 'assets/branding/mascot/brainly_thinking.png',
                 height: 80,
-                errorBuilder: (_, _, _) => const Icon(
+                errorBuilder: (context, error, stackTrace) => const Icon(
                   Icons.people_outline,
                   size: 64,
                   color: AppColors.textLight,

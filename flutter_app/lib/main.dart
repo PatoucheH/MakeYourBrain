@@ -50,35 +50,24 @@ void _handleNotificationTap(RemoteMessage message) {
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 }
 
 void main() async {
+  // 1. Flutter engine ready
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 2. Firebase
   await Firebase.initializeApp();
+
+  // 3. Background handler — must be registered before runApp
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+  // 4. Supabase — critical for auth gate
   await SupabaseService.initialize();
-  await AdService.initialize();
 
-  // Demander les permissions et configurer l'affichage foreground
-  await NotificationService().initialize();
-
-  // Handler foreground : notification reçue app ouverte
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    debugPrint('📬 Notification foreground: ${message.notification?.title}');
-  });
-
-  // Token refresh → mettre à jour Supabase
-  NotificationService().listenToTokenRefresh(() async {
-    await AuthRepository().refreshFcmToken();
-  });
-
-  // Tap notification depuis background
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    _handleNotificationTap(message);
-  });
-
+  // 5. Start the app
   runApp(
     MultiProvider(
       providers: [
@@ -89,6 +78,28 @@ void main() async {
       child: const MyApp(),
     ),
   );
+
+  // 6. Non-critical native plugins — deferred until after first frame
+  // Avoids shared_preferences_foundation crash on iOS during early startup
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    await AdService.initialize();
+    await NotificationService().initialize();
+
+    // Handler foreground : notification reçue app ouverte
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      debugPrint('📬 Notification foreground: ${message.notification?.title}');
+    });
+
+    // Token refresh → mettre à jour Supabase
+    NotificationService().listenToTokenRefresh(() async {
+      await AuthRepository().refreshFcmToken();
+    });
+
+    // Tap notification depuis background
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      _handleNotificationTap(message);
+    });
+  });
 }
 
 class MyApp extends StatelessWidget {
