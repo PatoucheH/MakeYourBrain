@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../shared/services/supabase_service.dart';
 import '../../../../shared/services/notification_service.dart';
 import '../models/user_model.dart';
@@ -8,7 +9,10 @@ import '../models/user_model.dart';
 class AuthRepository {
   final _supabase = SupabaseService().client;
 
-  String _getPreferredLanguage() {
+  Future<String> _getPreferredLanguage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString('app_language');
+    if (saved != null) return saved;
     final deviceLang = PlatformDispatcher.instance.locale.languageCode;
     return deviceLang == 'fr' ? 'fr' : 'en';
   }
@@ -54,7 +58,7 @@ class AuthRepository {
 
     // Créer l'entrée user_stats avec le pseudo si l'inscription réussit
     if (response.user != null && username != null && username.isNotEmpty) {
-      final lang = _getPreferredLanguage();
+      final lang = await _getPreferredLanguage();
       await _supabase.from('user_stats').insert({
         'user_id': response.user!.id,
         'username': username.toLowerCase().trim(),
@@ -183,7 +187,7 @@ Future<bool> signInWithFacebook() async {
             .maybeSingle();
 
         if (existingUser == null) {
-          final lang = _getPreferredLanguage();
+          final lang = await _getPreferredLanguage();
           await _supabase.from('user_stats').insert({
             'user_id': userId,
             'preferred_language': lang,
@@ -223,7 +227,7 @@ Future<bool> signInWithFacebook() async {
             .maybeSingle();
 
         if (existingUser == null) {
-          final lang = _getPreferredLanguage();
+          final lang = await _getPreferredLanguage();
           await _supabase.from('user_stats').insert({
             'user_id': userId,
             'preferred_language': lang,

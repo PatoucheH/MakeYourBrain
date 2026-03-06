@@ -1,7 +1,7 @@
 name: flutter_app
 description: "A new Flutter project."
 publish_to: 'none' 
-version: 1.0.8+9
+version: 1.0.9+10
 
 environment:
   sdk: ^3.10.7
@@ -40,3 +40,7 @@ flutter_launcher_icons:
   remove_alpha_ios: true
   image_path: "assets/branding/logo/brainly_logo.png"
   android_background_color: "#6A1B9A"
+
+dependency_overrides:
+  shared_preferences: 2.2.3
+  shared_preferences_foundation: 2.3.2

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/auth/data/repositories/auth_repository.dart';
 
 class LanguageProvider extends ChangeNotifier {
@@ -9,15 +10,23 @@ class LanguageProvider extends ChangeNotifier {
 
   // Initialiser au démarrage de l'app
   Future<void> initialize() async {
-    // Détecter la langue du système
-    final locale = WidgetsBinding.instance.platformDispatcher.locale;
-    _currentLanguage = locale.languageCode == 'fr' ? 'fr' : 'en';
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString('app_language');
+    if (saved != null) {
+      _currentLanguage = saved;
+    } else {
+      final locale = WidgetsBinding.instance.platformDispatcher.locale;
+      _currentLanguage = locale.languageCode == 'fr' ? 'fr' : 'en';
+    }
     notifyListeners();
   }
 
   // Changer la langue
   Future<void> setLanguage(String languageCode) async {
     _currentLanguage = languageCode;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('app_language', languageCode);
 
     // Sauvegarder en DB si connecté
     if (_authRepo.isLoggedIn()) {
