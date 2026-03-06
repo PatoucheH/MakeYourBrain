@@ -1,6 +1,9 @@
 import Flutter
 import UIKit
 import UserNotifications
+import app_links
+import url_launcher_ios
+import webview_flutter_wkwebview
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
