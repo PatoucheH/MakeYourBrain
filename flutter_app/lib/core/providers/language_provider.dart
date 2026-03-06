@@ -10,23 +10,28 @@ class LanguageProvider extends ChangeNotifier {
 
   // Initialiser au démarrage de l'app
   Future<void> initialize() async {
-    final prefs = await SharedPreferences.getInstance();
-    
-    // Charger la langue sauvegardée localement
-    final savedLanguage = prefs.getString('app_language');
-    
-    if (savedLanguage != null) {
-      // Utiliser la langue sauvegardée
-      _currentLanguage = savedLanguage;
-    } else {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedLanguage = prefs.getString('app_language');
+
+      if (savedLanguage != null) {
+        _currentLanguage = savedLanguage;
+        notifyListeners();
+        return;
+      }
+
       // Première fois : détecter la langue du système
       final locale = WidgetsBinding.instance.platformDispatcher.locale;
       _currentLanguage = locale.languageCode == 'fr' ? 'fr' : 'en';
-      
-      // Sauvegarder
+
       await prefs.setString('app_language', _currentLanguage);
+    } catch (e) {
+      debugPrint('[LanguageProvider] SharedPreferences failed, using device locale: $e');
+      // Fallback : détecter la langue du système sans sauvegarder
+      final locale = WidgetsBinding.instance.platformDispatcher.locale;
+      _currentLanguage = locale.languageCode == 'fr' ? 'fr' : 'en';
     }
-    
+
     notifyListeners();
   }
 
@@ -35,8 +40,12 @@ class LanguageProvider extends ChangeNotifier {
     _currentLanguage = languageCode;
     
     // Sauvegarder LOCALEMENT
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('app_language', languageCode);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('app_language', languageCode);
+    } catch (e) {
+      debugPrint('[LanguageProvider] SharedPreferences failed to save language: $e');
+    }
     
     // Sauvegarder en DB si connecté
     if (_authRepo.isLoggedIn()) {
