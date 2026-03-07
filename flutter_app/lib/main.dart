@@ -59,10 +59,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 2. Firebase
-  await Firebase.initializeApp();
+  bool firebaseInitialized = false;
+  try {
+    await Firebase.initializeApp();
+    firebaseInitialized = true;
+  } catch (e) {
+    debugPrint('[main] Firebase.initializeApp failed: $e');
+  }
 
   // 3. Background handler — must be registered before runApp
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  if (firebaseInitialized) {
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  }
 
   // 4. Supabase — critical for auth gate
   await SupabaseService.initialize();
@@ -83,22 +91,24 @@ void main() async {
   // Avoids shared_preferences_foundation crash on iOS during early startup
   WidgetsBinding.instance.addPostFrameCallback((_) async {
     await AdService.initialize();
-    await NotificationService().initialize();
+    if (firebaseInitialized) {
+      await NotificationService().initialize();
 
-    // Handler foreground : notification reçue app ouverte
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint('📬 Notification foreground: ${message.notification?.title}');
-    });
+      // Handler foreground : notification reçue app ouverte
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        debugPrint('📬 Notification foreground: ${message.notification?.title}');
+      });
 
-    // Token refresh → mettre à jour Supabase
-    NotificationService().listenToTokenRefresh(() async {
-      await AuthRepository().refreshFcmToken();
-    });
+      // Token refresh → mettre à jour Supabase
+      NotificationService().listenToTokenRefresh(() async {
+        await AuthRepository().refreshFcmToken();
+      });
 
-    // Tap notification depuis background
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      _handleNotificationTap(message);
-    });
+      // Tap notification depuis background
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        _handleNotificationTap(message);
+      });
+    }
   });
 }
 
