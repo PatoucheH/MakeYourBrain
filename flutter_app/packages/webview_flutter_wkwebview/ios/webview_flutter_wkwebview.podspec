@@ -11,4 +11,5 @@ Pod::Spec.new do |s|
   s.public_header_files = 'Classes/**/*.h'
   s.ios.deployment_target = '12.0'
   s.dependency 'Flutter'
+  s.frameworks = 'WebKit'
 end

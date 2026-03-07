@@ -43,6 +43,18 @@
 }
 @end
 
+// ─── External API (required by google_mobile_ads) ────────────────────────────
+
+@implementation FWFWebViewFlutterWKWebViewExternalAPI
+
++ (WKWebView *)webViewForIdentifier:(int64_t)identifier
+                 withPluginRegistry:(id<FlutterPluginRegistry>)registry {
+    // Stub: no real WKWebView instances exist in this iOS 26 stub implementation.
+    return nil;
+}
+
+@end
+
 // ─── Main plugin ──────────────────────────────────────────────────────────────
 
 @implementation WebViewFlutterPlugin
