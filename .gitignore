@@ -258,3 +258,6 @@ app.*.map.json
 # Exceptions - fichiers à garder
 !.gitkeep
 !.gitattributes
+
+# Local stub packages (iOS 26 workarounds) - allow generated files
+!flutter_app/packages/**/*.g.dart
