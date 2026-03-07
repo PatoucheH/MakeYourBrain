@@ -1,0 +1,20 @@
+name: url_launcher_ios
+description: iOS implementation of the url_launcher plugin (pure ObjC patch for iOS 26).
+version: 6.3.4
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+flutter:
+  plugin:
+    implements: url_launcher
+    platforms:
+      ios:
+        pluginClass: URLLauncherPlugin
+        dartPluginClass: UrlLauncherIOS
+
+dependencies:
+  flutter:
+    sdk: flutter
+  url_launcher_platform_interface: ^2.2.0

@@ -45,3 +45,9 @@ dependency_overrides:
   shared_preferences: ^2.3.0
   shared_preferences_foundation:
     path: packages/shared_preferences_foundation
+  url_launcher_ios:
+    path: packages/url_launcher_ios
+  app_links:
+    path: packages/app_links
+  webview_flutter_wkwebview:
+    path: packages/webview_flutter_wkwebview

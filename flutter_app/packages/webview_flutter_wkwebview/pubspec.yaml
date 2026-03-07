@@ -1,0 +1,20 @@
+name: webview_flutter_wkwebview
+description: iOS webview_flutter_wkwebview - pure ObjC stub for iOS 26.
+version: 3.23.8
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+flutter:
+  plugin:
+    implements: webview_flutter
+    platforms:
+      ios:
+        pluginClass: WebViewFlutterPlugin
+        dartPluginClass: WebKitWebViewPlatform
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter_platform_interface: ^2.14.0
