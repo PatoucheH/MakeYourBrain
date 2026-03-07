@@ -1,0 +1,19 @@
+name: shared_preferences_foundation
+description: iOS implementation of shared_preferences - patched for iOS 26 compatibility.
+version: 2.5.6
+
+flutter:
+  plugin:
+    implements: shared_preferences
+    platforms:
+      ios:
+        pluginClass: SharedPreferencesPlugin
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared_preferences_platform_interface: ^2.0.0

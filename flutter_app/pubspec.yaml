@@ -1,7 +1,7 @@
 name: flutter_app
 description: "A new Flutter project."
 publish_to: 'none' 
-version: 1.0.15+16
+version: 1.0.16+17
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
@@ -44,3 +44,5 @@ flutter_launcher_icons:
 
 dependency_overrides:
   shared_preferences: ^2.3.0
+  shared_preferences_foundation:
+    path: packages/shared_preferences_foundation
