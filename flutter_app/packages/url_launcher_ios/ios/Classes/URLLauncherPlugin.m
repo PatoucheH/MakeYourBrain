@@ -4,7 +4,6 @@
 
 #import "URLLauncherPlugin.h"
 #import <UIKit/UIKit.h>
-#import <SafariServices/SafariServices.h>
 
 // ─── Enum values (matching Swift rawValue / Dart index) ──────────────────────
 
@@ -112,22 +111,9 @@ typedef NS_ENUM(NSInteger, URLInAppLoadResult) {
 }
 @end
 
-// ─── Safari session (tracks the active SFSafariViewController) ───────────────
-
-@interface URLLauncherSafariSession : NSObject <SFSafariViewControllerDelegate>
-@property (nonatomic, weak) SFSafariViewController *safariVC;
-@end
-
-@implementation URLLauncherSafariSession
-- (void)safariViewControllerDidFinish:(SFSafariViewController *)controller {
-    // User tapped Done — nothing to reply (reply was already sent on present).
-}
-@end
-
 // ─── Main plugin ─────────────────────────────────────────────────────────────
 
 @interface URLLauncherPlugin ()
-@property (nonatomic, strong) URLLauncherSafariSession *currentSession;
 @end
 
 @implementation URLLauncherPlugin
@@ -183,38 +169,18 @@ typedef NS_ENUM(NSInteger, URLInAppLoadResult) {
                          codec:codec];
     [safariChannel setMessageHandler:^(id message, FlutterReply reply) {
         NSArray *args = (NSArray *)message;
-        NSString *urlString = args[0];
-        NSURL *url = [NSURL URLWithString:urlString];
+        NSString *urlString = (args.count > 0) ? args[0] : nil;
+        NSURL *url = urlString ? [NSURL URLWithString:urlString] : nil;
         if (!url) {
             reply(@[[URLInAppLoadResultWrapper wrap:URLInAppLoadResultInvalidUrl]]);
             return;
         }
+        // Reply immediately so launchUrl returns — OAuth callback arrives via app_links.
+        // Use external Safari (openURL) instead of SFSafariViewController to avoid
+        // view hierarchy complexity and completion-block issues on iOS 26.
+        reply(@[[URLInAppLoadResultWrapper wrap:URLInAppLoadResultSuccess]]);
         dispatch_async(dispatch_get_main_queue(), ^{
-            SFSafariViewController *vc = [[SFSafariViewController alloc] initWithURL:url];
-            URLLauncherSafariSession *session = [[URLLauncherSafariSession alloc] init];
-            session.safariVC = vc;
-            vc.delegate = session;
-            instance.currentSession = session;
-            // Use scene-based window API (keyWindow deprecated iOS 13+)
-            UIViewController *rootVC = nil;
-            for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
-                if ([scene isKindOfClass:[UIWindowScene class]]) {
-                    UIWindowScene *ws = (UIWindowScene *)scene;
-                    for (UIWindow *w in ws.windows) {
-                        if (w.isKeyWindow) { rootVC = w.rootViewController; break; }
-                    }
-                }
-                if (rootVC) break;
-            }
-            if (rootVC) {
-                // Reply immediately on present — OAuth callback arrives via app_links,
-                // not via safariViewControllerDidFinish (which is only for user-tapped Done).
-                [rootVC presentViewController:vc animated:YES completion:^{
-                    reply(@[[URLInAppLoadResultWrapper wrap:URLInAppLoadResultSuccess]]);
-                }];
-            } else {
-                reply(@[[URLInAppLoadResultWrapper wrap:URLInAppLoadResultFailedToLoad]]);
-            }
+            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
         });
     }];
 
@@ -224,11 +190,8 @@ typedef NS_ENUM(NSInteger, URLInAppLoadResult) {
                binaryMessenger:messenger
                          codec:codec];
     [closeChannel setMessageHandler:^(id message, FlutterReply reply) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [instance.currentSession.safariVC dismissViewControllerAnimated:YES completion:nil];
-            instance.currentSession = nil;
-            reply(@[[NSNull null]]);
-        });
+        // No-op: we use openURL (external Safari), nothing to close programmatically.
+        reply(@[[NSNull null]]);
     }];
 }
 
