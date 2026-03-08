@@ -115,16 +115,12 @@ typedef NS_ENUM(NSInteger, URLInAppLoadResult) {
 // ─── Safari session (tracks the active SFSafariViewController) ───────────────
 
 @interface URLLauncherSafariSession : NSObject <SFSafariViewControllerDelegate>
-@property (nonatomic, copy) FlutterReply replyBlock;
 @property (nonatomic, weak) SFSafariViewController *safariVC;
 @end
 
 @implementation URLLauncherSafariSession
 - (void)safariViewControllerDidFinish:(SFSafariViewController *)controller {
-    if (self.replyBlock) {
-        self.replyBlock(@[[URLInAppLoadResultWrapper wrap:URLInAppLoadResultDismissed]]);
-        self.replyBlock = nil;
-    }
+    // User tapped Done — nothing to reply (reply was already sent on present).
 }
 @end
 
@@ -196,12 +192,29 @@ typedef NS_ENUM(NSInteger, URLInAppLoadResult) {
         dispatch_async(dispatch_get_main_queue(), ^{
             SFSafariViewController *vc = [[SFSafariViewController alloc] initWithURL:url];
             URLLauncherSafariSession *session = [[URLLauncherSafariSession alloc] init];
-            session.replyBlock = reply;
             session.safariVC = vc;
             vc.delegate = session;
             instance.currentSession = session;
-            UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
-            [rootVC presentViewController:vc animated:YES completion:nil];
+            // Use scene-based window API (keyWindow deprecated iOS 13+)
+            UIViewController *rootVC = nil;
+            for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
+                if ([scene isKindOfClass:[UIWindowScene class]]) {
+                    UIWindowScene *ws = (UIWindowScene *)scene;
+                    for (UIWindow *w in ws.windows) {
+                        if (w.isKeyWindow) { rootVC = w.rootViewController; break; }
+                    }
+                }
+                if (rootVC) break;
+            }
+            if (rootVC) {
+                // Reply immediately on present — OAuth callback arrives via app_links,
+                // not via safariViewControllerDidFinish (which is only for user-tapped Done).
+                [rootVC presentViewController:vc animated:YES completion:^{
+                    reply(@[[URLInAppLoadResultWrapper wrap:URLInAppLoadResultSuccess]]);
+                }];
+            } else {
+                reply(@[[URLInAppLoadResultWrapper wrap:URLInAppLoadResultFailedToLoad]]);
+            }
         });
     }];
 
