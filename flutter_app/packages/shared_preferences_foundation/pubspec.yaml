@@ -8,6 +8,7 @@ flutter:
     platforms:
       ios:
         pluginClass: SharedPreferencesPlugin
+        dartPluginClass: SharedPreferencesFoundation
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -16,4 +17,4 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  shared_preferences_platform_interface: ^2.0.0
+  shared_preferences_platform_interface: ^2.4.0
