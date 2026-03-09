@@ -7,11 +7,26 @@ class LanguageProvider extends ChangeNotifier {
 
   String get currentLanguage => _currentLanguage;
 
-  // Initialiser au démarrage de l'app
+  // Initialiser au démarrage de l'app (depuis la locale du device)
   Future<void> initialize() async {
     final locale = WidgetsBinding.instance.platformDispatcher.locale;
     _currentLanguage = locale.languageCode == 'fr' ? 'fr' : 'en';
     notifyListeners();
+  }
+
+  // Charger la langue préférée depuis le serveur après connexion
+  Future<void> loadFromServer() async {
+    if (!_authRepo.isLoggedIn()) return;
+    try {
+      final userStats = await _authRepo.getUserStats();
+      final lang = userStats?.preferredLanguage;
+      if (lang != null && lang != _currentLanguage) {
+        _currentLanguage = lang;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('[LanguageProvider] Failed to load language from server: $e');
+    }
   }
 
   // Changer la langue

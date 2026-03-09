@@ -14,7 +14,7 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
+class _LoginPageState extends State<LoginPage> {
   final _repository = AuthRepository();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -22,25 +22,6 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
   bool _obscurePassword = true;
   Timer? _oauthTimer;
   StreamSubscription? _oauthSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // User returned to app (from Safari / OAuth browser) without completing login.
-    // Wait briefly to allow the deep-link to be processed, then reset if not signed in.
-    if (state == AppLifecycleState.resumed && _isLoading) {
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted && _isLoading && !_repository.isLoggedIn()) {
-          _resetOAuthState();
-        }
-      });
-    }
-  }
 
   void _resetOAuthState() {
     _oauthTimer?.cancel();
@@ -508,7 +489,6 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     _oauthTimer?.cancel();
     _oauthSubscription?.cancel();
     _emailController.dispose();

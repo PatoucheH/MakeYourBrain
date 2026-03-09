@@ -271,9 +271,10 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                 ),
                 if (isMyTurn)
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       final pvpProvider = context.read<PvPProvider>();
-                      pvpProvider.loadMatch(match.id);
+                      await pvpProvider.loadMatch(match.id);
+                      if (!mounted) return;
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const PvPGamePage()),

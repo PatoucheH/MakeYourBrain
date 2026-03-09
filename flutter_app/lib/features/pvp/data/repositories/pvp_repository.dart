@@ -283,7 +283,7 @@ class PvPRepository {
       await _supabase.rpc('pvp_update_match_status', params: {
         'p_match_id': matchId,
         'p_status': status,
-        'p_round': currentRound,
+        'p_current_round': currentRound,
       });
     } catch (e) {
       debugPrint('Error updating match status and round: $e');

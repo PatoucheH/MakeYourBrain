@@ -1020,10 +1020,23 @@ class PvPProvider extends ChangeNotifier {
         debugPrint('[PvP] Error updating streak: $e');
       }
 
+      final submittedRoundNumber = currentRound!.roundNumber;
       currentRound = await _pvpRepository.getRound(
         currentMatch!.id,
-        currentRound!.roundNumber,
+        submittedRoundNumber,
       );
+
+      // Verify our submission was recorded. If not, the RPC failed silently.
+      final myCompletionRecorded = isPlayer1
+          ? (currentRound?.isPlayer1Completed ?? false)
+          : (currentRound?.isPlayer2Completed ?? false);
+
+      if (!myCompletionRecorded) {
+        errorMessage = 'Submission failed. Please try again.';
+        isLoading = false;
+        _safeNotify();
+        return;
+      }
 
       currentMatch = await _pvpRepository.getMatch(currentMatch!.id);
 
@@ -1047,6 +1060,7 @@ class PvPProvider extends ChangeNotifier {
           currentMatch = await _pvpRepository.getMatch(currentMatch!.id);
         }
       } else {
+        // Round not yet complete: it's now the other player's turn
         final newStatus = isPlayer1 ? 'player2_turn' : 'player1_turn';
         await _pvpRepository.updateMatchStatus(currentMatch!.id, newStatus);
         currentMatch = await _pvpRepository.getMatch(currentMatch!.id);

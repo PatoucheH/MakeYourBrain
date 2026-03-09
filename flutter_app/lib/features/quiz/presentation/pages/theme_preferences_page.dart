@@ -24,6 +24,7 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
   Set<String> selectedThemeIds = {};
   bool isLoading = true;
   bool isSaving = false;
+  static const int _maxThemes = 3;
 
   @override
   void initState() {
@@ -109,6 +110,26 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                         ),
                         textAlign: TextAlign.center,
                       ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: selectedThemeIds.length >= _maxThemes
+                              ? Colors.orange.shade100
+                              : Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          '${selectedThemeIds.length} / $_maxThemes',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: selectedThemeIds.length >= _maxThemes
+                                ? Colors.orange.shade800
+                                : Colors.blue.shade700,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -143,6 +164,12 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                           trailing: Checkbox(
                             value: isSelected,
                             onChanged: (value) {
+                              if (value == true && selectedThemeIds.length >= _maxThemes) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(AppLocalizations.of(context)!.maxThemesReached)),
+                                );
+                                return;
+                              }
                               setState(() {
                                 if (value == true) {
                                   selectedThemeIds.add(theme.id);
@@ -153,6 +180,12 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                             },
                           ),
                           onTap: () {
+                            if (!isSelected && selectedThemeIds.length >= _maxThemes) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(AppLocalizations.of(context)!.maxThemesReached)),
+                              );
+                              return;
+                            }
                             setState(() {
                               if (isSelected) {
                                 selectedThemeIds.remove(theme.id);

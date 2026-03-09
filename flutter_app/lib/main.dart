@@ -440,6 +440,8 @@ class _AuthCheckerState extends State<AuthChecker> {
     // Démarrer le polling PvP en arrière-plan dès que l'utilisateur est connecté
     if (context.mounted) {
       context.read<PvPProvider>().startBackgroundChecks();
+      // Charger la langue préférée de l'utilisateur depuis la DB
+      context.read<LanguageProvider>().loadFromServer();
     }
 
     try {
