@@ -19,8 +19,6 @@ class AddThemePage extends StatefulWidget {
 }
 
 class _AddThemePageState extends State<AddThemePage> {
-  static const int maxFavoriteThemes = 3;
-
   final _quizRepo = QuizRepository();
   final _prefsRepo = ThemePreferencesRepository();
   final _authRepo = AuthRepository();
@@ -84,7 +82,6 @@ class _AddThemePageState extends State<AddThemePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final hasReachedLimit = widget.currentPreferences.length >= maxFavoriteThemes;
 
     return Scaffold(
       body: Container(
@@ -96,60 +93,7 @@ class _AddThemePageState extends State<AddThemePage> {
               Expanded(
                 child: isLoading
                     ? const Center(child: CircularProgressIndicator(color: AppColors.brainPurple))
-          : hasReachedLimit
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: AppColors.warningLight,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.block,
-                            size: 60,
-                            color: AppColors.warning,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          l10n.maxThemesReached,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          l10n.maxThemesMessage,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton.icon(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.arrow_back),
-                          label: Text(l10n.backToThemes),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.brainPurple,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : availableThemes.isEmpty
+                    : availableThemes.isEmpty
                   ? Center(
                       child: Padding(
                         padding: const EdgeInsets.all(24.0),

@@ -245,7 +245,7 @@ abstract class AppLocalizations {
   /// No description provided for @progressByTheme.
   ///
   /// In en, this message translates to:
-  /// **'Progress by Theme'**
+  /// **'My Themes'**
   String get progressByTheme;
 
   /// No description provided for @noProgressYet.
@@ -389,7 +389,7 @@ abstract class AppLocalizations {
   /// No description provided for @removeFromFavorites.
   ///
   /// In en, this message translates to:
-  /// **'Remove from favorites?'**
+  /// **'Remove from favorites'**
   String get removeFromFavorites;
 
   /// No description provided for @removeFavoriteConfirm.

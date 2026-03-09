@@ -13,8 +13,9 @@ enum AppPage { home, profile, leaderboard, other }
 
 class BrainAppBar extends StatefulWidget {
   final AppPage currentPage;
+  final VoidCallback? onReturn;
 
-  const BrainAppBar({super.key, this.currentPage = AppPage.other});
+  const BrainAppBar({super.key, this.currentPage = AppPage.other, this.onReturn});
 
   @override
   State<BrainAppBar> createState() => _BrainAppBarState();
@@ -161,6 +162,7 @@ class _BrainAppBarState extends State<BrainAppBar> {
                         builder: (context) => const ProfilePage()),
                   );
                   _loadStreak();
+                  widget.onReturn?.call();
                 } else if (value == 'leaderboard') {
                   Navigator.push(
                     context,

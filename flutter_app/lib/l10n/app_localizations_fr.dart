@@ -82,7 +82,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get accuracy => 'précision';
 
   @override
-  String get progressByTheme => 'Progression par Thème';
+  String get progressByTheme => 'Mes Thèmes';
 
   @override
   String get noProgressYet => 'Aucune progression. Commencez un quiz !';
@@ -155,7 +155,7 @@ class AppLocalizationsFr extends AppLocalizations {
       '🚀 Plus de fonctionnalités bientôt !\nClassement, Défi Chrono, Mode Versus...';
 
   @override
-  String get removeFromFavorites => 'Retirer des favoris ?';
+  String get removeFromFavorites => 'Retirer des favoris';
 
   @override
   String removeFavoriteConfirm(Object themeName) {

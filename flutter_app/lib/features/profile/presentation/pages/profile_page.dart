@@ -29,7 +29,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   UserModel? userStats;
   List<Map<String, dynamic>> progressByTheme = [];
-  List<ThemeModel> favoriteThemes = [];
   List<ThemeModel> allThemes = [];
   List<String> favoriteThemeIds = [];
   bool isLoading = true;
@@ -53,9 +52,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
       final preferredIds = await _prefsRepo.getPreferences(userId);
       final themes = await _quizRepo.getThemes(currentLang);
-      final preferred = themes
-          .where((theme) => preferredIds.contains(theme.id))
-          .toList();
       final counts = await _followRepo.getFollowCounts(userId);
 
       if (!mounted) return;
@@ -64,7 +60,6 @@ class _ProfilePageState extends State<ProfilePage> {
         selectedLanguage = currentLang;
         progressByTheme = progress;
         allThemes = themes;
-        favoriteThemes = preferred;
         favoriteThemeIds = preferredIds;
         followersCount = counts['followers'] ?? 0;
         followingCount = counts['following'] ?? 0;
@@ -179,16 +174,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         _buildStatsCards(l10n),
                         const SizedBox(height: 24),
 
-                        // Progress by Theme
+                        // My Themes
                         _buildSectionTitle(l10n.progressByTheme),
                         const SizedBox(height: 12),
                         _buildProgressSection(l10n),
-                        const SizedBox(height: 24),
-
-                        // Favorite Themes Management
-                        _buildSectionTitle(l10n.manageFavoriteThemes),
-                        const SizedBox(height: 12),
-                        _buildFavoriteThemesSection(l10n),
                         const SizedBox(height: 32),
                       ],
                     ),
@@ -909,6 +898,52 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ],
               ),
+              if (favoriteThemeIds.contains(themeId)) ...[
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          title: Text(l10n.removeFromFavorites),
+                          content: Text(l10n.removeFavoriteConfirm(themeName)),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: Text(l10n.cancel),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                removeThemeFromFavorites(context, themeId, themeName);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.error,
+                                foregroundColor: Colors.white,
+                              ),
+                              child: Text(l10n.remove),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.delete_outline, size: 16),
+                    label: Text(l10n.removeFromFavorites),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.error,
+                      side: BorderSide.none,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         );
@@ -916,101 +951,4 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildFavoriteThemesSection(AppLocalizations l10n) {
-    if (favoriteThemes.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: AppColors.cardShadow,
-        ),
-        child: Text(
-          l10n.noFavoriteThemesProfile,
-          style: TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 16,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }
-
-    return Column(
-      children: favoriteThemes.map((theme) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: AppColors.softShadow,
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            leading: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.brainPurpleLight.withValues(alpha:0.3),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Center(
-                child: Text(
-                  theme.icon,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
-                  ),
-                ),
-              ),
-            ),
-            title: Text(
-              theme.name,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            trailing: IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: AppColors.errorLight,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.remove, color: AppColors.error, size: 20),
-              ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    title: Text(l10n.removeFromFavorites),
-                    content: Text(AppLocalizations.of(context)!.removeFavoriteConfirm(theme.name)),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(l10n.cancel),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          removeThemeFromFavorites(context, theme.id, theme.name);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.error,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: Text(l10n.remove),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
 }

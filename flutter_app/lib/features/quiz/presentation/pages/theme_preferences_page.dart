@@ -24,7 +24,6 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
   Set<String> selectedThemeIds = {};
   bool isLoading = true;
   bool isSaving = false;
-  static const int _maxThemes = 3;
 
   @override
   void initState() {
@@ -50,9 +49,9 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
   Future<void> savePreferences() async {
     final l10n = AppLocalizations.of(context)!;
 
-    if (selectedThemeIds.isEmpty || selectedThemeIds.length > _maxThemes) {
+    if (selectedThemeIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.maxThemesMessage)),
+        SnackBar(content: Text(l10n.pleaseFillAllFields)),
       );
       return;
     }
@@ -71,7 +70,7 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.maxThemesMessage)),
+          SnackBar(content: Text(l10n.errorSavingPreferences)),
         );
       }
     } finally {
@@ -116,24 +115,16 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: selectedThemeIds.length >= _maxThemes
-                              ? Colors.orange.shade100
-                              : Colors.blue.shade50,
+                          color: Colors.blue.shade50,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: selectedThemeIds.length >= _maxThemes
-                                ? Colors.orange.shade300
-                                : Colors.blue.shade200,
-                          ),
+                          border: Border.all(color: Colors.blue.shade200),
                         ),
                         child: Text(
-                          '${selectedThemeIds.length} / $_maxThemes max',
+                          l10n.continueWithCount(selectedThemeIds.length),
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: selectedThemeIds.length >= _maxThemes
-                                ? Colors.orange.shade800
-                                : Colors.blue.shade700,
+                            color: Colors.blue.shade700,
                           ),
                         ),
                       ),
@@ -171,12 +162,6 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                           trailing: Checkbox(
                             value: isSelected,
                             onChanged: (value) {
-                              if (value == true && selectedThemeIds.length >= _maxThemes) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(AppLocalizations.of(context)!.maxThemesReached)),
-                                );
-                                return;
-                              }
                               setState(() {
                                 if (value == true) {
                                   selectedThemeIds.add(theme.id);
@@ -187,12 +172,6 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                             },
                           ),
                           onTap: () {
-                            if (!isSelected && selectedThemeIds.length >= _maxThemes) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(AppLocalizations.of(context)!.maxThemesReached)),
-                              );
-                              return;
-                            }
                             setState(() {
                               if (isSelected) {
                                 selectedThemeIds.remove(theme.id);

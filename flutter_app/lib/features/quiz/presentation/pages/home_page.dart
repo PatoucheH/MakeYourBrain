@@ -43,6 +43,8 @@ class _HomePageState extends State<HomePage> {
   int pvpRating = 1000;
   DailyConceptModel? dailyConcept;
   String? _lastLanguage;
+  int _currentPage = 0;
+  static const int _themesPerPage = 3;
 
   @override
   void initState() {
@@ -202,6 +204,7 @@ class _HomePageState extends State<HomePage> {
           pvpRating = stats?.pvpRating ?? 1000;
           dailyConcept = daily;
           isLoading = false;
+          _currentPage = 0;
         });
       }
     } catch (e) {
@@ -248,7 +251,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               // Custom AppBar
-              const BrainAppBar(currentPage: AppPage.home),
+              BrainAppBar(currentPage: AppPage.home, onReturn: loadFavoriteThemes),
 
               // Content
               Expanded(
@@ -268,24 +271,12 @@ class _HomePageState extends State<HomePage> {
                               child: _buildHeaderSection(l10n),
                             ),
 
-                            // Themes Grid/List
-                            favoriteThemes.isEmpty
-                                ? SliverFillRemaining(
-                                    hasScrollBody: false,
-                                    child: _buildEmptyState(l10n),
-                                  )
-                                : SliverPadding(
-                                    padding: const EdgeInsets.all(16),
-                                    sliver: SliverList(
-                                      delegate: SliverChildBuilderDelegate(
-                                        (context, index) {
-                                          final theme = favoriteThemes[index];
-                                          return _buildThemeCard(theme, l10n);
-                                        },
-                                        childCount: favoriteThemes.length,
-                                      ),
-                                    ),
-                                  ),
+                            // Themes paginated
+                            SliverToBoxAdapter(
+                              child: favoriteThemes.isEmpty
+                                  ? _buildEmptyState(l10n)
+                                  : _buildPaginatedThemes(l10n),
+                            ),
                           ],
                         ),
                       ),
@@ -501,7 +492,7 @@ class _HomePageState extends State<HomePage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                '${favoriteThemes.length}/3',
+                '${favoriteThemes.length}',
                 style: const TextStyle(
                   color: AppColors.brainPurple,
                   fontSize: 14,
@@ -518,19 +509,10 @@ class _HomePageState extends State<HomePage> {
           children: [
             Expanded(
               child: _buildActionButton(
-                icon: favoriteThemes.length >= 3 ? Icons.block : Icons.add_circle_outline,
+                icon: Icons.add_circle_outline,
                 label: l10n.addTheme,
-                color: favoriteThemes.length >= 3 ? AppColors.textLight : AppColors.success,
-                onTap: favoriteThemes.length >= 3
-                    ? () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.maxThemesMessage),
-                            backgroundColor: AppColors.warning,
-                          ),
-                        );
-                      }
-                    : navigateToAddTheme,
+                color: AppColors.success,
+                onTap: navigateToAddTheme,
               ),
             ),
             const SizedBox(width: 12),
@@ -560,13 +542,14 @@ class _HomePageState extends State<HomePage> {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const PvPMenuPage(),
             ),
           );
+          if (mounted) loadFavoriteThemes();
         },
         child: Container(
           width: double.infinity,
@@ -741,6 +724,62 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPaginatedThemes(AppLocalizations l10n) {
+    final totalPages = (favoriteThemes.length / _themesPerPage).ceil();
+    final start = _currentPage * _themesPerPage;
+    final end = (start + _themesPerPage).clamp(0, favoriteThemes.length);
+    final pageThemes = favoriteThemes.sublist(start, end);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Column(
+        children: [
+          ...pageThemes.map((theme) => _buildThemeCard(theme, l10n)),
+          if (totalPages > 1)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: _currentPage > 0
+                        ? () => setState(() => _currentPage--)
+                        : null,
+                    icon: const Icon(Icons.arrow_back_ios_rounded, size: 18),
+                    color: AppColors.brainPurple,
+                    disabledColor: AppColors.textLight,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.brainPurple.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${_currentPage + 1} / $totalPages',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.brainPurple,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _currentPage < totalPages - 1
+                        ? () => setState(() => _currentPage++)
+                        : null,
+                    icon: const Icon(Icons.arrow_forward_ios_rounded, size: 18),
+                    color: AppColors.brainPurple,
+                    disabledColor: AppColors.textLight,
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }

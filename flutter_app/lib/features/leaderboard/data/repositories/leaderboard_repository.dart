@@ -28,14 +28,11 @@ class LeaderboardRepository {
     return List<Map<String, dynamic>>.from(response);
   }
 
-  // Leaderboard hebdomadaire (top 100)
+  // Leaderboard hebdomadaire (top 100) — appel RPC pour bypasser RLS proprement
   Future<List<Map<String, dynamic>>> getWeeklyLeaderboard({int limit = 100}) async {
-    final response = await _supabase
-        .from('leaderboard_weekly')
-        .select()
-        .limit(limit);
-
-    return List<Map<String, dynamic>>.from(response);
+    final response = await _supabase.rpc('get_weekly_leaderboard');
+    final list = List<Map<String, dynamic>>.from(response as List);
+    return limit > 0 ? list.take(limit).toList() : list;
   }
 
   // Position d'un user dans le leaderboard global.
