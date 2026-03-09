@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import '../../features/auth/data/repositories/auth_repository.dart';
 
 class LanguageProvider extends ChangeNotifier {
@@ -11,7 +12,10 @@ class LanguageProvider extends ChangeNotifier {
   Future<void> initialize() async {
     final locale = WidgetsBinding.instance.platformDispatcher.locale;
     _currentLanguage = locale.languageCode == 'fr' ? 'fr' : 'en';
-    notifyListeners();
+    // Différer notifyListeners pour éviter un setState-during-build (appelé depuis initState)
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   // Charger la langue préférée depuis le serveur après connexion
@@ -20,8 +24,9 @@ class LanguageProvider extends ChangeNotifier {
     try {
       final userStats = await _authRepo.getUserStats();
       final lang = userStats?.preferredLanguage;
-      if (lang != null && lang != _currentLanguage) {
+      if (lang != null) {
         _currentLanguage = lang;
+        // Toujours notifier : initialize() a pu échouer à notifier MaterialApp
         notifyListeners();
       }
     } catch (e) {
