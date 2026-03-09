@@ -282,7 +282,7 @@
   "errorAddingTheme": "Erreur lors de l'ajout du thème",
   "chooseYourInterests": "Choisissez vos intérêts",
   "whatTopicsInterestYou": "🎯 Quels sujets vous intéressent ?",
-  "selectFavoriteThemesHint": "Sélectionnez vos thèmes favoris pour obtenir des quiz personnalisés",
+  "selectFavoriteThemesHint": "Choisissez entre 1 et 3 thèmes favoris pour obtenir des quiz personnalisés",
   "continueWithCount": "Continuer ({count} sélectionné)",
   "@continueWithCount": {
     "placeholders": {
@@ -300,5 +300,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "discoveryQuizBadge": "Quiz de Découverte",
+  "notFromFavoritesHint": "Découvre un nouveau thème — pas parmi tes favoris"
 }

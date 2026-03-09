@@ -48,9 +48,11 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
   }
 
   Future<void> savePreferences() async {
-    if (selectedThemeIds.isEmpty) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (selectedThemeIds.isEmpty || selectedThemeIds.length > _maxThemes) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.noFavoriteThemes)),
+        SnackBar(content: Text(l10n.maxThemesMessage)),
       );
       return;
     }
@@ -69,7 +71,7 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.errorSavingPreferences)),
+          SnackBar(content: Text(l10n.maxThemesMessage)),
         );
       }
     } finally {
@@ -112,15 +114,20 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                       ),
                       const SizedBox(height: 12),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
                           color: selectedThemeIds.length >= _maxThemes
                               ? Colors.orange.shade100
                               : Colors.blue.shade50,
                           borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: selectedThemeIds.length >= _maxThemes
+                                ? Colors.orange.shade300
+                                : Colors.blue.shade200,
+                          ),
                         ),
                         child: Text(
-                          '${selectedThemeIds.length} / $_maxThemes',
+                          '${selectedThemeIds.length} / $_maxThemes max',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,

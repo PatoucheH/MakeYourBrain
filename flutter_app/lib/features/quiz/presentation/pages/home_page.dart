@@ -373,6 +373,7 @@ class _HomePageState extends State<HomePage> {
                 conceptName: dailyConcept!.conceptName,
                 conceptDescription: dailyConcept!.conceptDescription,
                 themeId: dailyConcept!.themeId,
+                themeName: dailyConcept!.themeName,
                 conceptDate: dailyConcept!.conceptDate,
                 alreadyCompleted: true,
               );
@@ -538,13 +539,14 @@ class _HomePageState extends State<HomePage> {
                 icon: Icons.grid_view_rounded,
                 label: l10n.allThemes,
                 color: AppColors.accentBlue,
-                onTap: () {
-                  Navigator.push(
+                onTap: () async {
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const AllThemesPage(),
                     ),
                   );
+                  if (mounted) loadFavoriteThemes();
                 },
               ),
             ),
@@ -761,13 +763,14 @@ class _HomePageState extends State<HomePage> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ThemeDetailPage(theme: theme),
               ),
             );
+            if (mounted) loadFavoriteThemes();
           },
           mouseCursor: SystemMouseCursors.click,
           borderRadius: BorderRadius.circular(20),

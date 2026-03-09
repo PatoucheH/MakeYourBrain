@@ -308,7 +308,9 @@ class _QuizPageState extends State<QuizPage> {
                 const SizedBox(height: 28),
 
                 // Buttons
-                Row(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
@@ -362,6 +364,7 @@ class _QuizPageState extends State<QuizPage> {
                       ),
                     ),
                   ],
+                  ),
                 ),
               ],
             ),

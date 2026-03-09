@@ -1433,7 +1433,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectFavoriteThemesHint.
   ///
   /// In en, this message translates to:
-  /// **'Select your favorite themes to get personalized quizzes'**
+  /// **'Choose between 1 and 3 favorite themes to get personalized quizzes'**
   String get selectFavoriteThemesHint;
 
   /// No description provided for @continueWithCount.
@@ -1459,6 +1459,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'+{amount} XP'**
   String xpBonus(int amount);
+
+  /// No description provided for @discoveryQuizBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Discovery Quiz'**
+  String get discoveryQuizBadge;
+
+  /// No description provided for @notFromFavoritesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover a new theme — not from your favorites'**
+  String get notFromFavoritesHint;
 }
 
 class _AppLocalizationsDelegate

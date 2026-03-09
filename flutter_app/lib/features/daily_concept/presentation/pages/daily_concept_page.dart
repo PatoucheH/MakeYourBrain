@@ -96,6 +96,24 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                         ),
                         child: Column(
                           children: [
+                            // Badge "Discovery Quiz"
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                l10n.discoveryQuizBadge,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
                             const Icon(Icons.auto_awesome, color: Colors.white, size: 48),
                             const SizedBox(height: 12),
                             Text(
@@ -116,6 +134,24 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                               ),
                               textAlign: TextAlign.center,
                             ),
+                            if (widget.concept.themeName.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.explore, color: Colors.white70, size: 14),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    widget.concept.themeName,
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ],
                         ),
                       ),

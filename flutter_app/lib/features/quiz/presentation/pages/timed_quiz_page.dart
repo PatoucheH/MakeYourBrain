@@ -398,7 +398,9 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                 const SizedBox(height: 28),
 
                 // Buttons
-                Row(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
@@ -453,6 +455,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                       ),
                     ),
                   ],
+                  ),
                 ),
               ],
             ),

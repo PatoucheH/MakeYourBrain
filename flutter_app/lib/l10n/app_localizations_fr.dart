@@ -719,7 +719,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get selectFavoriteThemesHint =>
-      'Sélectionnez vos thèmes favoris pour obtenir des quiz personnalisés';
+      'Choisissez entre 1 et 3 thèmes favoris pour obtenir des quiz personnalisés';
 
   @override
   String continueWithCount(int count) {
@@ -737,4 +737,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String xpBonus(int amount) {
     return '+$amount XP';
   }
+
+  @override
+  String get discoveryQuizBadge => 'Quiz de Découverte';
+
+  @override
+  String get notFromFavoritesHint =>
+      'Découvre un nouveau thème — pas parmi tes favoris';
 }

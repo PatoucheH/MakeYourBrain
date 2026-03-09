@@ -310,7 +310,7 @@
   "errorAddingTheme": "Error adding theme",
   "chooseYourInterests": "Choose Your Interests",
   "whatTopicsInterestYou": "🎯 What topics interest you?",
-  "selectFavoriteThemesHint": "Select your favorite themes to get personalized quizzes",
+  "selectFavoriteThemesHint": "Choose between 1 and 3 favorite themes to get personalized quizzes",
   "continueWithCount": "Continue ({count} selected)",
   "@continueWithCount": {
     "placeholders": {
@@ -328,5 +328,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "discoveryQuizBadge": "Discovery Quiz",
+  "notFromFavoritesHint": "Discover a new theme — not from your favorites"
 }

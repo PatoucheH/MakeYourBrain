@@ -67,6 +67,7 @@ class PvPProvider extends ChangeNotifier {
   Timer? _backgroundCheckTimer; // Polling global en arrière-plan
   final Set<String> _knownMatchIds = {}; // Matchs qu'on a déjà vus
   final Set<String> _notifiedCompletedMatchIds = {}; // Matchs dont on a déjà notifié la fin
+  final Set<String> _dismissedTurnNotifications = {}; // Tours déjà dismissés par l'utilisateur
 
   PvPProvider({
     PvPRepository? pvpRepository,
@@ -231,7 +232,8 @@ class PvPProvider extends ChangeNotifier {
           // Toujours relancer le watcher (peut mourir silencieusement sur Chrome/mobile)
           _watchMatch(match.id);
           await _ensureOpponentInfo(match, userId);
-          if (!yourTurnNotification) {
+          final notifKey = '${match.id}_${match.currentRound}';
+          if (!yourTurnNotification && !_dismissedTurnNotifications.contains(notifKey)) {
             matchFoundWaiting = false;
             yourTurnNotification = true;
             notificationRoundNumber = match.currentRound;
@@ -265,10 +267,13 @@ class PvPProvider extends ChangeNotifier {
             _knownMatchIds.add(currentMatch!.id);
             await _ensureOpponentInfo(currentMatch!, userId);
             if (isMyTurn || isMyThemeChoice) {
-              yourTurnNotification = true;
-              notificationRoundNumber = currentMatch!.currentRound;
-              _safeNotify();
-              _startAutoDismissTimer();
+              final notifKey = '${currentMatch!.id}_${currentMatch!.currentRound}';
+              if (!_dismissedTurnNotifications.contains(notifKey)) {
+                yourTurnNotification = true;
+                notificationRoundNumber = currentMatch!.currentRound;
+                _safeNotify();
+                _startAutoDismissTimer();
+              }
             }
           }
         }
@@ -492,6 +497,9 @@ class PvPProvider extends ChangeNotifier {
   }
 
   void dismissNotification() {
+    if (yourTurnNotification && currentMatch != null && notificationRoundNumber != null) {
+      _dismissedTurnNotifications.add('${currentMatch!.id}_$notificationRoundNumber');
+    }
     matchFound = false;
     matchFoundWaiting = false;
     yourTurnNotification = false;
@@ -509,6 +517,9 @@ class PvPProvider extends ChangeNotifier {
     _notificationAutoDismissTimer?.cancel();
     _notificationAutoDismissTimer = Timer(const Duration(seconds: 15), () {
       if (matchFoundWaiting || yourTurnNotification || matchCompletedNotification) {
+        if (yourTurnNotification && currentMatch != null && notificationRoundNumber != null) {
+          _dismissedTurnNotifications.add('${currentMatch!.id}_$notificationRoundNumber');
+        }
         matchFoundWaiting = false;
         yourTurnNotification = false;
         matchCompletedNotification = false;
@@ -637,14 +648,16 @@ class PvPProvider extends ChangeNotifier {
         // C'est devenu mon tour (et ça ne l'était pas avant)
         // Notification SEULEMENT si PAS sur la page de jeu
         if (!wasMyTurn && (isMyTurn || isMyThemeChoice) && !matchFound && !isOnGamePage) {
-          // Dismiss matchFoundWaiting si actif (le match a avancé, on passe à "C'est ton tour")
-          matchFoundWaiting = false;
-          yourTurnNotification = true;
-          notificationRoundNumber = match.currentRound;
-          if (currentUserId != null) {
-            await _ensureOpponentInfo(match, currentUserId!);
+          final notifKey = '${match.id}_${match.currentRound}';
+          if (!_dismissedTurnNotifications.contains(notifKey)) {
+            matchFoundWaiting = false;
+            yourTurnNotification = true;
+            notificationRoundNumber = match.currentRound;
+            if (currentUserId != null) {
+              await _ensureOpponentInfo(match, currentUserId!);
+            }
+            _startAutoDismissTimer();
           }
-          _startAutoDismissTimer();
         }
         _previousIsMyTurn = isMyTurn || isMyThemeChoice;
 
@@ -1187,6 +1200,7 @@ class PvPProvider extends ChangeNotifier {
     isOnGamePage = false;
     _knownMatchIds.clear();
     _notifiedCompletedMatchIds.clear();
+    _dismissedTurnNotifications.clear();
 
     // NE PAS arrêter le background timer : il doit continuer à tourner
     _safeNotify();

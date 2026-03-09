@@ -678,9 +678,11 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
   }
 
   Widget _buildCustomAppBar(AppLocalizations l10n) {
+    final themeName = widget.concept.themeName;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           MouseRegion(
             cursor: SystemMouseCursors.click,
@@ -703,16 +705,54 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              l10n.dailyQuiz,
-              style: const TextStyle(
-                color: AppColors.brainPurple,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Badge "Discovery Quiz"
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1B8A3C).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    l10n.discoveryQuizBadge,
+                    style: const TextStyle(
+                      color: Color(0xFF1B8A3C),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 3),
+                // Nom du concept
+                Text(
+                  widget.concept.conceptName,
+                  style: const TextStyle(
+                    color: AppColors.brainPurple,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (themeName.isNotEmpty)
+                  Text(
+                    themeName,
+                    style: TextStyle(
+                      color: AppColors.textSecondary.withValues(alpha: 0.8),
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+              ],
             ),
           ),
-          // Badge XP x3 au lieu du lives indicator
+          const SizedBox(width: 8),
+          // Badge XP x3
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(

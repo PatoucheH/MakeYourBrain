@@ -340,7 +340,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                   dividerColor: Colors.transparent,
                   tabs: widget.themeId != null
                       ? [
-                          Tab(icon: const Icon(Icons.style, size: 20), text: l10n.level),
+                          Tab(icon: const Icon(Icons.style, size: 20), text: widget.themeName ?? l10n.selectTheme),
                           Tab(icon: const Icon(Icons.public, size: 20), text: l10n.global),
                           Tab(icon: const Icon(Icons.calendar_today, size: 20), text: l10n.thisWeek),
                           Tab(icon: const Icon(Icons.people, size: 20), text: l10n.followingLeaderboard),
