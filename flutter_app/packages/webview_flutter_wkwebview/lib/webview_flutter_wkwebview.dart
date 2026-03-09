@@ -33,9 +33,7 @@ class WebKitWebViewControllerCreationParams
 /// Returns -1 since this is a stub (no real WKWebView on iOS 26).
 class WebKitWebViewController extends PlatformWebViewController {
   /// Creates a stub controller.
-  WebKitWebViewController(
-    PlatformWebViewControllerCreationParams params,
-  ) : super.implementation(params);
+  WebKitWebViewController(super.params) : super.implementation();
 
   /// Always returns -1 in this stub; no real WKWebView exists.
   int get webViewIdentifier => -1;

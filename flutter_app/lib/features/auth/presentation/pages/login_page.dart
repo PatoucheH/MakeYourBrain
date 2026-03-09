@@ -1,9 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/repositories/auth_repository.dart';
-import '../../../quiz/presentation/pages/home_page.dart';
 import '../../../../main.dart';
 import 'register_page.dart';
 
@@ -14,12 +14,41 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
   final _repository = AuthRepository();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
+  Timer? _oauthTimer;
+  StreamSubscription? _oauthSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // User returned to app (from Safari / OAuth browser) without completing login.
+    // Wait briefly to allow the deep-link to be processed, then reset if not signed in.
+    if (state == AppLifecycleState.resumed && _isLoading) {
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted && _isLoading && !_repository.isLoggedIn()) {
+          _resetOAuthState();
+        }
+      });
+    }
+  }
+
+  void _resetOAuthState() {
+    _oauthTimer?.cancel();
+    _oauthSubscription?.cancel();
+    _oauthTimer = null;
+    _oauthSubscription = null;
+    if (mounted) setState(() => _isLoading = false);
+  }
 
   Future<void> _login() async {
     final l10n = AppLocalizations.of(context)!;
@@ -93,40 +122,44 @@ class _LoginPageState extends State<LoginPage> {
   //   }
   // }
 
-  Future<void> _loginWithGoogle() async {
-    setState(() => _isLoading = true);
+  Future<void> _startOAuthFlow(Future<bool> Function() signIn, String failMessage) async {
     final l10n = AppLocalizations.of(context)!;
+    setState(() => _isLoading = true);
 
     try {
-      final success = await _repository.signInWithGoogle();
+      final success = await signIn();
 
       if (!success) {
         if (mounted) {
           setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.couldNotOpenGoogleLogin)),
+            SnackBar(content: Text(failMessage)),
           );
         }
         return;
       }
 
-      final subscription = _repository.authStateChanges.listen((state) {
+      // Listen for successful sign-in via deep link.
+      // Navigate to AuthChecker (not HomePage directly) so onboarding is checked.
+      _oauthSubscription = _repository.authStateChanges.listen((state) {
         if (state.event == AuthChangeEvent.signedIn && mounted) {
+          _oauthTimer?.cancel();
+          _oauthSubscription?.cancel();
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const HomePage()),
+            MaterialPageRoute(builder: (context) => const AuthChecker()),
           );
         }
       });
 
-      await Future.delayed(const Duration(seconds: 60));
-      subscription.cancel();
-
-      if (mounted && !_repository.isLoggedIn()) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.loginTimeout)),
-        );
-      }
+      // Reset after 30s if no deep link received.
+      _oauthTimer = Timer(const Duration(seconds: 30), () {
+        if (mounted && !_repository.isLoggedIn()) {
+          _resetOAuthState();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.loginTimeout)),
+          );
+        }
+      });
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -137,48 +170,20 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> _loginWithApple() async {
-    setState(() => _isLoading = true);
+  Future<void> _loginWithGoogle() async {
     final l10n = AppLocalizations.of(context)!;
+    await _startOAuthFlow(
+      _repository.signInWithGoogle,
+      l10n.couldNotOpenGoogleLogin,
+    );
+  }
 
-    try {
-      final success = await _repository.signInWithApple();
-
-      if (!success) {
-        if (mounted) {
-          setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.couldNotOpenAppleLogin)),
-          );
-        }
-        return;
-      }
-
-      final subscription = _repository.authStateChanges.listen((state) {
-        if (state.event == AuthChangeEvent.signedIn && mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          );
-        }
-      });
-
-      await Future.delayed(const Duration(seconds: 60));
-      subscription.cancel();
-
-      if (mounted && !_repository.isLoggedIn()) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.loginTimeout)),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.loginFailed)),
-        );
-      }
-    }
+  Future<void> _loginWithApple() async {
+    final l10n = AppLocalizations.of(context)!;
+    await _startOAuthFlow(
+      _repository.signInWithApple,
+      l10n.couldNotOpenAppleLogin,
+    );
   }
 
   @override
@@ -503,6 +508,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _oauthTimer?.cancel();
+    _oauthSubscription?.cancel();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
