@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../features/auth/data/repositories/auth_repository.dart';
@@ -39,6 +41,13 @@ class AdService {
       return;
     }
     try {
+      if (Platform.isIOS) {
+        final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+        if (status == TrackingStatus.notDetermined) {
+          await AppTrackingTransparency.requestTrackingAuthorization();
+        }
+        debugPrint('[AdService] ATT status: $status');
+      }
       await MobileAds.instance.initialize();
       _isSupported = true;
       AdService().loadRewardedAd();

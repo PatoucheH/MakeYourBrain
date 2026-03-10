@@ -43,6 +43,8 @@
 	</array>
 	<key>NSUserNotificationUsageDescription</key>
 	<string>Make Your Brain sends notifications for PvP match updates and streak reminders.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier will be used to deliver personalized ads to you.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
