@@ -10,6 +10,8 @@ import '../../data/repositories/profile_repository.dart';
 import '../../../quiz/data/repositories/theme_preferences_repository.dart';
 import '../../../quiz/data/repositories/quiz_repository.dart';
 import '../../../quiz/data/models/theme_model.dart';
+import '../../../auth/presentation/pages/login_page.dart';
+import '../../../pvp/data/providers/pvp_provider.dart';
 import '../../../social/data/repositories/follow_repository.dart';
 import '../../../social/presentation/pages/follow_list_page.dart';
 
@@ -45,7 +47,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> loadProfile() async {
     try {
       final currentLang = context.read<LanguageProvider>().currentLanguage;
-      final userId = _authRepo.getCurrentUserId()!;
+      final userId = _authRepo.getCurrentUserId();
+      if (userId == null) return;
 
       final stats = await _authRepo.getUserStats();
       final progress = await _profileRepo.getProgressByTheme(userId);
@@ -120,6 +123,60 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _deleteAccount(AppLocalizations l10n) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: AppColors.error),
+            const SizedBox(width: 8),
+            Text(l10n.deleteAccount),
+          ],
+        ),
+        content: Text(l10n.deleteAccountConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text(l10n.deleteAccount),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    if (!mounted) return;
+
+    context.read<PvPProvider>().stopBackgroundChecks();
+    context.read<PvPProvider>().reset();
+
+    final success = await _authRepo.deleteAccount();
+    if (!mounted) return;
+
+    if (!success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.deleteAccountError)),
+      );
+      return;
+    }
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+      (route) => false,
+    );
+  }
+
   Color _getColorForLevel(int level) {
     if (level >= 10) return AppColors.level10plus;
     if (level >= 7) return AppColors.level7_9;
@@ -179,6 +236,30 @@ class _ProfilePageState extends State<ProfilePage> {
                         const SizedBox(height: 12),
                         _buildProgressSection(l10n),
                         const SizedBox(height: 32),
+
+                        // Danger zone
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () => _deleteAccount(l10n),
+                            icon: const Icon(Icons.delete_forever,
+                                color: Colors.white, size: 22),
+                            label: Text(l10n.deleteAccount,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.error,
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 18),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16)),
+                              elevation: 2,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
                       ],
                     ),
                   ),

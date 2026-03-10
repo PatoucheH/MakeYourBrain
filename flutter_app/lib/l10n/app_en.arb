@@ -330,5 +330,8 @@
     }
   },
   "discoveryQuizBadge": "Discovery Quiz",
-  "notFromFavoritesHint": "Discover a new theme — not from your favorites"
+  "notFromFavoritesHint": "Discover a new theme — not from your favorites",
+  "deleteAccount": "Delete Account",
+  "deleteAccountConfirm": "This will permanently delete your account and all your data. This action cannot be undone.",
+  "deleteAccountError": "Failed to delete account. Please try again."
 }

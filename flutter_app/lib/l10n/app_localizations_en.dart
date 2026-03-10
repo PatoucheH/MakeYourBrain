@@ -736,4 +736,15 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notFromFavoritesHint =>
       'Discover a new theme — not from your favorites';
+
+  @override
+  String get deleteAccount => 'Delete Account';
+
+  @override
+  String get deleteAccountConfirm =>
+      'This will permanently delete your account and all your data. This action cannot be undone.';
+
+  @override
+  String get deleteAccountError =>
+      'Failed to delete account. Please try again.';
 }

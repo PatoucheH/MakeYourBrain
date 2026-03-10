@@ -1471,6 +1471,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Discover a new theme — not from your favorites'**
   String get notFromFavoritesHint;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete your account and all your data. This action cannot be undone.'**
+  String get deleteAccountConfirm;
+
+  /// No description provided for @deleteAccountError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete account. Please try again.'**
+  String get deleteAccountError;
 }
 
 class _AppLocalizationsDelegate

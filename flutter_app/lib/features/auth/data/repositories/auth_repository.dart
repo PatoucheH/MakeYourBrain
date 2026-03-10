@@ -150,6 +150,7 @@ Future<bool> signInWithFacebook() async {
     final response = await _supabase.auth.signInWithOAuth(
       OAuthProvider.facebook,
       redirectTo: kIsWeb ? null : 'makeyourbrain://auth-callback',
+      authScreenLaunchMode: LaunchMode.inAppWebView,
     );
     
     return response;
@@ -166,6 +167,7 @@ Future<bool> signInWithFacebook() async {
       final response = await _supabase.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: 'com.patou.makeyourbrain://login-callback',
+        authScreenLaunchMode: LaunchMode.inAppWebView,
       );
 
       if (!response) {
@@ -207,6 +209,7 @@ Future<bool> signInWithFacebook() async {
       final response = await _supabase.auth.signInWithOAuth(
         OAuthProvider.apple,
         redirectTo: kIsWeb ? null : 'com.patou.makeyourbrain://login-callback',
+        authScreenLaunchMode: LaunchMode.inAppWebView,
       );
 
       if (!response) {
@@ -243,6 +246,18 @@ Future<bool> signInWithFacebook() async {
   // Déconnexion
   Future<void> signOut() async {
     await _supabase.auth.signOut();
+  }
+
+  // Suppression du compte
+  Future<bool> deleteAccount() async {
+    try {
+      await _supabase.rpc('delete_own_account');
+      await _supabase.auth.signOut();
+      return true;
+    } catch (e) {
+      debugPrint('Delete account error: $e');
+      return false;
+    }
   }
 
   // User actuel

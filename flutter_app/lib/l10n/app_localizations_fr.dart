@@ -744,4 +744,15 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get notFromFavoritesHint =>
       'Découvre un nouveau thème — pas parmi tes favoris';
+
+  @override
+  String get deleteAccount => 'Supprimer le compte';
+
+  @override
+  String get deleteAccountConfirm =>
+      'Cela supprimera définitivement votre compte et toutes vos données. Cette action est irréversible.';
+
+  @override
+  String get deleteAccountError =>
+      'Impossible de supprimer le compte. Veuillez réessayer.';
 }

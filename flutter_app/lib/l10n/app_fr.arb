@@ -302,5 +302,8 @@
     }
   },
   "discoveryQuizBadge": "Quiz de Découverte",
-  "notFromFavoritesHint": "Découvre un nouveau thème — pas parmi tes favoris"
+  "notFromFavoritesHint": "Découvre un nouveau thème — pas parmi tes favoris",
+  "deleteAccount": "Supprimer le compte",
+  "deleteAccountConfirm": "Cela supprimera définitivement votre compte et toutes vos données. Cette action est irréversible.",
+  "deleteAccountError": "Impossible de supprimer le compte. Veuillez réessayer."
 }
