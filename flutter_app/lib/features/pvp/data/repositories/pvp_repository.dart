@@ -7,8 +7,8 @@ import '../models/pvp_round_model.dart';
 class PvPRepository {
   final _supabase = SupabaseService().client;
 
-  /// Rejoint la file d'attente de matchmaking
-  /// Retourne un Map avec matchFound, matchId, et opponentId
+  /// Joins the matchmaking queue
+  /// Returns a Map with matchFound, matchId, and opponentId
   Future<Map<String, dynamic>> joinMatchmaking(
     String userId,
     int rating,
@@ -37,7 +37,7 @@ class PvPRepository {
     }
   }
 
-  /// Quitte la file d'attente de matchmaking
+  /// Leaves the matchmaking queue
   Future<void> leaveMatchmaking(String userId) async {
     try {
       await _supabase.rpc('pvp_leave_queue', params: {
@@ -48,7 +48,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère un match par son ID
+  /// Gets a match by its ID
   Future<PvPMatchModel?> getMatch(String matchId) async {
     try {
       final response = await _supabase
@@ -66,7 +66,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère des questions aléatoires pour un round PvP
+  /// Gets random questions for a PvP round
   Future<List<QuestionModel>> getQuestionsForRound(
     String language,
     int limit,
@@ -87,7 +87,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère des questions par leurs IDs pour un round PvP
+  /// Gets questions by their IDs for a PvP round
   Future<List<QuestionModel>> getQuestionsByIds(
     List<String> questionIds,
     String language,
@@ -108,8 +108,8 @@ class PvPRepository {
     }
   }
 
-  /// Crée un nouveau round pour un match
-  /// Retourne l'ID du round créé
+  /// Creates a new round for a match
+  /// Returns the ID of the created round
   Future<String> createRound(
     String matchId,
     int roundNumber,
@@ -130,7 +130,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère un round spécifique d'un match
+  /// Gets a specific round of a match
   Future<PvPRoundModel?> getRound(String matchId, int roundNumber) async {
     try {
       final response = await _supabase
@@ -148,7 +148,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère tous les rounds d'un match
+  /// Gets all rounds of a match
   Future<List<PvPRoundModel>> getRounds(String matchId) async {
     try {
       final response = await _supabase
@@ -164,7 +164,7 @@ class PvPRepository {
     }
   }
 
-  /// Soumet les réponses d'un joueur pour un round
+  /// Submits a player's answers for a round
   Future<void> submitRoundAnswers(
     String matchId,
     int roundNumber,
@@ -197,7 +197,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère l'historique des matchs d'un joueur
+  /// Gets a player's match history
   Future<List<PvPMatchModel>> getMyMatches(
     String userId, {
     int limit = 20,
@@ -220,7 +220,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère les matchs en cours d'un joueur
+  /// Gets a player's active matches
   Future<List<PvPMatchModel>> getActiveMatches(String userId) async {
     try {
       final response = await _supabase
@@ -240,7 +240,7 @@ class PvPRepository {
     }
   }
 
-  /// Écoute les changements en temps réel sur un match
+  /// Listens for real-time changes on a match
   Stream<PvPMatchModel?> watchMatch(String matchId) {
     return _supabase
         .from('pvp_matches')
@@ -252,7 +252,7 @@ class PvPRepository {
         });
   }
 
-  /// Écoute les changements sur un round spécifique
+  /// Listens for changes on a specific round
   Stream<PvPRoundModel?> watchRound(String matchId, int roundNumber) {
     return _supabase
         .from('pvp_rounds')
@@ -265,7 +265,7 @@ class PvPRepository {
         });
   }
 
-  /// Met à jour le statut d'un match via RPC sécurisé (validation côté serveur)
+  /// Updates the status of a match via secure RPC (server-side validation)
   Future<void> updateMatchStatus(String matchId, String status) async {
     try {
       await _supabase.rpc('pvp_update_match_status', params: {
@@ -277,7 +277,7 @@ class PvPRepository {
     }
   }
 
-  /// Met à jour le statut et le round courant d'un match via RPC sécurisé
+  /// Updates the status and current round of a match via secure RPC
   Future<void> updateMatchStatusAndRound(String matchId, String status, int currentRound) async {
     try {
       await _supabase.rpc('pvp_update_match_status', params: {
@@ -290,7 +290,7 @@ class PvPRepository {
     }
   }
 
-  /// Annule un match (si l'adversaire ne répond pas)
+  /// Cancels a match (if the opponent does not respond)
   Future<void> cancelMatch(String matchId) async {
     try {
       await _supabase.rpc('pvp_update_match_status', params: {
@@ -302,7 +302,7 @@ class PvPRepository {
     }
   }
 
-  /// Vérifie si un joueur est dans la file d'attente
+  /// Checks if a player is in the queue
   Future<bool> isInQueue(String userId) async {
     try {
       final response = await _supabase
@@ -317,7 +317,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère le username d'un joueur
+  /// Gets a player's username
   Future<String?> getUsername(String userId) async {
     try {
       final response = await _supabase
@@ -332,7 +332,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère le username et la langue préférée d'un joueur en un seul appel
+  /// Gets a player's username and preferred language in a single call
   Future<Map<String, String?>> getOpponentInfo(String userId) async {
     try {
       final response = await _supabase
@@ -349,8 +349,8 @@ class PvPRepository {
     }
   }
 
-  /// Envoie une push notification à un joueur via l'edge function (fire-and-forget).
-  /// [notificationType] doit être l'un de : 'match_found', 'your_turn', 'match_over'
+  /// Sends a push notification to a player via the edge function (fire-and-forget).
+  /// [notificationType] must be one of: 'match_found', 'your_turn', 'match_over'
   Future<void> sendPvPNotification(String userId, String notificationType) async {
     try {
       await _supabase.functions.invoke('send-notification', body: {
@@ -362,7 +362,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère les statistiques PvP d'un joueur
+  /// Gets a player's PvP statistics
   Future<Map<String, dynamic>> getPlayerPvPStats(String userId) async {
     try {
       final response = await _supabase
@@ -387,7 +387,7 @@ class PvPRepository {
         'draws': _toInt(response['pvp_draws'], 0),
       };
     } catch (e) {
-      // Si les colonnes PvP n'existent pas encore, retourner les valeurs par défaut
+      // If the PvP columns don't exist yet, return default values
       debugPrint('Error getting PvP stats: $e');
       return {
         'rating': 1000,
@@ -398,7 +398,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère le classement PvP global
+  /// Gets the global PvP leaderboard
   Future<List<Map<String, dynamic>>> getPvPLeaderboard({int limit = 50}) async {
     try {
       final response = await _supabase
@@ -415,7 +415,7 @@ class PvPRepository {
     }
   }
 
-  /// Vérifie le statut de la queue au retour dans l'app
+  /// Checks the queue status when returning to the app
   Future<Map<String, dynamic>> checkQueueStatus(String userId) async {
     try {
       final response = await _supabase.rpc('pvp_check_queue_status', params: {
@@ -434,7 +434,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère des questions aléatoires pour un thème spécifique
+  /// Gets random questions for a specific theme
   Future<List<QuestionModel>> getQuestionsByTheme(
     String themeId,
     String language,
@@ -459,7 +459,7 @@ class PvPRepository {
     }
   }
 
-  /// Récupère un thème aléatoire excluant certains thèmes
+  /// Gets a random theme excluding certain themes
   Future<String?> getRandomTheme(
     String language,
     List<String> excludeThemeIds,

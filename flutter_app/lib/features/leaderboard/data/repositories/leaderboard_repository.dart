@@ -14,7 +14,7 @@ class LeaderboardRepository {
     return List<Map<String, dynamic>>.from(response);
   }
 
-  // Leaderboard par thème (top 100)
+  // Theme leaderboard (top 100)
   Future<List<Map<String, dynamic>>> getThemeLeaderboard(
     String themeId, {
     int limit = 100,
@@ -28,16 +28,16 @@ class LeaderboardRepository {
     return List<Map<String, dynamic>>.from(response);
   }
 
-  // Leaderboard hebdomadaire (top 100) — appel RPC pour bypasser RLS proprement
+  // Weekly leaderboard (top 100) — RPC call to bypass RLS cleanly
   Future<List<Map<String, dynamic>>> getWeeklyLeaderboard({int limit = 100}) async {
     final response = await _supabase.rpc('get_weekly_leaderboard');
     final list = List<Map<String, dynamic>>.from(response as List);
     return limit > 0 ? list.take(limit).toList() : list;
   }
 
-  // Position d'un user dans le leaderboard global.
-  // .count(CountOption.exact) → le serveur retourne le COUNT dans les headers,
-  // aucune donnée volumineuse n'est traitée côté client.
+  // Position of a user in the global leaderboard.
+  // .count(CountOption.exact) → the server returns the COUNT in headers,
+  // no large data is processed client-side.
   Future<int?> getUserGlobalRank(String userId) async {
     final userRow = await _supabase
         .from('leaderboard_global')
@@ -54,7 +54,7 @@ class LeaderboardRepository {
     return countResponse.count + 1;
   }
 
-  // Position d'un user dans un thème.
+  // Position of a user in a theme.
   Future<int?> getUserThemeRank(String userId, String themeId) async {
     final userRow = await _supabase
         .from('leaderboard_by_theme')

@@ -201,11 +201,11 @@ class LivesIndicator extends StatelessWidget {
 
     if (rewarded) {
       if (kDebugMode) {
-        // En debug : ajout direct car le SSV des ads test n'est pas fiable
+        // In debug: direct add because test ad SSV is not reliable
         await livesProvider.addLivesFromAd();
       } else {
-        // En prod : les vies sont accordées par le callback SSV AdMob (verify-ad-reward).
-        // On attend quelques secondes puis on rafraîchit pour afficher les vies mises à jour.
+        // In prod: lives are granted by the AdMob SSV callback (verify-ad-reward).
+        // Wait a few seconds then refresh to display the updated lives.
         await Future.delayed(const Duration(seconds: 3));
         if (!context.mounted) return;
         await livesProvider.refresh();

@@ -26,7 +26,7 @@ class AuthRepository {
         'platform': platform,
         'updated_at': DateTime.now().toIso8601String(),
       }, onConflict: 'user_id, token').timeout(const Duration(seconds: 15));
-      // Mettre à jour le timezone pour les notifications streak
+      // Update the timezone for streak notifications
       await _supabase.from('user_stats').update({
         'timezone_offset_hours': DateTime.now().timeZoneOffset.inHours,
       }).eq('user_id', userId);
@@ -37,9 +37,9 @@ class AuthRepository {
 
   Future<void> refreshFcmToken() => _savefcmToken();
 
-  // Inscription avec pseudo
+  // Sign up with username
   Future<void> signUp(String email, String password, {String? username}) async {
-    // Vérifier que le pseudo est disponible avant l'inscription
+    // Check that the username is available before signing up
     if (username != null && username.isNotEmpty) {
       final isAvailable = await isUsernameAvailable(username);
       if (!isAvailable) {
@@ -52,7 +52,7 @@ class AuthRepository {
       password: password,
     );
 
-    // Créer l'entrée user_stats avec le pseudo si l'inscription réussit
+    // Create the user_stats entry with the username if sign-up succeeds
     if (response.user != null && username != null && username.isNotEmpty) {
       final lang = _getPreferredLanguage();
       await _supabase.from('user_stats').insert({
@@ -64,18 +64,18 @@ class AuthRepository {
     }
   }
 
-  // Vérifier si un pseudo est disponible
+  // Check if a username is available
   Future<bool> isUsernameAvailable(String username) async {
     if (username.isEmpty) return false;
 
     final normalizedUsername = username.toLowerCase().trim();
 
-    // Vérifier la longueur (3-20 caractères)
+    // Check length (3-20 characters)
     if (normalizedUsername.length < 3 || normalizedUsername.length > 20) {
       return false;
     }
 
-    // Vérifier les caractères autorisés (lettres, chiffres, underscore)
+    // Check allowed characters (letters, numbers, underscore)
     final validPattern = RegExp(r'^[a-z0-9_]+$');
     if (!validPattern.hasMatch(normalizedUsername)) {
       return false;
@@ -90,19 +90,19 @@ class AuthRepository {
     return response == null;
   }
 
-  // Mettre à jour le pseudo
+  // Update the username
   Future<bool> updateUsername(String newUsername) async {
     final userId = getCurrentUserId();
     if (userId == null) return false;
 
     final normalizedUsername = newUsername.toLowerCase().trim();
 
-    // M1: Valider le format (mêmes règles que l'inscription)
+    // Validate format (same rules as sign-up)
     if (normalizedUsername.length < 3 || normalizedUsername.length > 20) return false;
     final validPattern = RegExp(r'^[a-z0-9_]+$');
     if (!validPattern.hasMatch(normalizedUsername)) return false;
 
-    // Vérifier que le pseudo est disponible
+    // Check that the username is available
     final response = await _supabase
         .from('user_stats')
         .select('user_id')
@@ -111,7 +111,7 @@ class AuthRepository {
         .maybeSingle();
 
     if (response != null) {
-      // Le pseudo est déjà pris par quelqu'un d'autre
+      // The username is already taken by someone else
       return false;
     }
 
@@ -123,7 +123,7 @@ class AuthRepository {
     return true;
   }
 
-  // Connexion
+  // Sign in
   Future<void> signIn(String email, String password) async {
     await _supabase.auth.signInWithPassword(
       email: email,
@@ -144,7 +144,7 @@ class AuthRepository {
     return username != null && username.isNotEmpty;
   }
 
-  // Connexion avec Facebook
+  // Sign in with Facebook
 Future<bool> signInWithFacebook() async {
   try {
     final response = await _supabase.auth.signInWithOAuth(
@@ -160,7 +160,7 @@ Future<bool> signInWithFacebook() async {
   }
 }
 
-  // Connexion avec Google
+  // Sign in with Google
   Future<bool> signInWithGoogle() async {
     try {
       // Use Supabase Auth for Google Sign-In
@@ -202,7 +202,7 @@ Future<bool> signInWithFacebook() async {
     }
   }
 
-  // Connexion avec Apple
+  // Sign in with Apple
   Future<bool> signInWithApple() async {
     try {
       // Use Supabase Auth for Apple Sign-In
@@ -243,7 +243,7 @@ Future<bool> signInWithFacebook() async {
     }
   }
 
-  // Déconnexion
+  // Sign out
   Future<void> signOut() async {
     await _supabase.auth.signOut();
   }
@@ -260,7 +260,7 @@ Future<bool> signInWithFacebook() async {
     }
   }
 
-  // User actuel
+  // Current user
   String? getCurrentUserId() {
     return _supabase.auth.currentUser?.id;
   }
@@ -273,7 +273,7 @@ Future<bool> signInWithFacebook() async {
     return _supabase.auth.currentUser != null;
   }
 
-  // Récupérer les stats du user
+  // Get user stats
   Future<UserModel?> getUserStats() async {
     final userId = getCurrentUserId();
     if (userId == null) return null;
@@ -304,7 +304,7 @@ Future<bool> signInWithFacebook() async {
     });
   }
 
-  // Mettre à jour la langue préférée
+  // Update the preferred language
   Future<void> updateLanguage(String languageCode) async {
     final userId = getCurrentUserId();
     if (userId == null) return;
@@ -316,6 +316,6 @@ Future<bool> signInWithFacebook() async {
     });
   }
 
-  // Écouter les changements d'auth
+  // Listen to auth state changes
   Stream<AuthState> get authStateChanges => _supabase.auth.onAuthStateChange;
 }

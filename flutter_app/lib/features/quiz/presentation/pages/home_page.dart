@@ -18,7 +18,7 @@ import '../../../daily_concept/data/models/daily_concept_model.dart';
 import '../../../daily_concept/data/repositories/daily_concept_repository.dart';
 import '../../../daily_concept/presentation/pages/daily_concept_page.dart';
 
-/// Mettre à false pour désactiver la modal Beta
+/// Set to false to disable the Beta modal
 const bool kShowBetaDialog = true;
 
 class HomePage extends StatefulWidget {
@@ -357,7 +357,7 @@ class _HomePageState extends State<HomePage> {
               builder: (context) => DailyConceptPage(concept: concept),
             ),
           );
-          // Mise à jour optimiste immédiate : bloque la ré-entrée pendant le refresh réseau
+          // Immediate optimistic update: blocks re-entry during the network refresh
           if (completed == true && mounted && dailyConcept != null) {
             setState(() {
               dailyConcept = DailyConceptModel(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Couleurs principales (Brainly)
+  // Main colors (Brainly)
   static const Color brainPink = Color(0xFFFFB6D9);
   static const Color brainPinkLight = Color(0xFFFFD6EB);
   static const Color brainPurple = Color(0xFF5B21B6);
@@ -9,21 +9,21 @@ class AppColors {
   static const Color brainLightPurple = Color(0xFFA78BFA);
   static const Color brainPurpleLight = Color(0xFFEDE9FE);
 
-  // Couleurs secondaires
+  // Secondary colors
   static const Color accentYellow = Color(0xFFFCD34D);
   static const Color accentYellowLight = Color(0xFFFEF3C7);
   static const Color accentBlue = Color(0xFF60A5FA);
   static const Color accentGreen = Color(0xFF34D399);
 
-  // Niveaux de couleurs (pour les levels)
-  static const Color level1_2 = Color(0xFF60A5FA);   // Bleu
-  static const Color level3_4 = Color(0xFF10B981);   // Vert
+  // Color levels (for levels)
+  static const Color level1_2 = Color(0xFF60A5FA);   // Blue
+  static const Color level3_4 = Color(0xFF10B981);   // Green
   static const Color level5_6 = Color(0xFFF59E0B);   // Orange
-  static const Color level7_9 = Color(0xFFEF4444);   // Rouge
-  static const Color level10plus = Color(0xFF8B5CF6); // Violet
+  static const Color level7_9 = Color(0xFFEF4444);   // Red
+  static const Color level10plus = Color(0xFF8B5CF6); // Purple
 
-  // Couleurs neutres
-  static const Color backgroundLight = Color(0xFFFAF5FF); // Légère teinte violette
+  // Neutral colors
+  static const Color backgroundLight = Color(0xFFFAF5FF); // Slight purple tint
   static const Color backgroundGray = Color(0xFFF3F4F6);
   static const Color backgroundCard = Color(0xFFFFFFFF);
   static const Color textPrimary = Color(0xFF1F2937);
@@ -31,7 +31,7 @@ class AppColors {
   static const Color textLight = Color(0xFF9CA3AF);
   static const Color white = Color(0xFFFFFFFF);
 
-  // Couleurs fonctionnelles
+  // Functional colors
   static const Color success = Color(0xFF10B981);
   static const Color successLight = Color(0xFFD1FAE5);
   static const Color error = Color(0xFFEF4444);

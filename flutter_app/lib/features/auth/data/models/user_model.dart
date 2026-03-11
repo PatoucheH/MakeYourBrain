@@ -49,7 +49,7 @@ class UserModel {
     );
   }
 
-  /// Retourne le streak effectif : 0 si le dernier jeu date de plus d'1 jour
+  /// Returns the effective streak: 0 if the last game was more than 1 day ago
   int get effectiveStreak {
     if (lastPlayedAt == null) return 0;
     final now = DateTime.now();
@@ -57,8 +57,8 @@ class UserModel {
     final today = DateTime(now.year, now.month, now.day);
     final lastPlayed = DateTime(local.year, local.month, local.day);
     final diff = today.difference(lastPlayed).inDays;
-    if (diff <= 1) return currentStreak; // aujourd'hui ou hier
-    return 0; // plus d'1 jour sans jouer
+    if (diff <= 1) return currentStreak; // today or yesterday
+    return 0; // more than 1 day without playing
   }
 
   double get accuracy {
@@ -105,6 +105,6 @@ class UserModel {
     );
   }
 
-  /// Retourne le nom d'affichage (pseudo ou 'User' par défaut)
+  /// Returns the display name (username or 'User' by default)
   String get displayName => username?.isNotEmpty == true ? username! : 'User';
 }

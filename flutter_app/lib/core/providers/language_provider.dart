@@ -8,17 +8,17 @@ class LanguageProvider extends ChangeNotifier {
 
   String get currentLanguage => _currentLanguage;
 
-  // Initialiser au démarrage de l'app (depuis la locale du device)
+  // Initialize at app startup (from the device locale)
   Future<void> initialize() async {
     final locale = WidgetsBinding.instance.platformDispatcher.locale;
     _currentLanguage = locale.languageCode == 'fr' ? 'fr' : 'en';
-    // Différer notifyListeners pour éviter un setState-during-build (appelé depuis initState)
+    // Defer notifyListeners to avoid a setState-during-build (called from initState)
     SchedulerBinding.instance.addPostFrameCallback((_) {
       notifyListeners();
     });
   }
 
-  // Charger la langue préférée depuis le serveur après connexion
+  // Load the preferred language from the server after login
   Future<void> loadFromServer() async {
     if (!_authRepo.isLoggedIn()) return;
     try {
@@ -26,7 +26,7 @@ class LanguageProvider extends ChangeNotifier {
       final lang = userStats?.preferredLanguage;
       if (lang != null) {
         _currentLanguage = lang;
-        // Toujours notifier : initialize() a pu échouer à notifier MaterialApp
+        // Always notify: initialize() may have failed to notify MaterialApp
         notifyListeners();
       }
     } catch (e) {
@@ -34,11 +34,11 @@ class LanguageProvider extends ChangeNotifier {
     }
   }
 
-  // Changer la langue
+  // Change the language
   Future<void> setLanguage(String languageCode) async {
     _currentLanguage = languageCode;
 
-    // Sauvegarder en DB si connecté
+    // Save to DB if logged in
     if (_authRepo.isLoggedIn()) {
       try {
         await _authRepo.updateLanguage(languageCode);

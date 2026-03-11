@@ -5,7 +5,7 @@ import '../models/question_model.dart';
 class QuizRepository {
   final _supabase = SupabaseService().client;
 
-  // Récupérer tous les thèmes dans une langue
+  // Get all themes in a language
   Future<List<ThemeModel>> getThemes(String languageCode) async {
     final response = await _supabase
         .from('themes_localized')
@@ -17,7 +17,7 @@ class QuizRepository {
         .toList();
   }
 
-  // Récupérer des questions aléatoires pour un thème avec contrôle de difficulté
+  // Get random questions for a theme with difficulty control
   Future<List<QuestionModel>> getQuestions({
     required String themeId,
     required String languageCode,
@@ -43,7 +43,7 @@ class QuizRepository {
     );
   }
 
-  // Sauvegarder la réponse d'un user (sans XP - l'XP est ajouté à la fin du quiz)
+  // Save a user answer (without XP - XP is added at the end of the quiz)
   Future<void> saveUserAnswer({
     required String userId,
     required String questionId,
@@ -51,7 +51,7 @@ class QuizRepository {
     required bool isCorrect,
     required String languageUsed,
   }) async {
-    // Sauvegarder la réponse
+    // Save the answer
     await _supabase.from('user_answers').insert({
       'user_id': userId,
       'question_id': questionId,
@@ -60,15 +60,15 @@ class QuizRepository {
       'language_used': languageUsed,
     });
 
-    // Mettre à jour les stats
+    // Update stats
     await _supabase.rpc('increment_user_stats', params: {
       'p_user_id': userId,
       'p_is_correct': isCorrect,
     });
   }
 
-  // Ajouter l'XP à la fin du quiz — les paires (questionId, answerId) sont
-  // vérifiées côté serveur pour éviter la triche sur le nombre de bonnes réponses.
+  // Add XP at the end of the quiz — (questionId, answerId) pairs are
+  // verified server-side to prevent cheating on the number of correct answers.
   Future<void> addQuizCompletionXp({
     required String userId,
     required String themeId,
@@ -76,7 +76,7 @@ class QuizRepository {
     required List<String> answerIds,
     int bonusXp = 0,
   }) async {
-    // Le RPC vérifie chaque paire (question_id, answer_id) contre la table answers
+    // The RPC verifies each (question_id, answer_id) pair against the answers table
     await _supabase.rpc('add_quiz_completion_xp', params: {
       'p_user_id': userId,
       'p_theme_id': themeId,
@@ -84,7 +84,7 @@ class QuizRepository {
       'p_answer_ids': answerIds,
     });
 
-    // Ajouter le bonus XP (pour les quiz chronométrés)
+    // Add bonus XP (for timed quizzes)
     if (bonusXp > 0) {
       await _supabase.rpc('add_bonus_xp', params: {
         'p_user_id': userId,

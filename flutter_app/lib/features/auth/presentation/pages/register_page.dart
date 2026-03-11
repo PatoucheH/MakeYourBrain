@@ -35,7 +35,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final normalized = username.toLowerCase().trim();
     final l10n = AppLocalizations.of(context)!;
 
-    // Validation locale
+    // Local validation
     if (normalized.length < 3) {
       setState(() {
         _isUsernameAvailable = false;
@@ -207,7 +207,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Titre
+                  // Title
                   ShaderMask(
                     shaderCallback: (bounds) => const LinearGradient(
                       colors: [AppColors.brainPurple, AppColors.brainLightPurple],
@@ -232,7 +232,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   SizedBox(height: size.height * 0.04),
 
-                  // Card d'inscription
+                  // Sign-up card
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(

@@ -157,7 +157,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Description (cachée si vide)
+                      // Description (hidden if empty)
                       if (widget.concept.conceptDescription.isNotEmpty) ...[
                         Container(
                           width: double.infinity,

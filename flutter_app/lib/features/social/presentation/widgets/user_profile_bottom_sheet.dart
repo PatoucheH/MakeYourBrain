@@ -126,7 +126,7 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
     final accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions * 100) : 0.0;
     final rawStreak = (data['current_streak'] as num?)?.toInt() ?? 0;
     final bestStreak = (data['best_streak'] as num?)?.toInt() ?? 0;
-    // Calculer le streak effectif : 0 si pas joué depuis plus d'1 jour
+    // Calculate the effective streak: 0 if not played for more than 1 day
     final lastPlayedAt = data['last_played_at'] != null
         ? DateTime.tryParse(data['last_played_at'].toString())
         : null;

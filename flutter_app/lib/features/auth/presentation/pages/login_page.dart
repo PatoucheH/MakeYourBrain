@@ -185,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   SizedBox(height: size.height * 0.06),
 
-                  // Logo et mascotte
+                  // Logo and mascot
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -200,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Titre de l'app
+                  // App title
                   ShaderMask(
                     shaderCallback: (bounds) => const LinearGradient(
                       colors: [AppColors.brainPurple, AppColors.brainLightPurple],
@@ -225,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   SizedBox(height: size.height * 0.05),
 
-                  // Card de connexion
+                  // Sign-in card
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -236,7 +236,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Bouton Google
+                        // Google button
                         _buildSocialButton(
                           onPressed: _isLoading ? null : _loginWithGoogle,
                           icon: Icons.g_mobiledata,
@@ -246,7 +246,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 12),
 
-                        // Bouton Apple
+                        // Apple button
                         _buildSocialButton(
                           onPressed: _isLoading ? null : _loginWithApple,
                           icon: Icons.apple,
@@ -471,7 +471,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         child: Row(
           children: [
-            // Icône à gauche
+            // Icon on the left
             isLoading
                 ? const SizedBox(
                     width: 24,
@@ -482,7 +482,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   )
                 : Icon(icon, size: 24),
-            // Texte centré dans l'espace restant
+            // Text centered in the remaining space
             Expanded(
               child: Center(
                 child: Text(
@@ -491,7 +491,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            // Miroir de l'icône pour équilibrer le centrage optique
+            // Mirror of the icon to balance the optical centering
             const SizedBox(width: 24),
           ],
         ),

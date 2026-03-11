@@ -24,7 +24,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final pvp = context.read<PvPProvider>();
-      // Initialiser à l'état courant pour éviter un faux positif au premier changement
+      // Initialize to the current state to avoid a false positive on the first change
       _hadMatchFound = pvp.matchFound || pvp.matchFoundWaiting;
       pvp.addListener(_onProviderChanged);
     });
@@ -42,19 +42,19 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
     if (!mounted) return;
     final pvp = context.read<PvPProvider>();
 
-    // Consommer une vie au moment où le match est effectivement trouvé (pas avant).
-    // La transition false→true ne se produit que depuis une recherche active.
+    // Consume a life at the moment the match is actually found (not before).
+    // The false→true transition only occurs from an active search.
     final hasMatchFound = pvp.matchFound || pvp.matchFoundWaiting;
     if (hasMatchFound && !_hadMatchFound) {
       context.read<LivesProvider>().useLife();
     }
     _hadMatchFound = hasMatchFound;
 
-    // Dé-minimiser pour toute nouvelle notification
+    // Un-minimize for any new notification
     if ((pvp.matchFound || pvp.matchFoundWaiting || pvp.yourTurnNotification || pvp.matchCompletedNotification) && _isMinimized) {
       setState(() => _isMinimized = false);
     }
-    // Auto-navigation UNIQUEMENT pour le joueur qui commence (matchFound)
+    // Auto-navigation ONLY for the player who goes first (matchFound)
     if (pvp.matchFound && pvp.matchFoundCountdown <= 0) {
       _goToMatch();
     }
@@ -378,7 +378,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
               ],
             ),
             const SizedBox(height: 12),
-            // Barre de progression
+            // Progress bar
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(

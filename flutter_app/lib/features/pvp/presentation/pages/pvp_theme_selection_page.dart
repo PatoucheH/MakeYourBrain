@@ -72,8 +72,8 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
     try {
       final pvpProvider = context.read<PvPProvider>();
       await pvpProvider.selectTheme(theme.id);
-      // Pas de Navigator.pop() ici : la page est rendue à l'intérieur de PvPGamePage
-      // Le provider notifie, PvPGamePage se rebuild et affiche le quiz automatiquement
+      // No Navigator.pop() here: the page is rendered inside PvPGamePage
+      // The provider notifies, PvPGamePage rebuilds and displays the quiz automatically
     } catch (e) {
       debugPrint('Error selecting theme: $e');
       if (mounted) {

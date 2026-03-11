@@ -3,7 +3,7 @@ import '../../../../shared/services/supabase_service.dart';
 class ThemePreferencesRepository {
   final _supabase = SupabaseService().client;
 
-  // Sauvegarder les thèmes préférés
+  // Save preferred themes
   Future<void> savePreferences(String userId, List<String> themeIds) async {
     // Upsert new preferences FIRST — if this fails, the old ones are preserved
     if (themeIds.isNotEmpty) {
@@ -30,7 +30,7 @@ class ThemePreferencesRepository {
           .not('theme_id', 'in', '(${themeIds.join(',')})');
     }
 
-    // Marquer l'onboarding comme complété
+    // Mark onboarding as completed
     await _supabase
         .from('user_stats')
         .upsert({
@@ -40,7 +40,7 @@ class ThemePreferencesRepository {
         });
   }
 
-  // Récupérer les thèmes préférés
+  // Get preferred themes
   Future<List<String>> getPreferences(String userId) async {
     final response = await _supabase
         .from('user_theme_preferences')
@@ -53,10 +53,10 @@ class ThemePreferencesRepository {
         .toList();
   }
 
-  // Vérifier si onboarding complété
-  // Retourne true par défaut sur erreur réseau — un user authentifié
-  // existant ne doit pas être renvoyé vers l'onboarding à cause d'un
-  // problème de connexion au démarrage.
+  // Check if onboarding is completed
+  // Returns true by default on network error — an existing authenticated user
+  // must not be sent back to onboarding because of a
+  // connection problem at startup.
   Future<bool> hasCompletedOnboarding(String userId) async {
     try {
       final response = await _supabase

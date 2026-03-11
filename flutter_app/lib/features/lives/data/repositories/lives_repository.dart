@@ -4,7 +4,7 @@ import '../../../../shared/services/supabase_service.dart';
 class LivesRepository {
   final _supabase = SupabaseService().client;
 
-  // Récupérer les vies actuelles
+  // Get current lives
   Future<Map<String, dynamic>> getLives(String userId) async {
     final response = await _supabase.rpc('get_user_lives', params: {
       'p_user_id': userId,
@@ -22,7 +22,7 @@ class LivesRepository {
     return data.first as Map<String, dynamic>;
   }
 
-  // Utiliser une vie (retourne false si plus de vies)
+  // Use a life (returns false if no lives left)
   Future<bool> useLife(String userId) async {
     final response = await _supabase.rpc('use_life', params: {
       'p_user_id': userId,
@@ -31,7 +31,7 @@ class LivesRepository {
     return response == true;
   }
 
-  // Ajouter 2 vies après une pub (debug uniquement — en prod, les vies sont accordées via SSV AdMob)
+  // Add 2 lives after an ad (debug only — in prod, lives are granted via AdMob SSV)
   Future<void> addLivesFromAd(String userId) async {
     assert(kDebugMode, 'addLivesFromAd must only be called in debug mode');
     if (!kDebugMode) return;
@@ -40,7 +40,7 @@ class LivesRepository {
     });
   }
 
-  // Stream pour les mises à jour en temps réel
+  // Stream for real-time updates
   Stream<Map<String, dynamic>> livesStream(String userId) {
     return Stream.periodic(const Duration(seconds: 10), (_) async {
       return await getLives(userId);

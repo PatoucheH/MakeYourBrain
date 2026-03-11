@@ -25,14 +25,14 @@ class _BrainAppBarState extends State<BrainAppBar> {
   final _authRepo = AuthRepository();
   int? currentStreak;
 
-  // Cache statique : conserve la dernière valeur entre les navigations
-  // pour éviter le flash "-" à chaque rebuild.
+  // Static cache: keeps the last value between navigations
+  // to avoid the "-" flash on each rebuild.
   static int? _cachedStreak;
 
   @override
   void initState() {
     super.initState();
-    currentStreak = _cachedStreak; // affichage immédiat si déjà connu
+    currentStreak = _cachedStreak; // immediate display if already known
     _loadStreak();
   }
 

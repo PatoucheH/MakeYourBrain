@@ -32,7 +32,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
   int score = 0;
   bool isLoading = true;
   bool hasAnswered = false;
-  bool _completed = false; // guard : XP + complétion ne se déclenchent qu'une fois
+  bool _completed = false; // guard: XP + completion are only triggered once
   String? selectedAnswerId;
   final List<String> _questionIds = [];
   final List<String> _answerIds = [];
@@ -45,7 +45,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
 
   Future<void> _loadQuestions() async {
     try {
-      // Difficulté fixe pour le daily : 5 easy / 3 medium / 2 hard
+      // Fixed difficulty for the daily: 5 easy / 3 medium / 2 hard
       final result = await _dailyRepo.getDailyQuestions(
         languageCode: widget.languageCode,
         limit: 10,
@@ -84,7 +84,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
 
     final currentLanguage = context.read<LanguageProvider>().currentLanguage;
 
-    // PAS de useLife() ici - le quiz du jour ne coute pas de vie
+    // NO useLife() here - the daily quiz does not cost a life
 
     final authRepo = AuthRepository();
     if (authRepo.isLoggedIn()) {
@@ -132,18 +132,18 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
         debugPrint('Error updating streak: $e');
       }
       try {
-        // Le RPC vérifie chaque paire (question, réponse) côté serveur.
-        // Le bonus x3 du daily est géré via bonusXp.
+        // The RPC verifies each (question, answer) pair server-side.
+        // The daily x3 bonus is handled via bonusXp.
         if (_questionIds.isNotEmpty) {
           await _quizRepo.addQuizCompletionXp(
             userId: authRepo.getCurrentUserId()!,
             themeId: widget.concept.themeId,
             questionIds: List.unmodifiable(_questionIds),
             answerIds: List.unmodifiable(_answerIds),
-            bonusXp: score * 20, // équivalent au x3 (10 XP base × 2 bonus)
+            bonusXp: score * 20, // equivalent to x3 (10 XP base × 2 bonus)
           );
         }
-        // Marquer le quiz du jour comme complete
+        // Mark the daily quiz as complete
         await _dailyRepo.completeDailyConcept(authRepo.getCurrentUserId()!);
       } catch (e) {
         debugPrint('Error adding XP / completing daily: $e');
@@ -265,7 +265,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                 ),
                 const SizedBox(height: 28),
 
-                // Bouton retour uniquement (pas de recommencer)
+                // Back button only (no restart)
                 SizedBox(
                   width: double.infinity,
                   child: Container(
@@ -275,9 +275,9 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                     ),
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).pop(); // ferme dialog
-                        Navigator.of(context).pop(); // ferme daily quiz
-                        Navigator.of(context).pop(true); // ferme daily concept page, signale la complétion
+                        Navigator.of(context).pop(); // close dialog
+                        Navigator.of(context).pop(); // close daily quiz
+                        Navigator.of(context).pop(true); // close daily concept page, signal completion
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
@@ -727,7 +727,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                   ),
                 ),
                 const SizedBox(height: 3),
-                // Nom du concept
+                // Concept name
                 Text(
                   widget.concept.conceptName,
                   style: const TextStyle(

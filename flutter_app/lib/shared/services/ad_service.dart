@@ -16,12 +16,12 @@ class AdService {
   static bool _isSupported = false;
 
   static String get _androidRewardedAdUnitId => kDebugMode
-    ? 'ca-app-pub-3940256099942544/5224354917' // ID de test
-    : 'ca-app-pub-6743392628237404/2396801579'; // Ton vrai ID prod
+    ? 'ca-app-pub-3940256099942544/5224354917' // Test ID
+    : 'ca-app-pub-6743392628237404/2396801579'; // Real prod ID
 
   static String get _iosRewardedAdUnitId => kDebugMode
-    ? 'ca-app-pub-3940256099942544/1712485313' // ID de test
-    : 'ca-app-pub-6743392628237404/8998427429'; // Vrai ID prod iOS
+    ? 'ca-app-pub-3940256099942544/1712485313' // Test ID
+    : 'ca-app-pub-6743392628237404/8998427429'; // Real prod ID iOS
 
   String get _rewardedAdUnitId {
     if (defaultTargetPlatform == TargetPlatform.android) {
@@ -88,9 +88,9 @@ class AdService {
     );
   }
 
-  /// Affiche la pub rewarded.
-  /// Retourne true si l'utilisateur a regardé la pub jusqu'au bout (reward gagné).
-  /// Retourne false si la pub n'est pas prête ou si l'utilisateur l'a fermée avant la fin.
+  /// Shows the rewarded ad.
+  /// Returns true if the user watched the ad to the end (reward earned).
+  /// Returns false if the ad is not ready or if the user closed it before the end.
   Future<bool> showRewardedAd() async {
     if (_rewardedAd == null) {
       debugPrint('[AdService] Rewarded ad not ready');

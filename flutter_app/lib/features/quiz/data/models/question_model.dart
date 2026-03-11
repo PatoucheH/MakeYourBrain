@@ -47,8 +47,8 @@ class QuestionModel {
     );
   }
 
-  /// Garantit que la bonne réponse ne soit pas au même index
-  /// deux questions de suite dans la liste.
+  /// Ensures the correct answer is not at the same index
+  /// for two consecutive questions in the list.
   static List<QuestionModel> ensureAnswerVariety(List<QuestionModel> questions) {
     if (questions.length <= 1) return questions;
     final rng = Random();

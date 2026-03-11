@@ -94,12 +94,12 @@ void main() async {
     if (firebaseInitialized) {
       await NotificationService().initialize();
 
-      // Handler foreground : notification reçue app ouverte
+      // Foreground handler: notification received while app is open
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         debugPrint('📬 Notification foreground: ${message.notification?.title}');
       });
 
-      // Token refresh → mettre à jour Supabase
+      // Token refresh → update Supabase
       NotificationService().listenToTokenRefresh(() async {
         await AuthRepository().refreshFcmToken();
       });
@@ -325,16 +325,16 @@ class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Redémarrer le polling PvP au retour dans l'app
+      // Restart PvP polling on return to the app
       final pvp = context.read<PvPProvider>();
       if (pvp.currentUserId != null) {
         pvp.startBackgroundChecks();
       }
     } else if (state == AppLifecycleState.paused) {
-      // Auto-soumettre le round en cours si le joueur quitte l'app pendant un quiz
+      // Auto-submit the current round if the player leaves the app during a quiz
       final pvp = context.read<PvPProvider>();
       pvp.autoSubmitIfInProgress();
-      // Arrêter le polling quand l'app passe en arrière-plan
+      // Stop polling when the app goes to the background
       pvp.stopBackgroundChecks();
     }
   }
@@ -370,7 +370,7 @@ class SplashScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo animé
+              // Animated logo
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -437,13 +437,13 @@ class _AuthCheckerState extends State<AuthChecker> {
       return;
     }
 
-    // Démarrer le polling PvP en arrière-plan dès que l'utilisateur est connecté
+    // Start PvP background polling as soon as the user is logged in
     if (context.mounted) {
       context.read<PvPProvider>().startBackgroundChecks();
     }
 
-    // Charger la langue préférée depuis la DB avant d'afficher la destination
-    // (doit être awaité pour que le locale soit correct dès le premier rendu)
+    // Load the preferred language from the DB before showing the destination
+    // (must be awaited so the locale is correct from the first render)
     if (mounted) {
       await context.read<LanguageProvider>().loadFromServer();
     }
@@ -479,7 +479,7 @@ class _AuthCheckerState extends State<AuthChecker> {
         _isChecking = false;
       });
 
-      // Cold start depuis une notification (app fermée)
+      // Cold start from a notification (app closed)
       final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
       if (initialMessage != null && mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -488,8 +488,8 @@ class _AuthCheckerState extends State<AuthChecker> {
       }
     } catch (e) {
       if (!mounted) return;
-      // Sur erreur (ex: pas de réseau au démarrage), un user authentifié
-      // va sur HomePage. Seul un user non connecté va sur LoginPage.
+      // On error (e.g. no network at startup), an authenticated user
+      // goes to HomePage. Only a logged-out user goes to LoginPage.
       setState(() {
         _destination = _authRepo.isLoggedIn()
             ? const HomePage()

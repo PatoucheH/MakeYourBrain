@@ -3,7 +3,7 @@ import '../../../../shared/services/supabase_service.dart';
 class ProfileRepository {
   final _supabase = SupabaseService().client;
 
-  // Récupérer la progression par thème
+  // Get progress by theme
   Future<List<Map<String, dynamic>>> getProgressByTheme(String userId) async {
     final response = await _supabase.rpc('get_user_progress_by_theme', 
       params: {'p_user_id': userId}
@@ -13,7 +13,7 @@ class ProfileRepository {
     return List<Map<String, dynamic>>.from(response);
   }
 
-  // Mettre à jour le streak
+  // Update the streak
   Future<void> updateStreak(String userId) async {
     final offsetMinutes = DateTime.now().timeZoneOffset.inMinutes;
     final offsetHours = offsetMinutes ~/ 60;

@@ -55,8 +55,8 @@ class LivesProvider extends ChangeNotifier {
     }
   }
 
-  // Plus appelé directement — les vies sont accordées par le callback SSV AdMob.
-  // Conservé comme fallback de débogage uniquement.
+  // No longer called directly — lives are granted by the AdMob SSV callback.
+  // Kept as a debug fallback only.
   Future<void> addLivesFromAd() async {
     if (!kDebugMode) return;
     final userId = _authRepo.getCurrentUserId();

@@ -197,7 +197,7 @@ class _PvPGamePageState extends State<PvPGamePage>
       final pvp = context.read<PvPProvider>();
       pvp.removeListener(_onProviderChanged);
       // Si le joueur quitte en plein quiz et n'a pas encore soumis,
-      // auto-submit le round avec les réponses déjà données
+      // auto-submit the round with the already-given answers
       if (!pvp.roundSubmitted && pvp.currentRound != null && pvp.isMyTurn) {
         debugPrint('[PvP] GamePage dispose - player left during active quiz, auto-finishing round (${pvp.myAnswers.length} answers)');
         pvp.finishRound();
@@ -597,7 +597,7 @@ class _PvPGamePageState extends State<PvPGamePage>
     );
   }
 
-  /// Header du quiz PvP : ligne 1 = Round + Timer centré + Score, ligne 2 = Question
+  /// PvP quiz header: line 1 = Round + centered Timer + Score, line 2 = Question
   Widget _buildGameHeader(PvPProvider pvpProvider, AppLocalizations l10n) {
     final currentMatch = pvpProvider.currentMatch;
     final currentRound = currentMatch?.currentRound ?? 1;
@@ -614,7 +614,7 @@ class _PvPGamePageState extends State<PvPGamePage>
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         children: [
-          // Ligne 1 : Round | Timer centré | Score
+          // Line 1: Round | centered Timer | Score
           Row(
             children: [
               // Round
@@ -635,7 +635,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                 ),
               ),
               const Spacer(),
-              // Timer centré
+              // Centered timer
               SizedBox(
                 width: 52,
                 height: 52,

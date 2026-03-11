@@ -10,7 +10,7 @@ import '../repositories/pvp_repository.dart';
 class PvPProvider extends ChangeNotifier {
   bool _disposed = false;
 
-  /// Appelle notifyListeners() uniquement si le provider n'est pas encore disposé.
+  /// Calls notifyListeners() only if the provider has not yet been disposed.
   void _safeNotify() {
     if (!_disposed) notifyListeners();
   }
@@ -19,7 +19,7 @@ class PvPProvider extends ChangeNotifier {
   final AuthRepository _authRepository;
   final ProfileRepository _profileRepository;
 
-  // === État du jeu ===
+  // === Game state ===
   PvPMatchModel? currentMatch;
   PvPRoundModel? currentRound;
   List<QuestionModel> currentQuestions = [];
@@ -32,42 +32,42 @@ class PvPProvider extends ChangeNotifier {
   int consecutiveWrong = 0;
   bool roundSubmitted = false;
 
-  // === État de la recherche ===
+  // === Search state ===
   bool isSearchingMatch = false;
   bool isInQueue = false;
   int searchDuration = 0;
 
-  // === État des notifications ===
-  // Type 1a: Match trouvé, c'est à moi de jouer → countdown + auto-nav
+  // === Notification state ===
+  // Type 1a: Match found, it's my turn to play → countdown + auto-nav
   bool matchFound = false;
-  // Type 1b: Match trouvé, c'est à l'adversaire de jouer → countdown + auto-nav
+  // Type 1b: Match found, it's the opponent's turn to play → countdown + auto-nav
   bool matchFoundWaiting = false;
   int matchFoundCountdown = 5;
   String? foundMatchId;
   String? opponentUsername;
   String? opponentLanguage;
-  // Type 2: C'est ton tour → bouton pour aller au match
+  // Type 2: It's your turn → button to go to the match
   bool yourTurnNotification = false;
   int? notificationRoundNumber;
-  // Type 3: Match terminé → résultat
+  // Type 3: Match over → result
   bool matchCompletedNotification = false;
   bool? matchCompletedDidWin;
 
-  // === État interne ===
+  // === Internal state ===
   bool isOnGamePage = false;
   bool _previousIsMyTurn = false;
-  bool _processingMatchFound = false; // Guard contre les appels concurrents
-  bool _backgroundCheckRunning = false; // Guard pour le polling
-  bool _isSubmittingRound = false; // Guard contre les doubles soumissions
+  bool _processingMatchFound = false; // Guard against concurrent calls
+  bool _backgroundCheckRunning = false; // Guard for polling
+  bool _isSubmittingRound = false; // Guard against double submissions
   Timer? _matchFoundTimer;
   Timer? _notificationAutoDismissTimer;
   StreamSubscription<PvPMatchModel?>? _matchSubscription;
   Timer? _searchTimer;
   Timer? _searchDurationTimer;
-  Timer? _backgroundCheckTimer; // Polling global en arrière-plan
-  final Set<String> _knownMatchIds = {}; // Matchs qu'on a déjà vus
-  final Set<String> _notifiedCompletedMatchIds = {}; // Matchs dont on a déjà notifié la fin
-  final Set<String> _dismissedTurnNotifications = {}; // Tours déjà dismissés par l'utilisateur
+  Timer? _backgroundCheckTimer; // Global background polling
+  final Set<String> _knownMatchIds = {}; // Matches we have already seen
+  final Set<String> _notifiedCompletedMatchIds = {}; // Matches whose completion we have already notified
+  final Set<String> _dismissedTurnNotifications = {}; // Turns already dismissed by the user
 
   PvPProvider({
     PvPRepository? pvpRepository,
@@ -119,28 +119,28 @@ class PvPProvider extends ChangeNotifier {
       matchFound || matchFoundWaiting || yourTurnNotification || matchCompletedNotification;
 
   // =========================================================================
-  // POLLING GLOBAL EN ARRIÈRE-PLAN
+  // GLOBAL BACKGROUND POLLING
   // =========================================================================
 
-  /// Démarre le polling global. Appelé une fois au login/init.
-  /// Vérifie toutes les 5 secondes : queue + matchs actifs.
+  /// Starts global polling. Called once at login/init.
+  /// Checks every 5 seconds: queue + active matches.
   void startBackgroundChecks() {
     _backgroundCheckTimer?.cancel();
-    _backgroundCheckRunning = false; // Reset le guard au redémarrage
-    _processingMatchFound = false; // Reset au cas où bloqué
+    _backgroundCheckRunning = false; // Reset the guard on restart
+    _processingMatchFound = false; // Reset in case it was stuck
     _backgroundCheckTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       _backgroundCheck();
     });
-    // Ré-établir le watcher si on a un match actif (retour au foreground sur mobile)
+    // Re-establish the watcher if we have an active match (returning to foreground on mobile)
     if (currentMatch != null) {
       _knownMatchIds.add(currentMatch!.id);
       if (currentMatch!.isInProgress) {
         _watchMatch(currentMatch!.id);
       }
     }
-    // Charger les IDs des matchs connus au démarrage (pour détecter les complétions)
+    // Load known match IDs at startup (to detect completions)
     _initKnownMatches();
-    // Vérification immédiate au démarrage
+    // Immediate check at startup
     _backgroundCheck();
   }
 
@@ -160,8 +160,8 @@ class PvPProvider extends ChangeNotifier {
     _backgroundCheckRunning = false;
   }
 
-  /// Appelé quand l'app passe en arrière-plan (paused).
-  /// Si un quiz est en cours et le joueur n'a pas fini, auto-soumet ses réponses.
+  /// Called when the app goes to the background (paused).
+  /// If a quiz is in progress and the player hasn't finished, auto-submits their answers.
   void autoSubmitIfInProgress() {
     if (currentRound != null && !roundSubmitted && isMyTurn && myAnswers.isNotEmpty) {
       finishRound();
@@ -176,7 +176,7 @@ class PvPProvider extends ChangeNotifier {
     _backgroundCheckRunning = true;
 
     try {
-      // ── 1. Vérifier si le match courant est devenu "completed" ──
+      // ── 1. Check if the current match has become "completed" ──
       if (currentMatch != null && !currentMatch!.isCompleted) {
         final freshMatch = await _pvpRepository.getMatch(currentMatch!.id);
         if (freshMatch != null && freshMatch.isCompleted &&
@@ -193,16 +193,16 @@ class PvPProvider extends ChangeNotifier {
         }
       }
 
-      // ── 2. Récupérer tous les matchs actifs ──
+      // ── 2. Retrieve all active matches ──
       final activeMatches = await _pvpRepository.getActiveMatches(userId);
 
-      // ── 3. Vérifier les matchs connus qui sont devenus "completed" ──
+      // ── 3. Check known matches that have become "completed" ──
       if (_knownMatchIds.isNotEmpty && !matchCompletedNotification) {
         for (final knownId in _knownMatchIds.toList()) {
-          // Skip si déjà notifié ou si c'est un match actif
+          // Skip if already notified or if it's an active match
           if (_notifiedCompletedMatchIds.contains(knownId)) continue;
           if (activeMatches.any((m) => m.id == knownId)) continue;
-          // Ce match n'est plus actif → il est peut-être complété
+          // This match is no longer active → it may be completed
           final completedMatch = await _pvpRepository.getMatch(knownId);
           if (completedMatch != null && completedMatch.isCompleted) {
             _notifiedCompletedMatchIds.add(knownId);
@@ -217,7 +217,7 @@ class PvPProvider extends ChangeNotifier {
         }
       }
 
-      // ── 4. Parcourir les matchs actifs : c'est mon tour ? ──
+      // ── 4. Iterate over active matches: is it my turn? ──
       for (final match in activeMatches) {
         _knownMatchIds.add(match.id);
         final myTurn = match.isPlayerTurn(userId) || match.isPlayerChoosingTheme(userId);
@@ -229,7 +229,7 @@ class PvPProvider extends ChangeNotifier {
           if (isNewMatch) {
             _previousIsMyTurn = true;
           }
-          // Toujours relancer le watcher (peut mourir silencieusement sur Chrome/mobile)
+          // Always restart the watcher (can die silently on Chrome/mobile)
           _watchMatch(match.id);
           await _ensureOpponentInfo(match, userId);
           final notifKey = '${match.id}_${match.currentRound}';
@@ -244,19 +244,19 @@ class PvPProvider extends ChangeNotifier {
         }
       }
 
-      // ── 5. Pas notre tour → s'assurer que le watcher est actif ──
+      // ── 5. Not our turn → make sure the watcher is active ──
       if (activeMatches.isNotEmpty) {
         final match = activeMatches.first;
         final isNewMatch = currentMatch?.id != match.id;
         currentMatch = match;
         _updateIsMyTurn();
         _previousIsMyTurn = isMyTurn || isMyThemeChoice;
-        // Toujours relancer le watcher pour compenser les déconnexions silencieuses
+        // Always restart the watcher to compensate for silent disconnections
         _watchMatch(match.id);
         if (isNewMatch) _safeNotify();
       }
 
-      // ── 6. Aucun match actif ni courant → vérifier la queue ──
+      // ── 6. No active or current match → check the queue ──
       if (activeMatches.isEmpty && currentMatch == null) {
         final queueResult = await _pvpRepository.checkQueueStatus(userId);
         if (queueResult['matchFound'] == true && queueResult['matchId'] != null) {
@@ -285,9 +285,9 @@ class PvPProvider extends ChangeNotifier {
     }
   }
 
-  /// Envoie une push notification à l'adversaire (fire-and-forget).
-  /// [notificationType] : 'match_found' | 'your_turn' | 'match_over'
-  /// Le contenu est généré côté serveur selon la langue du destinataire.
+  /// Sends a push notification to the opponent (fire-and-forget).
+  /// [notificationType]: 'match_found' | 'your_turn' | 'match_over'
+  /// The content is generated server-side based on the recipient's language.
   void _notifyOpponent(String notificationType) {
     final userId = currentUserId;
     if (userId == null || currentMatch == null) return;
@@ -307,13 +307,13 @@ class PvPProvider extends ChangeNotifier {
   }
 
   // =========================================================================
-  // PAGE DE JEU - flag pour supprimer les notifications quand on est dessus
+  // GAME PAGE - flag to suppress notifications when on this page
   // =========================================================================
 
   void setOnGamePage(bool value) {
     isOnGamePage = value;
     if (value) {
-      // On entre sur la page de jeu → dismiss toutes les notifications
+      // Entering the game page → dismiss all notifications
       final hadNotification = yourTurnNotification || matchFoundWaiting || matchCompletedNotification;
       yourTurnNotification = false;
       matchFoundWaiting = false;
@@ -393,7 +393,7 @@ class PvPProvider extends ChangeNotifier {
   Future<void> _checkForMatch() async {
     final userId = currentUserId;
     if (userId == null) return;
-    // Guard contre les appels concurrents (Timer.periodic n'attend pas l'async)
+    // Guard against concurrent calls (Timer.periodic doesn't wait for async)
     if (_processingMatchFound) return;
 
     try {
@@ -433,17 +433,17 @@ class PvPProvider extends ChangeNotifier {
   // MATCH FOUND
   // =========================================================================
 
-  /// Match trouvé depuis une RECHERCHE ACTIVE (joinMatchmaking / _checkForMatch).
-  /// Affiche la notification "Match Trouvé" avec countdown + auto-nav.
+  /// Match found from an ACTIVE SEARCH (joinMatchmaking / _checkForMatch).
+  /// Shows the "Match Found" notification with countdown + auto-nav.
   Future<void> _onMatchFound() async {
-    // Guard contre les appels concurrents (Timer.periodic + réseau lent sur mobile)
+    // Guard against concurrent calls (Timer.periodic + slow network on mobile)
     if (_processingMatchFound) return;
     _processingMatchFound = true;
 
     _stopSearchTimers();
     isInQueue = false;
     isSearchingMatch = false;
-    // Notifier immédiatement pour que l'UI masque le popup de recherche
+    // Notify immediately so the UI hides the search popup
     _safeNotify();
 
     try {
@@ -463,14 +463,14 @@ class PvPProvider extends ChangeNotifier {
       _notifyOpponent('match_found');
 
       if (isMyTurn || isMyThemeChoice) {
-        // C'est à moi de jouer → countdown 5s puis auto-nav
+        // It's my turn to play → 5s countdown then auto-nav
         _previousIsMyTurn = true;
         matchFound = true;
         matchFoundCountdown = 5;
         _safeNotify();
         _startMatchFoundCountdown();
       } else {
-        // L'adversaire joue → notification "Match Trouvé - En attente"
+        // The opponent plays → "Match Found - Waiting" notification
         _previousIsMyTurn = false;
         matchFoundWaiting = true;
         _safeNotify();
@@ -490,8 +490,8 @@ class PvPProvider extends ChangeNotifier {
       _safeNotify();
       if (matchFoundCountdown <= 0) {
         timer.cancel();
-        // Ne pas clear les flags ici - l'overlay gère la navigation
-        // et appelle dismissNotification() au moment de naviguer
+        // Do not clear the flags here - the overlay manages navigation
+        // and calls dismissNotification() when navigating
       }
     });
   }
@@ -511,8 +511,8 @@ class PvPProvider extends ChangeNotifier {
     _safeNotify();
   }
 
-  /// Démarre un timer de 15s pour auto-dismiss les notifications
-  /// (toutes sauf matchFound qui a son propre countdown + auto-teleport)
+  /// Starts a 15s timer to auto-dismiss notifications
+  /// (all except matchFound which has its own countdown + auto-teleport)
   void _startAutoDismissTimer() {
     _notificationAutoDismissTimer?.cancel();
     _notificationAutoDismissTimer = Timer(const Duration(seconds: 15), () {
@@ -583,8 +583,8 @@ class PvPProvider extends ChangeNotifier {
 
       _knownMatchIds.add(currentMatch!.id);
       _updateIsMyTurn();
-      // Ne pas écraser _previousIsMyTurn si appelé depuis _onMatchFound
-      // (qui le définit correctement pour que le watcher détecte les transitions)
+      // Do not overwrite _previousIsMyTurn if called from _onMatchFound
+      // (which sets it correctly so the watcher can detect transitions)
       if (!preservePreviousTurn) {
         _previousIsMyTurn = isMyTurn || isMyThemeChoice;
       }
@@ -619,8 +619,8 @@ class PvPProvider extends ChangeNotifier {
     _matchSubscription = _pvpRepository.watchMatch(matchId).listen(
       (match) async {
         if (match == null) return;
-        // Ne pas interférer pendant un submitRound en cours
-        // (submitRound gère lui-même les transitions de status)
+        // Do not interfere while a submitRound is in progress
+        // (submitRound manages its own status transitions)
         if (_isSubmittingRound) return;
 
         final previousStatus = currentMatch?.status;
@@ -629,7 +629,7 @@ class PvPProvider extends ChangeNotifier {
         currentMatch = match;
         _updateIsMyTurn();
 
-        // Match terminé
+        // Match over
         if (previousStatus != PvPMatchStatus.completed &&
             match.status == PvPMatchStatus.completed) {
           _notifiedCompletedMatchIds.add(match.id);
@@ -645,7 +645,7 @@ class PvPProvider extends ChangeNotifier {
           return;
         }
 
-        // C'est devenu mon tour (et ça ne l'était pas avant)
+        // It has become my turn (and it wasn't before)
         // Notification SEULEMENT si PAS sur la page de jeu
         if (!wasMyTurn && (isMyTurn || isMyThemeChoice) && !matchFound && !isOnGamePage) {
           final notifKey = '${match.id}_${match.currentRound}';
@@ -661,7 +661,7 @@ class PvPProvider extends ChangeNotifier {
         }
         _previousIsMyTurn = isMyTurn || isMyThemeChoice;
 
-        // Si statut changé de choosingTheme → playerTurn, charger le round
+        // If status changed from choosingTheme → playerTurn, load the round
         final wasChoosingTheme = previousStatus == PvPMatchStatus.player1ChoosingTheme ||
             previousStatus == PvPMatchStatus.player2ChoosingTheme;
         final isNowPlaying = match.status == PvPMatchStatus.player1Turn ||
@@ -710,7 +710,7 @@ class PvPProvider extends ChangeNotifier {
 
       final questionIds = questions.map((q) => q.id).toList();
 
-      // Vérifier si le round existe déjà (peut arriver si submitRound a été appelé 2 fois)
+      // Check if the round already exists (can happen if submitRound was called twice)
       final existingRound = await _pvpRepository.getRound(
         currentMatch!.id,
         currentMatch!.currentRound,
@@ -857,7 +857,7 @@ class PvPProvider extends ChangeNotifier {
       language,
     );
 
-    // Réordonner pour correspondre à l'ordre exact de questionIds
+    // Reorder to match the exact order of questionIds
     final questionsMap = {for (final q in fetchedQuestions) q.id: q};
     currentQuestions = questionIds
         .where((id) => questionsMap.containsKey(id))
@@ -994,8 +994,8 @@ class PvPProvider extends ChangeNotifier {
     if (roundSubmitted) return;
     roundSubmitted = true;
     _safeNotify();
-    // Si un submit est déjà en cours (ex: dernière réponse a déclenché submitRound),
-    // on ne relance pas - le round sera soumis avec les réponses actuelles
+    // If a submit is already in progress (e.g. last answer triggered submitRound),
+    // do not re-trigger - the round will be submitted with the current answers
     if (!_isSubmittingRound) {
       submitRound();
     }
@@ -1009,7 +1009,7 @@ class PvPProvider extends ChangeNotifier {
     if (currentMatch == null || currentRound == null || currentUserId == null) {
       return;
     }
-    // Guard contre les appels concurrents (selectAnswer + finishRound/timer)
+    // Guard against concurrent calls (selectAnswer + finishRound/timer)
     if (_isSubmittingRound) return;
     _isSubmittingRound = true;
 
@@ -1202,7 +1202,7 @@ class PvPProvider extends ChangeNotifier {
     _notifiedCompletedMatchIds.clear();
     _dismissedTurnNotifications.clear();
 
-    // NE PAS arrêter le background timer : il doit continuer à tourner
+    // DO NOT stop the background timer: it must keep running
     _safeNotify();
   }
 
