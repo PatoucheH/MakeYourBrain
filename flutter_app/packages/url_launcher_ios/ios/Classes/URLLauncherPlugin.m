@@ -4,6 +4,7 @@
 
 #import "URLLauncherPlugin.h"
 #import <UIKit/UIKit.h>
+#import <SafariServices/SafariServices.h>
 
 // ─── Enum values (matching Swift rawValue / Dart index) ──────────────────────
 
@@ -114,7 +115,31 @@ typedef NS_ENUM(NSInteger, URLInAppLoadResult) {
 // ─── Main plugin ─────────────────────────────────────────────────────────────
 
 @interface URLLauncherPlugin ()
+@property (nonatomic, weak) SFSafariViewController *activeSafariVC;
 @end
+
+// Returns the topmost presented UIViewController, safe on iOS 26.
+static UIViewController *FLTopViewController(void) {
+    UIWindow *keyWindow = nil;
+    for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
+        if (![scene isKindOfClass:[UIWindowScene class]]) continue;
+        UIWindowScene *ws = (UIWindowScene *)scene;
+        if (ws.activationState != UISceneActivationStateForegroundActive) continue;
+        for (UIWindow *w in ws.windows) {
+            if (w.isKeyWindow) { keyWindow = w; break; }
+        }
+        if (keyWindow) break;
+    }
+    // Fallback for older iOS or edge cases
+    if (!keyWindow) {
+        keyWindow = [UIApplication sharedApplication].windows.firstObject;
+    }
+    UIViewController *vc = keyWindow.rootViewController;
+    while (vc.presentedViewController && !vc.presentedViewController.isBeingDismissed) {
+        vc = vc.presentedViewController;
+    }
+    return vc;
+}
 
 @implementation URLLauncherPlugin
 
@@ -176,11 +201,16 @@ typedef NS_ENUM(NSInteger, URLInAppLoadResult) {
             return;
         }
         // Reply immediately so launchUrl returns — OAuth callback arrives via app_links.
-        // Use external Safari (openURL) instead of SFSafariViewController to avoid
-        // view hierarchy complexity and completion-block issues on iOS 26.
+        // SFSafariViewController is presented in-app to satisfy Apple guideline 4.
         reply(@[[URLInAppLoadResultWrapper wrap:URLInAppLoadResultSuccess]]);
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+            UIViewController *topVC = FLTopViewController();
+            if (!topVC) return;
+            SFSafariViewController *safariVC = [[SFSafariViewController alloc] initWithURL:url];
+            safariVC.delegate = instance;
+            safariVC.modalPresentationStyle = UIModalPresentationPageSheet;
+            instance.activeSafariVC = safariVC;
+            [topVC presentViewController:safariVC animated:YES completion:nil];
         });
     }];
 
@@ -190,9 +220,20 @@ typedef NS_ENUM(NSInteger, URLInAppLoadResult) {
                binaryMessenger:messenger
                          codec:codec];
     [closeChannel setMessageHandler:^(id message, FlutterReply reply) {
-        // No-op: we use openURL (external Safari), nothing to close programmatically.
+        dispatch_async(dispatch_get_main_queue(), ^{
+            SFSafariViewController *safariVC = instance.activeSafariVC;
+            if (safariVC && safariVC.presentingViewController) {
+                [safariVC dismissViewControllerAnimated:YES completion:nil];
+            }
+            instance.activeSafariVC = nil;
+        });
         reply(@[[NSNull null]]);
     }];
+}
+
+// Called when the user taps "Done" in the SFSafariViewController.
+- (void)safariViewControllerDidFinish:(SFSafariViewController *)controller {
+    self.activeSafariVC = nil;
 }
 
 @end
