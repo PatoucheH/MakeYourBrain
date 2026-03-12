@@ -167,7 +167,7 @@ Future<bool> signInWithFacebook() async {
       final response = await _supabase.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: 'com.patou.makeyourbrain://login-callback',
-        authScreenLaunchMode: LaunchMode.inAppWebView,
+        authScreenLaunchMode: LaunchMode.inAppBrowserView,
       );
 
       if (!response) {
@@ -209,7 +209,7 @@ Future<bool> signInWithFacebook() async {
       final response = await _supabase.auth.signInWithOAuth(
         OAuthProvider.apple,
         redirectTo: kIsWeb ? null : 'com.patou.makeyourbrain://login-callback',
-        authScreenLaunchMode: LaunchMode.inAppWebView,
+        authScreenLaunchMode: LaunchMode.inAppBrowserView,
       );
 
       if (!response) {
