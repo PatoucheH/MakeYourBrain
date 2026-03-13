@@ -69,6 +69,7 @@
   "loadingAdd": "Loading add ....",
   "winLifes": "+2 Lives! Keep playing!",
   "adRewardPending": "Reward is being verified, your lives will appear shortly.",
+  "adNotAvailable": "Ad not available. Try again later.",
   "noLife": "No Lives Left!",
   "needLifes": "You need lives to play.",
   "nextLife": "Next life in:",

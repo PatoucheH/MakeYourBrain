@@ -69,6 +69,7 @@
   "loadingAdd": "Chargement d'une pub....",
   "winLifes": "+2 Vies ! Continuez à jouer",
   "adRewardPending": "Récompense en cours de vérification, vos vies arrivent...",
+  "adNotAvailable": "Pub non disponible. Réessayez plus tard.",
   "noLife": "Plus de vie !",
   "needLifes": "Vous avez besoin de vie pour jouer",
   "nextLife": "Prochaine vie dans :",
