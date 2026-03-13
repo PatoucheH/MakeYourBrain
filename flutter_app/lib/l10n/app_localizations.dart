@@ -506,6 +506,12 @@ abstract class AppLocalizations {
   /// **'Reward is being verified, your lives will appear shortly.'**
   String get adRewardPending;
 
+  /// No description provided for @adNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Ad not available. Try again later.'**
+  String get adNotAvailable;
+
   /// No description provided for @noLife.
   ///
   /// In en, this message translates to:

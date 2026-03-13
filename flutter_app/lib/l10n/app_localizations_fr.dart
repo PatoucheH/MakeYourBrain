@@ -219,6 +219,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Récompense en cours de vérification, vos vies arrivent...';
 
   @override
+  String get adNotAvailable => 'Pub non disponible. Réessayez plus tard.';
+
+  @override
   String get noLife => 'Plus de vie !';
 
   @override

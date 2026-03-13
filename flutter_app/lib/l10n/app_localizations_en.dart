@@ -219,6 +219,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Reward is being verified, your lives will appear shortly.';
 
   @override
+  String get adNotAvailable => 'Ad not available. Try again later.';
+
+  @override
   String get noLife => 'No Lives Left!';
 
   @override

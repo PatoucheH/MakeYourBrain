@@ -18,6 +18,8 @@ class AdService {
   bool _isShowing = false;
   static bool _isSupported = false;
 
+  bool get isSupported => _isSupported;
+
   // ─── Ad unit IDs ──────────────────────────────────────────────────────────
 
   static String get _androidAdUnitId => kDebugMode
@@ -76,12 +78,15 @@ class AdService {
   /// Waits until the ad is ready or [timeout] expires.
   Future<bool> waitUntilReady(
       {Duration timeout = const Duration(seconds: 10)}) async {
+    if (!_isSupported) return false;
     if (isAdReady) return true;
     loadRewardedAd();
     final deadline = DateTime.now().add(timeout);
     while (DateTime.now().isBefore(deadline)) {
       await Future.delayed(const Duration(milliseconds: 500));
       if (isAdReady) return true;
+      // Retry if loading failed and not currently loading
+      if (!_isLoading) loadRewardedAd();
     }
     return false;
   }

@@ -46,6 +46,20 @@ class _NoLivesDialogState extends State<NoLivesDialog>
     setState(() => _isLoadingAd = true);
 
     if (!adService.isAdReady) {
+      if (!adService.isSupported) {
+        if (mounted) setState(() => _isLoadingAd = false);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.adNotAvailable),
+              backgroundColor: AppColors.warning,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          );
+        }
+        return;
+      }
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -61,6 +75,16 @@ class _NoLivesDialogState extends State<NoLivesDialog>
       if (context.mounted) ScaffoldMessenger.of(context).hideCurrentSnackBar();
       if (!ready) {
         if (mounted) setState(() => _isLoadingAd = false);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.adNotAvailable),
+              backgroundColor: AppColors.warning,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          );
+        }
         return;
       }
     }
