@@ -10,26 +10,28 @@ class AdService {
   factory AdService() => _instance;
   AdService._internal();
 
-  RewardedInterstitialAd? _rewardedAd;
+  // Android uses RewardedAd, iOS uses RewardedInterstitialAd.
+  RewardedAd? _rewardedAdAndroid;
+  RewardedInterstitialAd? _rewardedAdIos;
+
   bool _isLoading = false;
   bool _isShowing = false;
   static bool _isSupported = false;
 
-  static String get _androidRewardedAdUnitId => kDebugMode
-    ? 'ca-app-pub-3940256099942544/5354046379' // Test ID (rewarded interstitial)
-    : 'ca-app-pub-6743392628237404/2396801579'; // Real prod ID
+  // ─── Ad unit IDs ──────────────────────────────────────────────────────────
 
-  static String get _iosRewardedAdUnitId => kDebugMode
-    ? 'ca-app-pub-3940256099942544/6978759866' // Test ID (rewarded interstitial)
-    : 'ca-app-pub-6743392628237404/8998427429'; // Real prod ID iOS
+  static String get _androidAdUnitId => kDebugMode
+      ? 'ca-app-pub-3940256099942544/5224354917' // Test ID (rewarded)
+      : 'ca-app-pub-6743392628237404/2396801579'; // Prod ID Android
 
-  String get _rewardedAdUnitId {
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return _androidRewardedAdUnitId;
-    } else {
-      return _iosRewardedAdUnitId;
-    }
-  }
+  static String get _iosAdUnitId => kDebugMode
+      ? 'ca-app-pub-3940256099942544/6978759866' // Test ID (rewarded interstitial)
+      : 'ca-app-pub-6743392628237404/8998427429'; // Prod ID iOS
+
+  String get _adUnitId =>
+      Platform.isAndroid ? _androidAdUnitId : _iosAdUnitId;
+
+  // ─── Init ─────────────────────────────────────────────────────────────────
 
   static bool get _isMobilePlatform =>
       defaultTargetPlatform == TargetPlatform.android ||
@@ -42,11 +44,16 @@ class AdService {
     }
     try {
       if (Platform.isIOS) {
-        final status = await AppTrackingTransparency.trackingAuthorizationStatus;
-        if (status == TrackingStatus.notDetermined) {
-          await AppTrackingTransparency.requestTrackingAuthorization();
+        try {
+          final status =
+              await AppTrackingTransparency.trackingAuthorizationStatus;
+          if (status == TrackingStatus.notDetermined) {
+            await AppTrackingTransparency.requestTrackingAuthorization();
+          }
+          debugPrint('[AdService] ATT status: $status');
+        } catch (e) {
+          debugPrint('[AdService] ATT error (non-fatal): $e');
         }
-        debugPrint('[AdService] ATT status: $status');
       }
       await MobileAds.instance.initialize();
       _isSupported = true;
@@ -57,10 +64,18 @@ class AdService {
     }
   }
 
-  bool get isAdReady => _isSupported && _rewardedAd != null;
+  // ─── State ────────────────────────────────────────────────────────────────
 
-  /// Waits until the rewarded ad is ready or [timeout] expires.
-  Future<bool> waitUntilReady({Duration timeout = const Duration(seconds: 10)}) async {
+  bool get isAdReady {
+    if (!_isSupported) return false;
+    return Platform.isAndroid
+        ? _rewardedAdAndroid != null
+        : _rewardedAdIos != null;
+  }
+
+  /// Waits until the ad is ready or [timeout] expires.
+  Future<bool> waitUntilReady(
+      {Duration timeout = const Duration(seconds: 10)}) async {
     if (isAdReady) return true;
     loadRewardedAd();
     final deadline = DateTime.now().add(timeout);
@@ -71,41 +86,72 @@ class AdService {
     return false;
   }
 
+  // ─── Load ─────────────────────────────────────────────────────────────────
+
   void loadRewardedAd() {
-    if (!_isSupported || _isLoading || _rewardedAd != null) return;
+    if (!_isSupported || _isLoading || isAdReady) return;
     _isLoading = true;
 
     final userId = AuthRepository().getCurrentUserId();
 
-    RewardedInterstitialAd.load(
-      adUnitId: _rewardedAdUnitId,
+    if (Platform.isAndroid) {
+      _loadAndroid(userId);
+    } else {
+      _loadIos(userId);
+    }
+  }
+
+  void _loadAndroid(String? userId) {
+    RewardedAd.load(
+      adUnitId: _adUnitId,
       request: const AdRequest(),
-      rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
           if (userId != null) {
             ad.setServerSideOptions(
-              ServerSideVerificationOptions(userId: userId),
-            );
+                ServerSideVerificationOptions(userId: userId));
           }
-          _rewardedAd = ad;
+          _rewardedAdAndroid = ad;
           _isLoading = false;
-          debugPrint('[AdService] Rewarded interstitial ad loaded (SSV userId: $userId)');
+          debugPrint('[AdService] Android rewarded ad loaded');
         },
         onAdFailedToLoad: (error) {
-          _rewardedAd = null;
+          _rewardedAdAndroid = null;
           _isLoading = false;
-          debugPrint('[AdService] Failed to load rewarded interstitial ad: ${error.message}');
+          debugPrint('[AdService] Android failed to load: ${error.message}');
         },
       ),
     );
   }
 
-  /// Shows the rewarded interstitial ad.
-  /// Returns true if the user watched the ad to the end (reward earned).
-  /// Returns false if the ad is not ready or if the user closed it before the end.
+  void _loadIos(String? userId) {
+    RewardedInterstitialAd.load(
+      adUnitId: _adUnitId,
+      request: const AdRequest(),
+      rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          if (userId != null) {
+            ad.setServerSideOptions(
+                ServerSideVerificationOptions(userId: userId));
+          }
+          _rewardedAdIos = ad;
+          _isLoading = false;
+          debugPrint('[AdService] iOS rewarded interstitial ad loaded');
+        },
+        onAdFailedToLoad: (error) {
+          _rewardedAdIos = null;
+          _isLoading = false;
+          debugPrint('[AdService] iOS failed to load: ${error.message}');
+        },
+      ),
+    );
+  }
+
+  // ─── Show ─────────────────────────────────────────────────────────────────
+
   Future<bool> showRewardedAd() async {
-    if (_rewardedAd == null) {
-      debugPrint('[AdService] Rewarded interstitial ad not ready');
+    if (!isAdReady) {
+      debugPrint('[AdService] Ad not ready');
       loadRewardedAd();
       return false;
     }
@@ -118,41 +164,67 @@ class AdService {
     final completer = Completer<bool>();
     bool rewarded = false;
 
-    _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdDismissedFullScreenContent: (ad) {
-        debugPrint('[AdService] Ad dismissed, rewarded=$rewarded');
-        ad.dispose();
-        _rewardedAd = null;
-        _isShowing = false;
-        loadRewardedAd();
-        if (!completer.isCompleted) {
-          completer.complete(rewarded);
-        }
-      },
-      onAdFailedToShowFullScreenContent: (ad, error) {
-        debugPrint('[AdService] Failed to show rewarded interstitial ad: ${error.message}');
-        ad.dispose();
-        _rewardedAd = null;
-        _isShowing = false;
-        loadRewardedAd();
-        if (!completer.isCompleted) {
-          completer.complete(false);
-        }
-      },
-    );
-
-    await _rewardedAd!.show(
-      onUserEarnedReward: (ad, reward) {
-        debugPrint('[AdService] User earned reward: ${reward.amount} ${reward.type}');
-        rewarded = true;
-      },
-    );
+    if (Platform.isAndroid) {
+      final ad = _rewardedAdAndroid!;
+      ad.fullScreenContentCallback = FullScreenContentCallback(
+        onAdDismissedFullScreenContent: (_) {
+          debugPrint('[AdService] Android ad dismissed, rewarded=$rewarded');
+          ad.dispose();
+          _rewardedAdAndroid = null;
+          _isShowing = false;
+          loadRewardedAd();
+          if (!completer.isCompleted) completer.complete(rewarded);
+        },
+        onAdFailedToShowFullScreenContent: (_, error) {
+          debugPrint('[AdService] Android failed to show: ${error.message}');
+          ad.dispose();
+          _rewardedAdAndroid = null;
+          _isShowing = false;
+          loadRewardedAd();
+          if (!completer.isCompleted) completer.complete(false);
+        },
+      );
+      await ad.show(
+        onUserEarnedReward: (_, reward) {
+          debugPrint('[AdService] Reward earned: ${reward.amount}');
+          rewarded = true;
+        },
+      );
+    } else {
+      final ad = _rewardedAdIos!;
+      ad.fullScreenContentCallback = FullScreenContentCallback(
+        onAdDismissedFullScreenContent: (_) {
+          debugPrint('[AdService] iOS ad dismissed, rewarded=$rewarded');
+          ad.dispose();
+          _rewardedAdIos = null;
+          _isShowing = false;
+          loadRewardedAd();
+          if (!completer.isCompleted) completer.complete(rewarded);
+        },
+        onAdFailedToShowFullScreenContent: (_, error) {
+          debugPrint('[AdService] iOS failed to show: ${error.message}');
+          ad.dispose();
+          _rewardedAdIos = null;
+          _isShowing = false;
+          loadRewardedAd();
+          if (!completer.isCompleted) completer.complete(false);
+        },
+      );
+      await ad.show(
+        onUserEarnedReward: (_, reward) {
+          debugPrint('[AdService] Reward earned: ${reward.amount}');
+          rewarded = true;
+        },
+      );
+    }
 
     return completer.future;
   }
 
   void dispose() {
-    _rewardedAd?.dispose();
-    _rewardedAd = null;
+    _rewardedAdAndroid?.dispose();
+    _rewardedAdAndroid = null;
+    _rewardedAdIos?.dispose();
+    _rewardedAdIos = null;
   }
 }

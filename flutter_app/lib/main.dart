@@ -19,8 +19,12 @@ import 'features/pvp/data/providers/pvp_provider.dart';
 import 'features/pvp/presentation/widgets/matchmaking_overlay.dart';
 import 'features/pvp/presentation/pages/pvp_menu_page.dart';
 import 'shared/services/notification_service.dart';
+import 'core/navigation/route_observer.dart';
+import 'dart:async';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+export 'core/navigation/route_observer.dart';
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void _navigateToPvPFromNotification() {
@@ -308,16 +312,27 @@ class AuthGate extends StatefulWidget {
 
 class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
   bool _isInitialized = false;
+  int _authVersion = 0;
+  StreamSubscription<AuthState>? _authSub;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initialize();
+    _authSub = SupabaseService().client.auth.onAuthStateChange.listen((state) {
+      if (!mounted) return;
+      if (state.event == AuthChangeEvent.signedIn ||
+          state.event == AuthChangeEvent.signedOut ||
+          state.event == AuthChangeEvent.userDeleted) {
+        setState(() => _authVersion++);
+      }
+    });
   }
 
   @override
   void dispose() {
+    _authSub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -351,7 +366,7 @@ class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
       return const SplashScreen();
     }
 
-    return const AuthChecker();
+    return AuthChecker(key: ValueKey(_authVersion));
   }
 }
 

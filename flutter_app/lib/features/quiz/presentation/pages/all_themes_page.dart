@@ -9,7 +9,7 @@ import '../../data/models/theme_model.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
 import 'theme_detail_page.dart';
-import '../../../../main.dart';
+import '../../../../core/navigation/route_observer.dart';
 
 class AllThemesPage extends StatefulWidget {
   const AllThemesPage({super.key});

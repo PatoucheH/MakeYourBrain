@@ -1,10 +1,7 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/repositories/auth_repository.dart';
-import '../../../../main.dart';
 import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -20,16 +17,6 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
-  Timer? _oauthTimer;
-  StreamSubscription? _oauthSubscription;
-
-  void _resetOAuthState() {
-    _oauthTimer?.cancel();
-    _oauthSubscription?.cancel();
-    _oauthTimer = null;
-    _oauthSubscription = null;
-    if (mounted) setState(() => _isLoading = false);
-  }
 
   Future<void> _login() async {
     final l10n = AppLocalizations.of(context)!;
@@ -48,113 +35,36 @@ class _LoginPageState extends State<LoginPage> {
         _emailController.text.trim(),
         _passwordController.text,
       );
-
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const AuthChecker()),
-        );
-      }
+      // Navigation handled globally by AuthGate via authStateChanges listener
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.loginFailed)),
         );
+        setState(() => _isLoading = false);
       }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  // Future<void> _loginWithFacebook() async {
-  //   setState(() => _isLoading = true);
-  //   try {
-  //     final success = await _repository.signInWithFacebook();
-  //     if (!success) {
-  //       if (mounted) {
-  //         setState(() => _isLoading = false);
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           const SnackBar(content: Text('Could not open Facebook login')),
-  //         );
-  //       }
-  //       return;
-  //     }
-  //     final subscription = _repository.authStateChanges.listen((state) {
-  //       if (state.event == AuthChangeEvent.signedIn && mounted) {
-  //         Navigator.of(context).pushReplacement(
-  //           MaterialPageRoute(builder: (context) => const HomePage()),
-  //         );
-  //       }
-  //     });
-  //     await Future.delayed(const Duration(seconds: 60));
-  //     subscription.cancel();
-  //     if (mounted && !_repository.isLoggedIn()) {
-  //       setState(() => _isLoading = false);
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text('Login timeout. Please try again.')),
-  //       );
-  //     }
-  //   } catch (e) {
-  //     if (mounted) {
-  //       setState(() => _isLoading = false);
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Facebook login error: $e')),
-  //       );
-  //     }
-  //   }
-  // }
-
-  Future<void> _startOAuthFlow(Future<bool> Function() signIn, String failMessage) async {
-    final l10n = AppLocalizations.of(context)!;
+  Future<void> _startOAuthFlow(
+    Future<bool> Function() signIn,
+    String failMessage,
+  ) async {
     setState(() => _isLoading = true);
-
     try {
       final success = await signIn();
-
-      if (!success) {
-        if (mounted) {
-          setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(failMessage)),
-          );
-        }
-        return;
-      }
-
-      // With inAppBrowserView, supabase_flutter v2 handles the deep link internally
-      // and completes the PKCE exchange before returning. The signedIn event has
-      // already been emitted by the time we reach here, so navigate directly.
-      if (mounted && _repository.isLoggedIn()) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const AuthChecker()),
+      if (!success && mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(failMessage)),
         );
-        return;
       }
-
-      // Fallback: listen for the signedIn event in case auth completes asynchronously.
-      _oauthSubscription = _repository.authStateChanges.listen((state) {
-        if (state.event == AuthChangeEvent.signedIn && mounted) {
-          _oauthTimer?.cancel();
-          _oauthSubscription?.cancel();
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const AuthChecker()),
-          );
-        }
-      });
-
-      // Reset after 30s if no auth received.
-      _oauthTimer = Timer(const Duration(seconds: 30), () {
-        if (mounted && !_repository.isLoggedIn()) {
-          _resetOAuthState();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.loginTimeout)),
-          );
-        }
-      });
+      // Navigation handled globally by AuthGate via authStateChanges listener
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.loginFailed)),
+          SnackBar(content: Text(AppLocalizations.of(context)!.loginFailed)),
         );
       }
     }
@@ -275,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                                   gradient: LinearGradient(
                                     colors: [
                                       Colors.transparent,
-                                      AppColors.brainPurple.withValues(alpha:0.3),
+                                      AppColors.brainPurple.withValues(alpha: 0.3),
                                     ],
                                   ),
                                 ),
@@ -297,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      AppColors.brainPurple.withValues(alpha:0.3),
+                                      AppColors.brainPurple.withValues(alpha: 0.3),
                                       Colors.transparent,
                                     ],
                                   ),
@@ -433,7 +343,7 @@ class _LoginPageState extends State<LoginPage> {
         prefixIcon: Icon(icon, color: AppColors.brainPurple),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: AppColors.brainPurpleLight.withValues(alpha:0.3),
+        fillColor: AppColors.brainPurpleLight.withValues(alpha: 0.3),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -480,7 +390,6 @@ class _LoginPageState extends State<LoginPage> {
         ),
         child: Row(
           children: [
-            // Icon on the left
             isLoading
                 ? const SizedBox(
                     width: 24,
@@ -491,7 +400,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   )
                 : Icon(icon, size: 24),
-            // Text centered in the remaining space
             Expanded(
               child: Center(
                 child: Text(
@@ -500,7 +408,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            // Mirror of the icon to balance the optical centering
             const SizedBox(width: 24),
           ],
         ),
@@ -510,8 +417,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    _oauthTimer?.cancel();
-    _oauthSubscription?.cancel();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();

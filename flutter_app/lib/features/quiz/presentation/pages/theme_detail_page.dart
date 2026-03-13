@@ -11,7 +11,7 @@ import 'timed_quiz_page.dart';
 import '../../../leaderboard/presentation/pages/leaderboard_page.dart';
 import '../../../lives/data/providers/lives_provider.dart';
 import '../../../lives/presentation/widgets/no_lives_dialog.dart';
-import '../../../../main.dart';
+import '../../../../core/navigation/route_observer.dart';
 
 class ThemeDetailPage extends StatefulWidget {
   final ThemeModel theme;
