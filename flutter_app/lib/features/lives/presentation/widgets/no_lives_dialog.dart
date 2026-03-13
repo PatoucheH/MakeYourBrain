@@ -43,8 +43,9 @@ class _NoLivesDialogState extends State<NoLivesDialog>
     final livesProvider = context.read<LivesProvider>();
     final adService = AdService();
 
+    setState(() => _isLoadingAd = true);
+
     if (!adService.isAdReady) {
-      adService.loadRewardedAd();
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -52,14 +53,17 @@ class _NoLivesDialogState extends State<NoLivesDialog>
             backgroundColor: AppColors.warning,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            duration: const Duration(seconds: 2),
+            duration: const Duration(seconds: 10),
           ),
         );
       }
-      return;
+      final ready = await adService.waitUntilReady();
+      if (context.mounted) ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      if (!ready) {
+        if (mounted) setState(() => _isLoadingAd = false);
+        return;
+      }
     }
-
-    setState(() => _isLoadingAd = true);
 
     try {
       final previousLives = livesProvider.currentLives;

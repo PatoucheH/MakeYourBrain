@@ -11,6 +11,7 @@ import 'timed_quiz_page.dart';
 import '../../../leaderboard/presentation/pages/leaderboard_page.dart';
 import '../../../lives/data/providers/lives_provider.dart';
 import '../../../lives/presentation/widgets/no_lives_dialog.dart';
+import '../../../../main.dart';
 
 class ThemeDetailPage extends StatefulWidget {
   final ThemeModel theme;
@@ -21,7 +22,7 @@ class ThemeDetailPage extends StatefulWidget {
   State<ThemeDetailPage> createState() => _ThemeDetailPageState();
 }
 
-class _ThemeDetailPageState extends State<ThemeDetailPage> {
+class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
   final _authRepo = AuthRepository();
   final _profileRepo = ProfileRepository();
 
@@ -33,6 +34,24 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> {
   @override
   void initState() {
     super.initState();
+    loadThemeProgress();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when returning from quiz — refresh XP
     loadThemeProgress();
   }
 

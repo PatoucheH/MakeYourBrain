@@ -9,6 +9,7 @@ import '../../data/models/theme_model.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
 import 'theme_detail_page.dart';
+import '../../../../main.dart';
 
 class AllThemesPage extends StatefulWidget {
   const AllThemesPage({super.key});
@@ -17,7 +18,7 @@ class AllThemesPage extends StatefulWidget {
   State<AllThemesPage> createState() => _AllThemesPageState();
 }
 
-class _AllThemesPageState extends State<AllThemesPage> {
+class _AllThemesPageState extends State<AllThemesPage> with RouteAware {
   final _quizRepo = QuizRepository();
   final _authRepo = AuthRepository();
   final _profileRepo = ProfileRepository();
@@ -29,6 +30,24 @@ class _AllThemesPageState extends State<AllThemesPage> {
   @override
   void initState() {
     super.initState();
+    loadThemes();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when returning from theme detail — refresh XP
     loadThemes();
   }
 

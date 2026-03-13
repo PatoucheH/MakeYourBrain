@@ -120,8 +120,17 @@ class _LoginPageState extends State<LoginPage> {
         return;
       }
 
-      // Listen for successful sign-in via deep link.
-      // Navigate to AuthChecker (not HomePage directly) so onboarding is checked.
+      // With inAppBrowserView, supabase_flutter v2 handles the deep link internally
+      // and completes the PKCE exchange before returning. The signedIn event has
+      // already been emitted by the time we reach here, so navigate directly.
+      if (mounted && _repository.isLoggedIn()) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const AuthChecker()),
+        );
+        return;
+      }
+
+      // Fallback: listen for the signedIn event in case auth completes asynchronously.
       _oauthSubscription = _repository.authStateChanges.listen((state) {
         if (state.event == AuthChangeEvent.signedIn && mounted) {
           _oauthTimer?.cancel();
@@ -132,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       });
 
-      // Reset after 30s if no deep link received.
+      // Reset after 30s if no auth received.
       _oauthTimer = Timer(const Duration(seconds: 30), () {
         if (mounted && !_repository.isLoggedIn()) {
           _resetOAuthState();

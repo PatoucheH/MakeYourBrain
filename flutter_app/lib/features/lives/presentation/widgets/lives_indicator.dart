@@ -182,7 +182,6 @@ class LivesIndicator extends StatelessWidget {
     final adService = AdService();
 
     if (!adService.isAdReady) {
-      adService.loadRewardedAd();
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -190,11 +189,13 @@ class LivesIndicator extends StatelessWidget {
             backgroundColor: AppColors.warning,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            duration: const Duration(seconds: 2),
+            duration: const Duration(seconds: 10),
           ),
         );
       }
-      return;
+      final ready = await adService.waitUntilReady();
+      if (context.mounted) ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      if (!ready) return;
     }
 
     final rewarded = await adService.showRewardedAd();

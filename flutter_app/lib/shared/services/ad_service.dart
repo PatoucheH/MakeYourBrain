@@ -10,17 +10,17 @@ class AdService {
   factory AdService() => _instance;
   AdService._internal();
 
-  RewardedAd? _rewardedAd;
+  RewardedInterstitialAd? _rewardedAd;
   bool _isLoading = false;
   bool _isShowing = false;
   static bool _isSupported = false;
 
   static String get _androidRewardedAdUnitId => kDebugMode
-    ? 'ca-app-pub-3940256099942544/5224354917' // Test ID
+    ? 'ca-app-pub-3940256099942544/5354046379' // Test ID (rewarded interstitial)
     : 'ca-app-pub-6743392628237404/2396801579'; // Real prod ID
 
   static String get _iosRewardedAdUnitId => kDebugMode
-    ? 'ca-app-pub-3940256099942544/1712485313' // Test ID
+    ? 'ca-app-pub-3940256099942544/6978759866' // Test ID (rewarded interstitial)
     : 'ca-app-pub-6743392628237404/8998427429'; // Real prod ID iOS
 
   String get _rewardedAdUnitId {
@@ -59,16 +59,28 @@ class AdService {
 
   bool get isAdReady => _isSupported && _rewardedAd != null;
 
+  /// Waits until the rewarded ad is ready or [timeout] expires.
+  Future<bool> waitUntilReady({Duration timeout = const Duration(seconds: 10)}) async {
+    if (isAdReady) return true;
+    loadRewardedAd();
+    final deadline = DateTime.now().add(timeout);
+    while (DateTime.now().isBefore(deadline)) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (isAdReady) return true;
+    }
+    return false;
+  }
+
   void loadRewardedAd() {
     if (!_isSupported || _isLoading || _rewardedAd != null) return;
     _isLoading = true;
 
     final userId = AuthRepository().getCurrentUserId();
 
-    RewardedAd.load(
+    RewardedInterstitialAd.load(
       adUnitId: _rewardedAdUnitId,
       request: const AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
+      rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
         onAdLoaded: (ad) {
           if (userId != null) {
             ad.setServerSideOptions(
@@ -77,23 +89,23 @@ class AdService {
           }
           _rewardedAd = ad;
           _isLoading = false;
-          debugPrint('[AdService] Rewarded ad loaded (SSV userId: $userId)');
+          debugPrint('[AdService] Rewarded interstitial ad loaded (SSV userId: $userId)');
         },
         onAdFailedToLoad: (error) {
           _rewardedAd = null;
           _isLoading = false;
-          debugPrint('[AdService] Failed to load rewarded ad: ${error.message}');
+          debugPrint('[AdService] Failed to load rewarded interstitial ad: ${error.message}');
         },
       ),
     );
   }
 
-  /// Shows the rewarded ad.
+  /// Shows the rewarded interstitial ad.
   /// Returns true if the user watched the ad to the end (reward earned).
   /// Returns false if the ad is not ready or if the user closed it before the end.
   Future<bool> showRewardedAd() async {
     if (_rewardedAd == null) {
-      debugPrint('[AdService] Rewarded ad not ready');
+      debugPrint('[AdService] Rewarded interstitial ad not ready');
       loadRewardedAd();
       return false;
     }
@@ -118,7 +130,7 @@ class AdService {
         }
       },
       onAdFailedToShowFullScreenContent: (ad, error) {
-        debugPrint('[AdService] Failed to show rewarded ad: ${error.message}');
+        debugPrint('[AdService] Failed to show rewarded interstitial ad: ${error.message}');
         ad.dispose();
         _rewardedAd = null;
         _isShowing = false;
