@@ -22,11 +22,15 @@ class AdService {
 
   // ─── Ad unit IDs ──────────────────────────────────────────────────────────
 
-  static String get _androidAdUnitId => kDebugMode
+  // Pass --dart-define=USE_TEST_ADS=true in Codemagic/CI to force test IDs
+  static const bool _useTestAds =
+      bool.fromEnvironment('USE_TEST_ADS', defaultValue: kDebugMode);
+
+  static String get _androidAdUnitId => _useTestAds
       ? 'ca-app-pub-3940256099942544/5224354917' // Test ID (rewarded)
       : 'ca-app-pub-6743392628237404/2396801579'; // Prod ID Android
 
-  static String get _iosAdUnitId => kDebugMode
+  static String get _iosAdUnitId => _useTestAds
       ? 'ca-app-pub-3940256099942544/6978759866' // Test ID (rewarded interstitial)
       : 'ca-app-pub-6743392628237404/8998427429'; // Prod ID iOS
 
