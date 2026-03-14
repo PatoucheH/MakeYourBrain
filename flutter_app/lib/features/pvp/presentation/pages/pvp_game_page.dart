@@ -28,6 +28,13 @@ class _PvPGamePageState extends State<PvPGamePage>
   bool _timerActive = false;
   bool _hasShownFinalResults = false;
 
+  // Round results latch: keeps results visible for both players even after
+  // the match status transitions to the next phase (theme selection, etc.)
+  bool _showingRoundResults = false;
+  int _resultsRoundNumber = 1;
+  int _resultsMyScore = 0;
+  int _resultsOpponentScore = 0;
+
   @override
   void initState() {
     super.initState();
@@ -225,6 +232,36 @@ class _PvPGamePageState extends State<PvPGamePage>
           });
         }
 
+        // Round results latch: shown for BOTH players before any status
+        // transition (theme selection, next round, etc.) takes over the UI.
+        if (_showingRoundResults) {
+          _stopTimer();
+          return _buildLatchedRoundResultsScreen(pvpProvider, l10n);
+        }
+
+        // All questions answered → capture results when round is complete,
+        // then show the round-end screen (waiting or results).
+        // This check comes BEFORE theme-selection so the second player to
+        // finish also sees results before being sent to choose a theme.
+        if (pvpProvider.hasAnsweredAllQuestions &&
+            pvpProvider.currentRound != null) {
+          _stopTimer();
+          final round = pvpProvider.currentRound!;
+          if (round.isRoundCompleted && !_showingRoundResults) {
+            // Set synchronously — picked up on the next rebuild that the
+            // provider triggers after transitioning to the next phase.
+            _showingRoundResults = true;
+            _resultsRoundNumber = round.roundNumber;
+            _resultsMyScore = pvpProvider.isPlayer1
+                ? round.player1Score
+                : round.player2Score;
+            _resultsOpponentScore = pvpProvider.isPlayer1
+                ? round.player2Score
+                : round.player1Score;
+          }
+          return _buildRoundEndScreen(pvpProvider, l10n);
+        }
+
         // Theme selection phase - my turn to choose
         if (pvpProvider.isMyThemeChoice) {
           _stopTimer();
@@ -236,13 +273,6 @@ class _PvPGamePageState extends State<PvPGamePage>
             !pvpProvider.isMyThemeChoice) {
           _stopTimer();
           return _buildWaitingForThemeScreen(pvpProvider, l10n);
-        }
-
-        // All questions answered → round end screen
-        if (pvpProvider.hasAnsweredAllQuestions &&
-            pvpProvider.currentRound != null) {
-          _stopTimer();
-          return _buildRoundEndScreen(pvpProvider, l10n);
         }
 
         // Not my turn → waiting for opponent screen
@@ -1072,6 +1102,145 @@ class _PvPGamePageState extends State<PvPGamePage>
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.arrow_back),
+                        label: Text(l10n.backToMenu),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Displays round results using the locally-snapshotted scores so the UI
+  // stays stable even after the provider transitions to the next phase.
+  Widget _buildLatchedRoundResultsScreen(
+      PvPProvider pvpProvider, AppLocalizations l10n) {
+    final isLastRound = _resultsRoundNumber >= 3;
+
+    String resultText;
+    Color resultColor;
+    IconData resultIcon;
+    if (_resultsMyScore > _resultsOpponentScore) {
+      resultText = l10n.victory;
+      resultColor = AppColors.success;
+      resultIcon = Icons.emoji_events;
+    } else if (_resultsMyScore < _resultsOpponentScore) {
+      resultText = l10n.defeat;
+      resultColor = AppColors.error;
+      resultIcon = Icons.sentiment_dissatisfied;
+    } else {
+      resultText = l10n.draw;
+      resultColor = Colors.grey;
+      resultIcon = Icons.handshake;
+    }
+
+    if (isLastRound && !_hasShownFinalResults) {
+      _hasShownFinalResults = true;
+      Future.delayed(const Duration(seconds: 2), () {
+        if (!mounted) return;
+        _showFinalResultsDialog(pvpProvider, l10n);
+      });
+    }
+
+    return Scaffold(
+      body: Container(
+        decoration:
+            const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: SafeArea(
+          child: Center(
+            child: Container(
+              margin: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: AppColors.cardShadow,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    l10n.roundComplete(_resultsRoundNumber),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: resultColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(resultIcon, color: resultColor, size: 32),
+                        const SizedBox(width: 12),
+                        Text(
+                          resultText,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: resultColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildScoreColumn(l10n.you, _resultsMyScore,
+                          AppColors.brainPurple),
+                      Padding(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'VS',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                      ),
+                      _buildScoreColumn(l10n.opponent,
+                          _resultsOpponentScore, Colors.grey),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  if (isLastRound) ...[
+                    Text(
+                      l10n.finalResultsComing,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ] else ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () =>
+                            setState(() => _showingRoundResults = false),
+                        icon: const Icon(Icons.arrow_forward),
+                        label: Text(l10n.continueGame),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.arrow_back),
                         label: Text(l10n.backToMenu),

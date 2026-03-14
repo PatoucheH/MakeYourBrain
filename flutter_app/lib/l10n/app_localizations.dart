@@ -770,6 +770,12 @@ abstract class AppLocalizations {
   /// **'Back to Menu'**
   String get backToMenu;
 
+  /// No description provided for @continueGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueGame;
+
   /// No description provided for @you.
   ///
   /// In en, this message translates to:

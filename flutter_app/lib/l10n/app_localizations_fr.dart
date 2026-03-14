@@ -358,6 +358,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get backToMenu => 'Retour au Menu';
 
   @override
+  String get continueGame => 'Continuer';
+
+  @override
   String get you => 'Vous';
 
   @override
