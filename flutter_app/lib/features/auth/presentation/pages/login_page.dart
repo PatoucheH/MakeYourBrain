@@ -53,13 +53,17 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
     try {
       final success = await signIn();
+      // Always reset loading after the OAuth browser opens (or fails to open).
+      // On iOS, signInWithOAuth returns true as soon as the browser launches —
+      // it does NOT wait for the user to complete or cancel.
+      // If auth completes, AuthGate handles navigation via authStateChanges.
+      // If the user cancels, loading is reset immediately — no infinite spinner.
+      if (mounted) setState(() => _isLoading = false);
       if (!success && mounted) {
-        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(failMessage)),
         );
       }
-      // Navigation handled globally by AuthGate via authStateChanges listener
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
