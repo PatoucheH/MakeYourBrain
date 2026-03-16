@@ -523,22 +523,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chooseTheme => 'Choisissez un thème pour cette manche';
 
   @override
-  String get betaTitle => 'Version Beta';
-
-  @override
-  String get betaMessage =>
-      'Cette application est encore en Beta. Certains bugs peuvent encore apparaitre.\n\nMerci pour votre patience ! Si vous rencontrez un problème, merci de le signaler a :';
-
-  @override
-  String get betaEmail => 'hugo.patou@hotmail.com';
-
-  @override
-  String get thanks => 'Merci !';
-
-  @override
-  String get understood => 'Compris !';
-
-  @override
   String get matchFoundWaiting =>
       'Match trouve ! L\'adversaire joue en premier.';
 
@@ -628,9 +612,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get themeRemoveError => 'Erreur lors de la suppression du thème';
-
-  @override
-  String get emailCopied => 'Email copié !';
 
   @override
   String get continueWithGoogle => 'Continuer avec Google';

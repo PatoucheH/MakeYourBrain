@@ -1082,36 +1082,6 @@ abstract class AppLocalizations {
   /// **'Choose a theme for this round'**
   String get chooseTheme;
 
-  /// No description provided for @betaTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Beta Version'**
-  String get betaTitle;
-
-  /// No description provided for @betaMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'This app is still in Beta. Some bugs may appear.\n\nThank you for your patience! If you encounter any issue, please report it to:'**
-  String get betaMessage;
-
-  /// No description provided for @betaEmail.
-  ///
-  /// In en, this message translates to:
-  /// **'hugo.patou@hotmail.com'**
-  String get betaEmail;
-
-  /// No description provided for @thanks.
-  ///
-  /// In en, this message translates to:
-  /// **'Thank you!'**
-  String get thanks;
-
-  /// No description provided for @understood.
-  ///
-  /// In en, this message translates to:
-  /// **'Got it!'**
-  String get understood;
-
   /// No description provided for @matchFoundWaiting.
   ///
   /// In en, this message translates to:
@@ -1273,12 +1243,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error removing theme'**
   String get themeRemoveError;
-
-  /// No description provided for @emailCopied.
-  ///
-  /// In en, this message translates to:
-  /// **'Email copied!'**
-  String get emailCopied;
 
   /// No description provided for @continueWithGoogle.
   ///

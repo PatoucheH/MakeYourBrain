@@ -200,11 +200,6 @@
   "waitingForThemeSelection": "Waiting for opponent to choose theme...",
   "randomTheme": "Random Theme",
   "chooseTheme": "Choose a theme for this round",
-  "betaTitle": "Beta Version",
-  "betaMessage": "This app is still in Beta. Some bugs may appear.\n\nThank you for your patience! If you encounter any issue, please report it to:",
-  "betaEmail": "hugo.patou@hotmail.com",
-  "thanks": "Thank you!",
-  "understood": "Got it!",
   "matchFoundWaiting": "Match found! Opponent plays first.",
   "roundAgainst": "Round {round} vs {opponent}",
   "@roundAgainst": {
@@ -256,7 +251,6 @@
     }
   },
   "themeRemoveError": "Error removing theme",
-  "emailCopied": "Email copied!",
   "continueWithGoogle": "Continue with Google",
   "continueWithApple": "Continue with Apple",
   "orDivider": "OR",

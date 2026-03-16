@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
@@ -17,9 +16,6 @@ import '../../../pvp/presentation/pages/pvp_menu_page.dart';
 import '../../../daily_concept/data/models/daily_concept_model.dart';
 import '../../../daily_concept/data/repositories/daily_concept_repository.dart';
 import '../../../daily_concept/presentation/pages/daily_concept_page.dart';
-
-/// Set to false to disable the Beta modal
-const bool kShowBetaDialog = true;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -47,14 +43,6 @@ class _HomePageState extends State<HomePage> {
   static const int _themesPerPage = 3;
 
   @override
-  void initState() {
-    super.initState();
-    if (kShowBetaDialog) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _showBetaDialog());
-    }
-  }
-
-  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final lang = Provider.of<LanguageProvider>(context).currentLanguage;
@@ -62,110 +50,6 @@ class _HomePageState extends State<HomePage> {
       _lastLanguage = lang;
       loadFavoriteThemes();
     }
-  }
-
-  void _showBetaDialog() {
-    final l10n = AppLocalizations.of(context);
-    if (l10n == null) return;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Image.asset(
-              'assets/branding/mascot/brainly_encourage.png',
-              height: 40,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                l10n.betaTitle,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              l10n.betaMessage,
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: () {
-                Clipboard.setData(const ClipboardData(text: 'hugo.patou@hotmail.com'));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.emailCopied)),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.brainPurple.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.brainPurple.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.email, color: AppColors.brainPurple, size: 18),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        l10n.betaEmail,
-                        style: const TextStyle(
-                          color: AppColors.brainPurple,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.copy, color: AppColors.brainPurple, size: 16),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              l10n.thanks,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: AppColors.brainPurple,
-                fontSize: 15,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(ctx),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.brainPurple,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              child: Text(l10n.understood, style: const TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Future<void> loadFavoriteThemes() async {
