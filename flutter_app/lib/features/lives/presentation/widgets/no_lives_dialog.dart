@@ -92,6 +92,7 @@ class _NoLivesDialogState extends State<NoLivesDialog>
     try {
       final previousLives = livesProvider.currentLives;
 
+      if (!context.mounted) return;
       Navigator.pop(context);
 
       final rewarded = await adService.showRewardedAd();

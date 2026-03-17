@@ -323,8 +323,7 @@ class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
     _authSub = SupabaseService().client.auth.onAuthStateChange.listen((state) {
       if (!mounted) return;
       if (state.event == AuthChangeEvent.signedIn ||
-          state.event == AuthChangeEvent.signedOut ||
-          state.event == AuthChangeEvent.userDeleted) {
+          state.event == AuthChangeEvent.signedOut) {
         setState(() => _authVersion++);
       }
     });
