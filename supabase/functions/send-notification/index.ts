@@ -95,8 +95,11 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const ALLOWED_NOTIFICATION_TYPES = ['match_found', 'your_turn', 'match_over'] as const
+    const ALLOWED_NOTIFICATION_TYPES = ['match_found', 'your_turn', 'match_over', 'pvp_invitation', 'pvp_invitation_accepted'] as const
     type NotificationType = typeof ALLOWED_NOTIFICATION_TYPES[number]
+
+    // Invitation types skip active-match verification
+    const INVITATION_TYPES = ['pvp_invitation', 'pvp_invitation_accepted']
 
     const NOTIFICATION_CONTENT: Record<NotificationType, { en: { title: string; body: string }; fr: { title: string; body: string } }> = {
       match_found: {
@@ -110,6 +113,14 @@ serve(async (req) => {
       match_over: {
         en: { title: 'Match over!', body: 'Your match result is available!' },
         fr: { title: 'Match terminé !', body: 'Le résultat de ta partie est disponible !' },
+      },
+      pvp_invitation: {
+        en: { title: 'PvP Challenge!', body: '{name} challenges you to a match!' },
+        fr: { title: 'Défi PvP !', body: '{name} vous défie en match !' },
+      },
+      pvp_invitation_accepted: {
+        en: { title: 'Challenge Accepted!', body: '{name} accepted your PvP challenge!' },
+        fr: { title: 'Défi Accepté !', body: '{name} a accepté votre défi PvP !' },
       },
     }
 
@@ -138,32 +149,47 @@ serve(async (req) => {
       )
     }
 
-    // Vérifier qu'il existe un match PvP actif entre l'appelant et le destinataire
-    // et que l'appelant (callerId) est bien un des deux joueurs (pas le destinataire)
-    const { data: match } = await supabaseAdmin
-      .from('pvp_matches')
-      .select('id')
-      .or(`and(player1_id.eq.${callerId},player2_id.eq.${userId}),and(player1_id.eq.${userId},player2_id.eq.${callerId})`)
-      .neq('status', 'completed')
-      .neq('status', 'cancelled')
-      .maybeSingle()
-
-    if (!match || callerId === userId) {
+    if (callerId === userId) {
       return new Response(
         JSON.stringify({ success: false, error: 'Forbidden' }),
         { headers: jsonHeader, status: 403 }
       )
     }
 
-    // Récupérer la langue préférée du destinataire pour localiser la notification
-    const { data: recipientStats } = await supabaseAdmin
-      .from('user_stats')
-      .select('preferred_language')
-      .eq('user_id', userId)
-      .maybeSingle()
+    // Pour les types hors invitation, vérifier qu'un match actif existe entre les deux joueurs
+    if (!INVITATION_TYPES.includes(notificationType)) {
+      const { data: match } = await supabaseAdmin
+        .from('pvp_matches')
+        .select('id')
+        .or(`and(player1_id.eq.${callerId},player2_id.eq.${userId}),and(player1_id.eq.${userId},player2_id.eq.${callerId})`)
+        .neq('status', 'completed')
+        .neq('status', 'cancelled')
+        .maybeSingle()
+
+      if (!match) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Forbidden' }),
+          { headers: jsonHeader, status: 403 }
+        )
+      }
+    }
+
+    // Récupérer la langue préférée du destinataire + pseudo de l'appelant (pour invitations)
+    const [recipientResult, callerResult] = await Promise.all([
+      supabaseAdmin.from('user_stats').select('preferred_language').eq('user_id', userId).maybeSingle(),
+      INVITATION_TYPES.includes(notificationType)
+        ? supabaseAdmin.from('user_stats').select('username').eq('user_id', callerId).maybeSingle()
+        : Promise.resolve({ data: null }),
+    ])
+
+    const recipientStats = recipientResult.data
+    const callerStats = callerResult.data
+    const senderName = (callerStats as { username?: string } | null)?.username ?? 'Someone'
 
     const lang = recipientStats?.preferred_language === 'fr' ? 'fr' : 'en'
-    const { title, body } = NOTIFICATION_CONTENT[notificationType as NotificationType][lang]
+    const content = NOTIFICATION_CONTENT[notificationType as NotificationType][lang]
+    const title = content.title
+    const body = content.body.replace('{name}', senderName)
 
     // ===== RÉCUPÉRER LES TOKENS FCM DE L'UTILISATEUR =====
     const { data: tokens, error: tokensError } = await supabaseAdmin

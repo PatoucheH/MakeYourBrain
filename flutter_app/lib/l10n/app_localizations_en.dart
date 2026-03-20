@@ -734,4 +734,37 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deleteAccountError =>
       'Failed to delete account. Please try again.';
+
+  @override
+  String get inviteFriend => 'Invite a Friend';
+
+  @override
+  String get searchPlayer => 'Search player...';
+
+  @override
+  String get suggested => 'Suggested';
+
+  @override
+  String get sendInvitation => 'Invite';
+
+  @override
+  String get invitationSent => 'Invitation sent!';
+
+  @override
+  String get usernameNotFound => 'Username not found';
+
+  @override
+  String get pendingInvitations => 'Pending Challenges';
+
+  @override
+  String get acceptInvite => 'Accept';
+
+  @override
+  String get declineInvite => 'Decline';
+
+  @override
+  String get challengesYou => 'challenges you to a match!';
+
+  @override
+  String get noFriendsToInvite => 'Follow players to invite them!';
 }

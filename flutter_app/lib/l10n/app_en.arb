@@ -329,5 +329,16 @@
   "notFromFavoritesHint": "Discover a new theme — not from your favorites",
   "deleteAccount": "Delete Account",
   "deleteAccountConfirm": "This will permanently delete your account and all your data. This action cannot be undone.",
-  "deleteAccountError": "Failed to delete account. Please try again."
+  "deleteAccountError": "Failed to delete account. Please try again.",
+  "inviteFriend": "Invite a Friend",
+  "searchPlayer": "Search player...",
+  "suggested": "Suggested",
+  "sendInvitation": "Invite",
+  "invitationSent": "Invitation sent!",
+  "usernameNotFound": "Username not found",
+  "pendingInvitations": "Pending Challenges",
+  "acceptInvite": "Accept",
+  "declineInvite": "Decline",
+  "challengesYou": "challenges you to a match!",
+  "noFriendsToInvite": "Follow players to invite them!"
 }

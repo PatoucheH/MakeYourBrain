@@ -10,6 +10,8 @@ import '../../data/providers/pvp_provider.dart';
 import '../../data/repositories/pvp_repository.dart';
 import '../../../lives/data/providers/lives_provider.dart';
 import '../../../lives/presentation/widgets/no_lives_dialog.dart';
+import '../../../social/presentation/widgets/clickable_username.dart';
+import '../widgets/invite_to_pvp_sheet.dart';
 import 'pvp_game_page.dart';
 import 'pvp_leaderboard_page.dart';
 
@@ -31,6 +33,8 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
   int draws = 0;
   List<PvPMatchModel> matchHistory = [];
   List<PvPMatchModel> activeMatches = [];
+  List<Map<String, dynamic>> pendingInvitations = [];
+  Map<String, String> _usernames = {};
   bool _hasMoreHistory = true;
   bool _isLoadingMore = false;
   static const int _historyPageSize = 10;
@@ -69,11 +73,23 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
         _pvpRepo.getPlayerPvPStats(userId),
         _pvpRepo.getMyMatches(userId, limit: _historyPageSize),
         _pvpRepo.getActiveMatches(userId),
+        _pvpRepo.getPendingInvitations(userId),
       ]);
 
       final stats = results[0] as Map<String, dynamic>;
       final history = results[1] as List<PvPMatchModel>;
       final active = results[2] as List<PvPMatchModel>;
+      final invitations = results[3] as List<Map<String, dynamic>>;
+
+      // Batch-fetch opponent usernames for all matches
+      final allMatches = [...history, ...active];
+      final opponentIds = allMatches
+          .map((m) => m.player1Id == userId ? m.player2Id : m.player1Id)
+          .where((id) => id != null && id.isNotEmpty)
+          .cast<String>()
+          .toSet()
+          .toList();
+      final usernames = await _pvpRepo.getUsernamesBatch(opponentIds);
 
       if (mounted) {
         setState(() {
@@ -83,6 +99,8 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
           draws = stats['draws'] ?? 0;
           matchHistory = history;
           activeMatches = active;
+          pendingInvitations = invitations;
+          _usernames = usernames;
           _hasMoreHistory = history.length >= _historyPageSize;
           isLoading = false;
         });
@@ -165,7 +183,17 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
 
                               // Find Match Button
                               _buildFindMatchButton(l10n),
+                              const SizedBox(height: 12),
+
+                              // Invite Friend Button
+                              _buildInviteFriendButton(l10n),
                               const SizedBox(height: 24),
+
+                              // Pending Invitations Section
+                              if (pendingInvitations.isNotEmpty) ...[
+                                _buildPendingInvitationsSection(l10n),
+                                const SizedBox(height: 24),
+                              ],
 
                               // Active Matches Section
                               if (activeMatches.isNotEmpty) ...[
@@ -226,6 +254,9 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
           final statusText = isMyTurn ? l10n.yourTurn : l10n.opponentsTurn;
           final statusIcon = isMyTurn ? Icons.play_arrow : Icons.hourglass_top;
 
+          final opponentId = match.player1Id == userId ? match.player2Id : match.player1Id;
+          final opponentName = _usernames[opponentId ?? ''] ?? opponentId ?? '?';
+
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
@@ -258,11 +289,18 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                           color: statusColor,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
+                      ClickableUsername(
+                        userId: opponentId ?? '',
+                        displayName: 'vs $opponentName',
+                        style: const TextStyle(fontSize: 13, color: AppColors.brainPurple, fontWeight: FontWeight.w600),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
                       Text(
-                        '${l10n.round} ${match.currentRound}/3 - ${l10n.score}: ${match.getPlayerScore(userId ?? '')} - ${userId == match.player1Id ? match.player2TotalScore : match.player1TotalScore}',
+                        '${l10n.round} ${match.currentRound}/3 · ${l10n.score}: ${match.getPlayerScore(userId ?? '')} - ${userId == match.player1Id ? match.player2TotalScore : match.player1TotalScore}',
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 13,
                           color: AppColors.textSecondary,
                         ),
                       ),
@@ -542,6 +580,189 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
     );
   }
 
+  Widget _buildInviteFriendButton(AppLocalizations l10n) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const InviteToPvpSheet(),
+        ),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.brainPurple.withValues(alpha: 0.4), width: 2),
+            boxShadow: AppColors.softShadow,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.person_add, color: AppColors.brainPurple, size: 20),
+              const SizedBox(width: 10),
+              Text(
+                l10n.inviteFriend,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.brainPurple,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPendingInvitationsSection(AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.error.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.sports_esports, color: AppColors.error, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              l10n.pendingInvitations,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        ...pendingInvitations.map((inv) => _buildPendingInvitationCard(inv, l10n)),
+      ],
+    );
+  }
+
+  Widget _buildPendingInvitationCard(Map<String, dynamic> inv, AppLocalizations l10n) {
+    final senderId = inv['sender_id'] as String? ?? '';
+    final senderName = inv['sender_name'] as String? ?? '?';
+    final invitationId = inv['invitation_id'] as String? ?? '';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppColors.cardShadow,
+        border: Border.all(color: AppColors.brainPurple.withValues(alpha: 0.3), width: 2),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: const BoxDecoration(
+              gradient: AppColors.primaryGradient,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                senderName.isNotEmpty ? senderName[0].toUpperCase() : '?',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClickableUsername(
+                  userId: senderId,
+                  displayName: senderName,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.brainPurple),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  l10n.challengesYou,
+                  style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OutlinedButton(
+                onPressed: () => _respondInvitation(invitationId, senderId, false, l10n),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  side: BorderSide(color: AppColors.error.withValues(alpha: 0.5)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  minimumSize: Size.zero,
+                ),
+                child: Text(l10n.declineInvite,
+                    style: const TextStyle(color: AppColors.error, fontSize: 13, fontWeight: FontWeight.bold)),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () => _respondInvitation(invitationId, senderId, true, l10n),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.brainPurple,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  minimumSize: Size.zero,
+                ),
+                child: Text(l10n.acceptInvite,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _respondInvitation(
+      String invitationId, String senderId, bool accept, AppLocalizations l10n) async {
+    final userId = _authRepo.getCurrentUserId();
+    if (userId == null) return;
+
+    setState(() {
+      pendingInvitations.removeWhere((inv) => inv['invitation_id'] == invitationId);
+    });
+
+    if (accept) {
+      final matchId = await _pvpRepo.respondToPvpInvitation(invitationId, userId, true);
+      if (matchId != null) {
+        // Notify sender that invitation was accepted
+        await _pvpRepo.sendPvPNotification(senderId, 'pvp_invitation_accepted');
+        if (mounted) {
+          final pvpProvider = context.read<PvPProvider>();
+          await pvpProvider.loadMatch(matchId);
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PvPGamePage()),
+            ).then((_) => _loadData());
+          }
+        }
+      }
+    } else {
+      await _pvpRepo.respondToPvpInvitation(invitationId, userId, false);
+    }
+  }
+
   Future<void> _startMatchmaking(BuildContext context, PvPProvider pvpProvider) async {
     final livesProvider = context.read<LivesProvider>();
 
@@ -664,6 +885,8 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
 
   Widget _buildMatchHistoryItem(PvPMatchModel match, AppLocalizations l10n) {
     final userId = _authRepo.getCurrentUserId();
+    final opponentId = match.player1Id == userId ? match.player2Id : match.player1Id;
+    final opponentName = _usernames[opponentId ?? ''] ?? opponentId ?? '?';
     final isWinner = match.winnerId == userId;
     final isDraw = match.winnerId == null && match.isCompleted;
     Color statusColor;
@@ -738,12 +961,19 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                     color: statusColor,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
+                ClickableUsername(
+                  userId: opponentId ?? '',
+                  displayName: 'vs $opponentName',
+                  style: const TextStyle(fontSize: 13, color: AppColors.brainPurple, fontWeight: FontWeight.w600),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
                 if (match.isCompleted)
                   Text(
                     '${l10n.score}: $myScore - $opponentScore',
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       color: AppColors.textSecondary,
                     ),
                   ),

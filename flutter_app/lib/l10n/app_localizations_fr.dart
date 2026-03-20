@@ -742,4 +742,37 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get deleteAccountError =>
       'Impossible de supprimer le compte. Veuillez réessayer.';
+
+  @override
+  String get inviteFriend => 'Inviter un Ami';
+
+  @override
+  String get searchPlayer => 'Rechercher un joueur...';
+
+  @override
+  String get suggested => 'Suggérés';
+
+  @override
+  String get sendInvitation => 'Inviter';
+
+  @override
+  String get invitationSent => 'Invitation envoyée !';
+
+  @override
+  String get usernameNotFound => 'Pseudo introuvable';
+
+  @override
+  String get pendingInvitations => 'Défis en Attente';
+
+  @override
+  String get acceptInvite => 'Accepter';
+
+  @override
+  String get declineInvite => 'Refuser';
+
+  @override
+  String get challengesYou => 'vous défie en match !';
+
+  @override
+  String get noFriendsToInvite => 'Suis des joueurs pour les inviter !';
 }

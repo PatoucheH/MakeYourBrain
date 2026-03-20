@@ -1465,6 +1465,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to delete account. Please try again.'**
   String get deleteAccountError;
+
+  /// No description provided for @inviteFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite a Friend'**
+  String get inviteFriend;
+
+  /// No description provided for @searchPlayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Search player...'**
+  String get searchPlayer;
+
+  /// No description provided for @suggested.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested'**
+  String get suggested;
+
+  /// No description provided for @sendInvitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite'**
+  String get sendInvitation;
+
+  /// No description provided for @invitationSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation sent!'**
+  String get invitationSent;
+
+  /// No description provided for @usernameNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Username not found'**
+  String get usernameNotFound;
+
+  /// No description provided for @pendingInvitations.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Challenges'**
+  String get pendingInvitations;
+
+  /// No description provided for @acceptInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get acceptInvite;
+
+  /// No description provided for @declineInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get declineInvite;
+
+  /// No description provided for @challengesYou.
+  ///
+  /// In en, this message translates to:
+  /// **'challenges you to a match!'**
+  String get challengesYou;
+
+  /// No description provided for @noFriendsToInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow players to invite them!'**
+  String get noFriendsToInvite;
 }
 
 class _AppLocalizationsDelegate

@@ -301,5 +301,16 @@
   "notFromFavoritesHint": "Découvre un nouveau thème — pas parmi tes favoris",
   "deleteAccount": "Supprimer le compte",
   "deleteAccountConfirm": "Cela supprimera définitivement votre compte et toutes vos données. Cette action est irréversible.",
-  "deleteAccountError": "Impossible de supprimer le compte. Veuillez réessayer."
+  "deleteAccountError": "Impossible de supprimer le compte. Veuillez réessayer.",
+  "inviteFriend": "Inviter un Ami",
+  "searchPlayer": "Rechercher un joueur...",
+  "suggested": "Suggérés",
+  "sendInvitation": "Inviter",
+  "invitationSent": "Invitation envoyée !",
+  "usernameNotFound": "Pseudo introuvable",
+  "pendingInvitations": "Défis en Attente",
+  "acceptInvite": "Accepter",
+  "declineInvite": "Refuser",
+  "challengesYou": "vous défie en match !",
+  "noFriendsToInvite": "Suis des joueurs pour les inviter !"
 }

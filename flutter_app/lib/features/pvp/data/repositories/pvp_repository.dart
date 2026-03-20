@@ -349,8 +349,76 @@ class PvPRepository {
     }
   }
 
+  /// Batch-fetches usernames for a list of user IDs. Returns a map userId → username.
+  Future<Map<String, String>> getUsernamesBatch(List<String> userIds) async {
+    if (userIds.isEmpty) return {};
+    try {
+      final response = await _supabase
+          .from('user_stats')
+          .select('user_id, username')
+          .inFilter('user_id', userIds);
+      final result = <String, String>{};
+      for (final row in response as List) {
+        final id = row['user_id'] as String?;
+        final name = row['username'] as String?;
+        if (id != null && name != null) result[id] = name;
+      }
+      return result;
+    } catch (e) {
+      debugPrint('Error getting usernames batch: $e');
+      return {};
+    }
+  }
+
+  /// Sends a PvP invitation to a recipient. Returns the invitation ID, or null on error.
+  Future<String?> sendPvpInvitation(String senderId, String recipientId) async {
+    try {
+      final response = await _supabase.rpc('pvp_send_invitation', params: {
+        'p_sender_id': senderId,
+        'p_recipient_id': recipientId,
+      });
+      return response?.toString();
+    } catch (e) {
+      debugPrint('Error sending PvP invitation: $e');
+      return null;
+    }
+  }
+
+  /// Accepts or declines a PvP invitation.
+  /// Returns the created match ID if accepted, null if declined or on error.
+  Future<String?> respondToPvpInvitation(String invitationId, String userId, bool accept) async {
+    try {
+      final response = await _supabase.rpc('pvp_respond_invitation', params: {
+        'p_invitation_id': invitationId,
+        'p_user_id': userId,
+        'p_accept': accept,
+      });
+      final list = List<Map<String, dynamic>>.from(response ?? []);
+      if (list.isEmpty) return null;
+      final row = list.first;
+      if (row['accepted'] == true) return row['match_id']?.toString();
+      return null;
+    } catch (e) {
+      debugPrint('Error responding to PvP invitation: $e');
+      return null;
+    }
+  }
+
+  /// Gets pending PvP invitations for a user.
+  Future<List<Map<String, dynamic>>> getPendingInvitations(String userId) async {
+    try {
+      final response = await _supabase.rpc('pvp_get_pending_invitations', params: {
+        'p_user_id': userId,
+      });
+      return List<Map<String, dynamic>>.from(response ?? []);
+    } catch (e) {
+      debugPrint('Error getting pending invitations: $e');
+      return [];
+    }
+  }
+
   /// Sends a push notification to a player via the edge function (fire-and-forget).
-  /// [notificationType] must be one of: 'match_found', 'your_turn', 'match_over'
+  /// [notificationType] must be one of: 'match_found', 'your_turn', 'match_over', 'pvp_invitation', 'pvp_invitation_accepted'
   Future<void> sendPvPNotification(String userId, String notificationType) async {
     try {
       await _supabase.functions.invoke('send-notification', body: {
