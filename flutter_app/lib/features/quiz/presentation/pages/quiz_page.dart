@@ -113,23 +113,6 @@ class _QuizPageState extends State<QuizPage> {
 
     final currentLanguage = context.read<LanguageProvider>().currentLanguage;
 
-    if (!isCorrect && mounted) {
-      final livesProvider = context.read<LivesProvider>();
-      await livesProvider.useLife();
-      if (livesProvider.currentLives <= 0 && mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => NoLivesDialog(
-            onClose: () {
-              Navigator.pop(context);
-            },
-          ),
-        );
-        return;
-      }
-    }
-
     final authRepo = AuthRepository();
     if (authRepo.isLoggedIn()) {
       try {
@@ -142,6 +125,38 @@ class _QuizPageState extends State<QuizPage> {
         );
       } catch (e) {
         debugPrint('Error saving answer: $e');
+      }
+    }
+
+    if (!isCorrect && mounted) {
+      final livesProvider = context.read<LivesProvider>();
+      await livesProvider.useLife();
+      if (livesProvider.currentLives <= 0 && mounted) {
+        // Award XP for questions answered so far before exiting
+        if (authRepo.isLoggedIn() && _questionIds.isNotEmpty) {
+          try {
+            await _repository.addQuizCompletionXp(
+              userId: authRepo.getCurrentUserId()!,
+              themeId: widget.theme.id,
+              questionIds: List.unmodifiable(_questionIds),
+              answerIds: List.unmodifiable(_answerIds),
+            );
+          } catch (e) {
+            debugPrint('Error adding XP on no lives: $e');
+          }
+        }
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => NoLivesDialog(
+              onClose: () {
+                Navigator.pop(context);
+              },
+            ),
+          );
+        }
+        return;
       }
     }
 
@@ -214,7 +229,7 @@ class _QuizPageState extends State<QuizPage> {
                   ),
                   child: Image.asset(
                     'assets/branding/mascot/brainly_victory.png',
-                    height: 80,
+                    height: 120,
                   ),
                 ),
                 const SizedBox(height: 20),

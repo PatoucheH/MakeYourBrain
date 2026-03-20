@@ -104,7 +104,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
       final result = await _repository.getQuestions(
         themeId: widget.theme.id,
         languageCode: languageCode,
-        limit: 10,
+        limit: 100,
         easyPercent: difficulty['easy']!,
         mediumPercent: difficulty['medium']!,
         hardPercent: difficulty['hard']!,
@@ -152,14 +152,18 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
 
   Future<void> selectAnswer(String answerId, bool isCorrect, String questionId) async {
     if (hasAnswered || isQuizEnded) return;
+    hasAnswered = true;
 
     _questionIds.add(questionId);
     _answerIds.add(answerId);
 
     setState(() {
       selectedAnswerId = answerId;
-      hasAnswered = true;
-      if (isCorrect) score++;
+      if (isCorrect) {
+        score++;
+      } else if (score > 0) {
+        score--;
+      }
     });
 
     // Save answer to database
@@ -209,7 +213,8 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
   Future<void> showResultDialog() async {
     final l10n = AppLocalizations.of(context)!;
     final timeBonus = _getTimeBonus();
-    final percentage = questions.isEmpty ? 0.0 : (score / questions.length) * 100;
+    final questionsAnswered = currentQuestionIndex + (hasAnswered ? 1 : 0);
+    final percentage = questionsAnswered == 0 ? 0.0 : (score / questionsAnswered) * 100;
 
     final authRepo = AuthRepository();
     if (authRepo.isLoggedIn()) {
@@ -309,7 +314,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                         ),
                       ),
                       Text(
-                        '$score/${questions.length}',
+                        '$score/$questionsAnswered',
                         style: const TextStyle(
                           fontSize: 16,
                           color: Colors.white70,
@@ -320,19 +325,13 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // Questions answered info
-                Text(
-                  '${l10n.questionsAnswered}: ${currentQuestionIndex + (hasAnswered ? 1 : 0)}/${questions.length}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
                 const SizedBox(height: 20),
 
                 // XP Badges
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
                     // Score XP
                     Container(
@@ -359,7 +358,6 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
                     // Time Bonus XP
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -415,7 +413,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: Text(l10n.backToThemes),
+                        child: Text(l10n.backToThemes, textAlign: TextAlign.center),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -567,7 +565,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
     }
 
     final currentQuestion = questions[currentQuestionIndex];
-    final progress = (currentQuestionIndex + 1) / questions.length;
+    final progress = widget.totalSeconds > 0 ? (remainingSeconds / widget.totalSeconds).clamp(0.0, 1.0) : 0.0;
 
     return Scaffold(
       body: Container(
@@ -592,7 +590,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Question ${currentQuestionIndex + 1}/${questions.length}',
+                          'Question ${currentQuestionIndex + 1}',
                           style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             color: AppColors.textSecondary,
@@ -626,11 +624,16 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                         ),
                         FractionallySizedBox(
                           widthFactor: progress,
-                          child: Container(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 500),
                             height: 8,
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFFF9800), Color(0xFFFF5722)],
+                              gradient: LinearGradient(
+                                colors: remainingSeconds <= 5
+                                    ? [AppColors.error, AppColors.error.withValues(alpha: 0.8)]
+                                    : remainingSeconds <= 10
+                                        ? [AppColors.warning, AppColors.warning.withValues(alpha: 0.8)]
+                                        : [const Color(0xFFFF9800), const Color(0xFFFF5722)],
                               ),
                               borderRadius: BorderRadius.circular(4),
                             ),
