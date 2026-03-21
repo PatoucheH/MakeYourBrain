@@ -52,6 +52,7 @@ Map<String, int> getDifficultyForLevel(int level) {
 
 class _QuizPageState extends State<QuizPage> {
   final _repository = QuizRepository();
+  final _authRepo = AuthRepository();
   List<QuestionModel> questions = [];
   int currentQuestionIndex = 0;
   int score = 0;
@@ -78,6 +79,7 @@ class _QuizPageState extends State<QuizPage> {
         easyPercent: difficulty['easy']!,
         mediumPercent: difficulty['medium']!,
         hardPercent: difficulty['hard']!,
+        userId: _authRepo.getCurrentUserId(),
       );
       if (mounted) {
         setState(() {

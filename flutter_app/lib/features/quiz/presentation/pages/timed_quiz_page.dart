@@ -57,6 +57,7 @@ Map<String, int> getDifficultyForLevel(int level) {
 
 class _TimedQuizPageState extends State<TimedQuizPage> {
   final _repository = QuizRepository();
+  final _authRepo = AuthRepository();
   List<QuestionModel> questions = [];
   int currentQuestionIndex = 0;
   int score = 0;
@@ -108,6 +109,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
         easyPercent: difficulty['easy']!,
         mediumPercent: difficulty['medium']!,
         hardPercent: difficulty['hard']!,
+        userId: _authRepo.getCurrentUserId(),
       );
       setState(() {
         questions = result;

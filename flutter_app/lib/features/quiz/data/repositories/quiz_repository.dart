@@ -25,6 +25,7 @@ class QuizRepository {
     int easyPercent = 100,
     int mediumPercent = 0,
     int hardPercent = 0,
+    String? userId,
   }) async {
     final response = await _supabase
         .rpc('get_random_questions', params: {
@@ -34,6 +35,7 @@ class QuizRepository {
           'p_easy_percent': easyPercent,
           'p_medium_percent': mediumPercent,
           'p_hard_percent': hardPercent,
+          if (userId != null) 'p_user_id': userId,
         });
 
     return QuestionModel.ensureAnswerVariety(
