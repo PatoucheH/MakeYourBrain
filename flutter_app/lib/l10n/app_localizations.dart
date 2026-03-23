@@ -305,7 +305,7 @@ abstract class AppLocalizations {
   /// No description provided for @quizCompleted.
   ///
   /// In en, this message translates to:
-  /// **'Quiz Completed! 🎉'**
+  /// **'Quiz Completed!'**
   String get quizCompleted;
 
   /// No description provided for @yourScore.

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:confetti/confetti.dart';
+import 'package:audioplayers/audioplayers.dart';
 import '../../../lives/data/providers/lives_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
@@ -53,6 +55,8 @@ Map<String, int> getDifficultyForLevel(int level) {
 class _QuizPageState extends State<QuizPage> {
   final _repository = QuizRepository();
   final _authRepo = AuthRepository();
+  late final ConfettiController _confettiController;
+  final _audioPlayer = AudioPlayer();
   List<QuestionModel> questions = [];
   int currentQuestionIndex = 0;
   int score = 0;
@@ -65,7 +69,15 @@ class _QuizPageState extends State<QuizPage> {
   @override
   void initState() {
     super.initState();
+    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
     loadQuestions();
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    _audioPlayer.dispose();
+    super.dispose();
   }
 
   Future<void> loadQuestions() async {
@@ -208,12 +220,19 @@ class _QuizPageState extends State<QuizPage> {
 
     if (!mounted) return;
 
+    _confettiController.play();
+    _audioPlayer.play(AssetSource('sounds/success.flac')).catchError((_) {});
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Container(
+        child: Stack(
+          alignment: Alignment.topCenter,
+          clipBehavior: Clip.none,
+          children: [
+            Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: AppColors.white,
@@ -386,6 +405,23 @@ class _QuizPageState extends State<QuizPage> {
               ],
             ),
           ),
+          ),
+          // Confetti au centre-haut de la modal
+          ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              numberOfParticles: 10,
+              gravity: 0.5,
+              emissionFrequency: 0.04,
+              colors: const [
+                AppColors.brainPurple,
+                Color(0xFFFFD700),
+                AppColors.accentGreen,
+                Color(0xFFFF6B9D),
+                Color(0xFF64B5F6),
+              ],
+            ),
+          ],
         ),
       ),
     );
