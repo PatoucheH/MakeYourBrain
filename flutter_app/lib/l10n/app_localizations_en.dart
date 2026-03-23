@@ -112,7 +112,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorLoadingQuestions => 'Error loading questions';
 
   @override
-  String get quizCompleted => 'Quiz Completed! 🎉';
+  String get quizCompleted => 'Quiz Completed!';
 
   @override
   String get yourScore => 'Your score';

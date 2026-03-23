@@ -112,7 +112,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get errorLoadingQuestions => 'Erreur de chargement des questions';
 
   @override
-  String get quizCompleted => 'Quiz Terminé ! 🎉';
+  String get quizCompleted => 'Quiz Terminé !';
 
   @override
   String get yourScore => 'Votre score';
