@@ -31,18 +31,18 @@ class _LeaderboardPageState extends State<LeaderboardPage>
   List<Map<String, dynamic>> globalLeaderboard = [];
   List<Map<String, dynamic>> weeklyLeaderboard = [];
   List<Map<String, dynamic>> themeLeaderboard = [];
-  List<Map<String, dynamic>> followingLeaderboard = [];
+  Set<String> _followingIds = {};
   bool isLoading = true;
+  bool _friendsOnly = false;
   int? myGlobalRank;
   int? myWeeklyRank;
   int? myThemeRank;
-  int? myFollowingRank;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: widget.themeId != null ? 4 : 3,
+      length: widget.themeId != null ? 3 : 2,
       vsync: this,
     );
     loadLeaderboards();
@@ -58,23 +58,25 @@ class _LeaderboardPageState extends State<LeaderboardPage>
     try {
       final userId = _authRepo.getCurrentUserId();
 
-      final global = await _leaderboardRepo.getGlobalLeaderboard();
-      final weekly = await _leaderboardRepo.getWeeklyLeaderboard();
-      final followingLb = await _followRepo.getFollowingLeaderboard();
+      final futures = await Future.wait([
+        _leaderboardRepo.getGlobalLeaderboard(),
+        _leaderboardRepo.getWeeklyLeaderboard(),
+        if (userId != null) _followRepo.getFollowing(userId),
+      ]);
+
+      final global = futures[0];
+      final weekly = futures[1];
+      final following = userId != null ? futures[2] : <Map<String, dynamic>>[];
 
       int? globalRank;
       int? weeklyRank;
       int? themeRank;
-      int? followRank;
       List<Map<String, dynamic>> theme = [];
 
       if (userId != null) {
         globalRank = await _leaderboardRepo.getUserGlobalRank(userId);
         final weeklyIndex = weekly.indexWhere((item) => item['user_id'] == userId);
         weeklyRank = weeklyIndex >= 0 ? weeklyIndex + 1 : null;
-
-        final followIndex = followingLb.indexWhere((item) => item['user_id'] == userId);
-        followRank = followIndex >= 0 ? followIndex + 1 : null;
 
         if (widget.themeId != null) {
           theme = await _leaderboardRepo.getThemeLeaderboard(widget.themeId!);
@@ -87,11 +89,13 @@ class _LeaderboardPageState extends State<LeaderboardPage>
         globalLeaderboard = global;
         weeklyLeaderboard = weekly;
         themeLeaderboard = theme;
-        followingLeaderboard = followingLb;
+        _followingIds = {
+          if (userId != null) userId,
+          ...following.map((u) => u['user_id'] as String? ?? '').where((id) => id.isNotEmpty),
+        };
         myGlobalRank = globalRank;
         myWeeklyRank = weeklyRank;
         myThemeRank = themeRank;
-        myFollowingRank = followRank;
         isLoading = false;
       });
     } catch (e) {
@@ -126,7 +130,11 @@ class _LeaderboardPageState extends State<LeaderboardPage>
     final l10n = AppLocalizations.of(context)!;
     final userId = _authRepo.getCurrentUserId();
 
-    if (leaderboard.isEmpty) {
+    final filtered = _friendsOnly
+        ? leaderboard.where((item) => _followingIds.contains(item['user_id'] as String?)).toList()
+        : leaderboard;
+
+    if (filtered.isEmpty) {
       return Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -159,10 +167,13 @@ class _LeaderboardPageState extends State<LeaderboardPage>
       color: AppColors.brainPurple,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: leaderboard.length,
+        itemCount: filtered.length,
         itemBuilder: (context, index) {
-          final item = leaderboard[index];
-          final rank = index + 1;
+          final item = filtered[index];
+          // Rank = position in full unfiltered list + 1
+          final rank = _friendsOnly
+              ? leaderboard.indexOf(item) + 1
+              : index + 1;
           final isCurrentUser = item['user_id'] == userId;
           final score = item[scoreKey] ?? 0;
           final accuracy = item['accuracy']?.toStringAsFixed(1) ?? '0.0';
@@ -318,38 +329,61 @@ class _LeaderboardPageState extends State<LeaderboardPage>
               if (!isLoading && (myGlobalRank != null || myWeeklyRank != null || myThemeRank != null))
                 _buildMyRankCard(l10n),
 
-              // Tabs
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: AppColors.softShadow,
-                ),
-                child: TabBar(
-                  controller: _tabController,
-                  isScrollable: true,
-                  tabAlignment: TabAlignment.center,
-                  labelColor: AppColors.brainPurple,
-                  unselectedLabelColor: AppColors.textSecondary,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicator: BoxDecoration(
-                    color: AppColors.brainPurpleLight.withValues(alpha:0.3),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  dividerColor: Colors.transparent,
-                  tabs: widget.themeId != null
-                      ? [
-                          Tab(icon: const Icon(Icons.style, size: 20), text: widget.themeName ?? l10n.selectTheme),
-                          Tab(icon: const Icon(Icons.public, size: 20), text: l10n.global),
-                          Tab(icon: const Icon(Icons.calendar_today, size: 20), text: l10n.thisWeek),
-                          Tab(icon: const Icon(Icons.people, size: 20), text: l10n.followingLeaderboard),
-                        ]
-                      : [
-                          Tab(icon: const Icon(Icons.public, size: 20), text: l10n.global),
-                          Tab(icon: const Icon(Icons.calendar_today, size: 20), text: l10n.thisWeek),
-                          Tab(icon: const Icon(Icons.people, size: 20), text: l10n.followingLeaderboard),
-                        ],
+              // Tabs + Friends filter
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: AppColors.softShadow,
+                        ),
+                        child: TabBar(
+                          controller: _tabController,
+                          isScrollable: true,
+                          tabAlignment: TabAlignment.center,
+                          labelColor: AppColors.brainPurple,
+                          unselectedLabelColor: AppColors.textSecondary,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicator: BoxDecoration(
+                            color: AppColors.brainPurpleLight.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          dividerColor: Colors.transparent,
+                          tabs: widget.themeId != null
+                              ? [
+                                  Tab(icon: const Icon(Icons.style, size: 20), text: widget.themeName ?? l10n.selectTheme),
+                                  Tab(icon: const Icon(Icons.public, size: 20), text: l10n.global),
+                                  Tab(icon: const Icon(Icons.calendar_today, size: 20), text: l10n.thisWeek),
+                                ]
+                              : [
+                                  Tab(icon: const Icon(Icons.public, size: 20), text: l10n.global),
+                                  Tab(icon: const Icon(Icons.calendar_today, size: 20), text: l10n.thisWeek),
+                                ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () => setState(() => _friendsOnly = !_friendsOnly),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: _friendsOnly ? AppColors.brainPurple : AppColors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: AppColors.softShadow,
+                        ),
+                        child: Icon(
+                          Icons.people,
+                          color: _friendsOnly ? Colors.white : AppColors.textSecondary,
+                          size: 22,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 8),
@@ -367,12 +401,10 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                                 _buildLeaderboardList(themeLeaderboard, myThemeRank, 'xp'),
                                 _buildLeaderboardList(globalLeaderboard, myGlobalRank, 'total_xp'),
                                 _buildLeaderboardList(weeklyLeaderboard, myWeeklyRank, 'xp_earned'),
-                                _buildLeaderboardList(followingLeaderboard, myFollowingRank, 'total_xp'),
                               ]
                             : [
                                 _buildLeaderboardList(globalLeaderboard, myGlobalRank, 'total_xp'),
                                 _buildLeaderboardList(weeklyLeaderboard, myWeeklyRank, 'xp_earned'),
-                                _buildLeaderboardList(followingLeaderboard, myFollowingRank, 'total_xp'),
                               ],
                       ),
               ),
