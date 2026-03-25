@@ -11,6 +11,8 @@ import 'features/quiz/presentation/pages/theme_preferences_page.dart';
 import 'features/auth/data/repositories/auth_repository.dart';
 import 'features/quiz/data/repositories/theme_preferences_repository.dart';
 import 'core/providers/language_provider.dart';
+import 'features/social/providers/follow_provider.dart';
+import 'features/auth/providers/user_stats_provider.dart';
 import 'core/theme/app_colors.dart';
 import 'l10n/app_localizations.dart';
 import 'features/lives/data/providers/lives_provider.dart';
@@ -86,6 +88,8 @@ void main() async {
         ChangeNotifierProvider(create: (context) => LanguageProvider()),
         ChangeNotifierProvider(create: (context) => LivesProvider()),
         ChangeNotifierProvider(create: (context) => PvPProvider()),
+        ChangeNotifierProvider(create: (context) => FollowProvider()),
+        ChangeNotifierProvider(create: (context) => UserStatsProvider()),
       ],
       child: const MyApp(),
     ),
@@ -456,12 +460,29 @@ class _AuthCheckerState extends State<AuthChecker> {
       context.read<PvPProvider>().startBackgroundChecks();
     }
 
-    // Load the preferred language from the DB before showing the destination
-    // (must be awaited so the locale is correct from the first render)
+    // Load language + streak in parallel before showing the destination
+    // (language awaited so locale is correct; streak awaited so header shows real value immediately)
+    final startupUserId = _authRepo.getCurrentUserId();
     if (mounted) {
-      await context.read<LanguageProvider>().loadFromServer();
+      await Future.wait([
+        context.read<LanguageProvider>().loadFromServer(),
+        if (startupUserId != null) context.read<UserStatsProvider>().loadFromServer(),
+      ]);
     }
     if (!mounted) return;
+
+    // Load follow state in background (less critical for initial render)
+    if (startupUserId != null && mounted) {
+      context.read<FollowProvider>().loadFromServer(startupUserId);
+    }
+
+    // Wire PvP streak updates to UserStatsProvider
+    if (mounted) {
+      final userStatsProvider = context.read<UserStatsProvider>();
+      context.read<PvPProvider>().onStreakUpdated = () {
+        userStatsProvider.loadFromServer();
+      };
+    }
 
     try {
       final usernameSet = await _authRepo.hasUsername();

@@ -12,8 +12,9 @@ import '../../../quiz/data/repositories/quiz_repository.dart';
 import '../../../quiz/data/models/theme_model.dart';
 import '../../../auth/presentation/pages/login_page.dart';
 import '../../../pvp/data/providers/pvp_provider.dart';
-import '../../../social/data/repositories/follow_repository.dart';
 import '../../../social/presentation/pages/follow_list_page.dart';
+import '../../../social/providers/follow_provider.dart';
+import '../../../auth/providers/user_stats_provider.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -27,7 +28,6 @@ class _ProfilePageState extends State<ProfilePage> {
   final _profileRepo = ProfileRepository();
   final _prefsRepo = ThemePreferencesRepository();
   final _quizRepo = QuizRepository();
-  final _followRepo = FollowRepository();
 
   UserModel? userStats;
   List<Map<String, dynamic>> progressByTheme = [];
@@ -35,8 +35,6 @@ class _ProfilePageState extends State<ProfilePage> {
   List<String> favoriteThemeIds = [];
   bool isLoading = true;
   String selectedLanguage = 'en';
-  int followersCount = 0;
-  int followingCount = 0;
 
   @override
   void initState() {
@@ -55,7 +53,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
       final preferredIds = await _prefsRepo.getPreferences(userId);
       final themes = await _quizRepo.getThemes(currentLang);
-      final counts = await _followRepo.getFollowCounts(userId);
 
       if (!mounted) return;
       setState(() {
@@ -64,8 +61,6 @@ class _ProfilePageState extends State<ProfilePage> {
         progressByTheme = progress;
         allThemes = themes;
         favoriteThemeIds = preferredIds;
-        followersCount = counts['followers'] ?? 0;
-        followingCount = counts['following'] ?? 0;
         isLoading = false;
       });
     } catch (e) {
@@ -394,6 +389,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildSocialSection(AppLocalizations l10n) {
+    final followProvider = context.watch<FollowProvider>();
+    final followingCount = followProvider.followingCount;
+    final followersCount = followProvider.followersCount;
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -676,6 +674,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildStatsCards(AppLocalizations l10n) {
+    final userStatsProvider = context.watch<UserStatsProvider>();
     return Column(
       children: [
         // Streak Card
@@ -704,7 +703,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${userStats?.effectiveStreak ?? 0} ${l10n.days}',
+                      '${userStatsProvider.effectiveStreak} ${l10n.days}',
                       style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -724,7 +723,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const Icon(Icons.emoji_events, color: Color(0xFFFFD700), size: 24),
                   const SizedBox(height: 4),
                   Text(
-                    '${l10n.bestStreak}: ${userStats?.bestStreak ?? 0}',
+                    '${l10n.bestStreak}: ${userStatsProvider.bestStreak}',
                     style: TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,

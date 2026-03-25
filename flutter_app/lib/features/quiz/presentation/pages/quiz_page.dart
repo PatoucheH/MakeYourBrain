@@ -11,6 +11,7 @@ import '../../data/models/theme_model.dart';
 import '../../data/models/question_model.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../../features/profile/data/repositories/profile_repository.dart';
+import '../../../auth/providers/user_stats_provider.dart';
 import '../../../lives/presentation/widgets/no_lives_dialog.dart';
 import '../../../lives/presentation/widgets/lives_indicator.dart';
 
@@ -201,6 +202,9 @@ class _QuizPageState extends State<QuizPage> {
     if (authRepo.isLoggedIn()) {
       try {
         await ProfileRepository().updateStreak(authRepo.getCurrentUserId()!);
+        if (mounted) {
+          context.read<UserStatsProvider>().loadFromServer();
+        }
       } catch (e) {
         debugPrint('Error updating streak: $e');
       }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/repositories/follow_repository.dart';
+import '../../providers/follow_provider.dart';
 
 class UserProfileBottomSheet extends StatefulWidget {
   final String userId;
@@ -57,11 +59,12 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
     if (isToggling) return;
     setState(() => isToggling = true);
 
+    final followProvider = context.read<FollowProvider>();
     bool success;
     if (isFollowing) {
-      success = await _followRepo.unfollowUser(widget.userId);
+      success = await followProvider.unfollowUser(widget.userId);
     } else {
-      success = await _followRepo.followUser(widget.userId);
+      success = await followProvider.followUser(widget.userId);
     }
 
     if (success && mounted) {

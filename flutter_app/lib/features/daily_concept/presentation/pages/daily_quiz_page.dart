@@ -9,6 +9,7 @@ import '../../../quiz/data/repositories/quiz_repository.dart';
 import '../../../quiz/data/models/question_model.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
+import '../../../auth/providers/user_stats_provider.dart';
 import '../../data/models/daily_concept_model.dart';
 import '../../data/repositories/daily_concept_repository.dart';
 
@@ -140,6 +141,9 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
     if (authRepo.isLoggedIn()) {
       try {
         await ProfileRepository().updateStreak(authRepo.getCurrentUserId()!);
+        if (mounted) {
+          context.read<UserStatsProvider>().loadFromServer();
+        }
       } catch (e) {
         debugPrint('Error updating streak: $e');
       }

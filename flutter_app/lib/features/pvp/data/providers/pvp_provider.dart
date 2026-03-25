@@ -53,6 +53,10 @@ class PvPProvider extends ChangeNotifier {
   bool matchCompletedNotification = false;
   bool? matchCompletedDidWin;
 
+  // === Callbacks ===
+  /// Called after a successful streak update so external providers can react.
+  VoidCallback? onStreakUpdated;
+
   // === Internal state ===
   bool isOnGamePage = false;
   bool _previousIsMyTurn = false;
@@ -1029,6 +1033,7 @@ class PvPProvider extends ChangeNotifier {
 
       try {
         await _profileRepository.updateStreak(currentUserId!);
+        onStreakUpdated?.call();
       } catch (e) {
         debugPrint('[PvP] Error updating streak: $e');
       }

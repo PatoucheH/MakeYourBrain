@@ -35,7 +35,6 @@ class _HomePageState extends State<HomePage> {
   List<String> favoriteThemeIds = [];
   Map<String, Map<String, dynamic>> themeProgress = {};
   bool isLoading = true;
-  int currentStreak = 0;
   int pvpRating = 1000;
   DailyConceptModel? dailyConcept;
   String? _lastLanguage;
@@ -84,7 +83,6 @@ class _HomePageState extends State<HomePage> {
           favoriteThemes = preferred;
           favoriteThemeIds = preferredIds;
           themeProgress = progressMap;
-          currentStreak = stats?.effectiveStreak ?? 0;
           pvpRating = stats?.pvpRating ?? 1000;
           dailyConcept = daily;
           isLoading = false;

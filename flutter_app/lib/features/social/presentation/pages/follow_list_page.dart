@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/brain_app_bar.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../data/repositories/follow_repository.dart';
+import '../../providers/follow_provider.dart';
 import '../widgets/user_profile_bottom_sheet.dart';
 
 class FollowListPage extends StatefulWidget {
@@ -97,11 +99,12 @@ class _FollowListPageState extends State<FollowListPage>
   }
 
   Future<void> _toggleFollow(String targetUserId, bool currentlyFollowing) async {
+    final followProvider = context.read<FollowProvider>();
     bool success;
     if (currentlyFollowing) {
-      success = await _followRepo.unfollowUser(targetUserId);
+      success = await followProvider.unfollowUser(targetUserId);
     } else {
-      success = await _followRepo.followUser(targetUserId);
+      success = await followProvider.followUser(targetUserId);
     }
     if (success && mounted) {
       _loadData();
@@ -405,8 +408,9 @@ class _FollowListPageState extends State<FollowListPage>
             // Name
             Expanded(
               child: GestureDetector(
-                onTap: () {
-                  UserProfileBottomSheet.show(context, userId, currentUserId);
+                onTap: () async {
+                  await UserProfileBottomSheet.show(context, userId, currentUserId);
+                  if (mounted) _loadData();
                 },
                 child: Text(
                   displayName,

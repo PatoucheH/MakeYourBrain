@@ -4,6 +4,7 @@ import '../../l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../features/auth/data/repositories/auth_repository.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/auth/providers/user_stats_provider.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/leaderboard/presentation/pages/leaderboard_page.dart';
 import '../../features/lives/presentation/widgets/lives_indicator.dart';
@@ -23,35 +24,12 @@ class BrainAppBar extends StatefulWidget {
 
 class _BrainAppBarState extends State<BrainAppBar> {
   final _authRepo = AuthRepository();
-  int? currentStreak;
-
-  // Static cache: keeps the last value between navigations
-  // to avoid the "-" flash on each rebuild.
-  static int? _cachedStreak;
-
-  @override
-  void initState() {
-    super.initState();
-    currentStreak = _cachedStreak; // immediate display if already known
-    _loadStreak();
-  }
-
-  Future<void> _loadStreak() async {
-    try {
-      final stats = await _authRepo.getUserStats();
-      if (mounted) {
-        setState(() {
-          currentStreak = stats?.effectiveStreak ?? 0;
-          _cachedStreak = currentStreak;
-        });
-      }
-    } catch (_) {}
-  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isFirstRoute = !Navigator.of(context).canPop();
+    final currentStreak = context.watch<UserStatsProvider>().effectiveStreak;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -110,7 +88,7 @@ class _BrainAppBarState extends State<BrainAppBar> {
                 ),
                 const SizedBox(width: 2),
                 Text(
-                  currentStreak != null ? '$currentStreak' : '-',
+                  '$currentStreak',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -161,7 +139,6 @@ class _BrainAppBarState extends State<BrainAppBar> {
                     MaterialPageRoute(
                         builder: (context) => const ProfilePage()),
                   );
-                  _loadStreak();
                   widget.onReturn?.call();
                 } else if (value == 'leaderboard') {
                   Navigator.push(

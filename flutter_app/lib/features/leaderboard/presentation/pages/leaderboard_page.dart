@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/brain_app_bar.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../data/repositories/leaderboard_repository.dart';
-import '../../../social/data/repositories/follow_repository.dart';
 import '../../../social/presentation/widgets/clickable_username.dart';
+import '../../../social/providers/follow_provider.dart';
 
 class LeaderboardPage extends StatefulWidget {
   final String? themeId;
@@ -25,13 +26,12 @@ class _LeaderboardPageState extends State<LeaderboardPage>
     with SingleTickerProviderStateMixin {
   final _leaderboardRepo = LeaderboardRepository();
   final _authRepo = AuthRepository();
-  final _followRepo = FollowRepository();
 
   late TabController _tabController;
   List<Map<String, dynamic>> globalLeaderboard = [];
   List<Map<String, dynamic>> weeklyLeaderboard = [];
   List<Map<String, dynamic>> themeLeaderboard = [];
-  Set<String> _followingIds = {};
+  String? _currentUserId;
   bool isLoading = true;
   bool _friendsOnly = false;
   int? myGlobalRank;
@@ -61,12 +61,10 @@ class _LeaderboardPageState extends State<LeaderboardPage>
       final futures = await Future.wait([
         _leaderboardRepo.getGlobalLeaderboard(),
         _leaderboardRepo.getWeeklyLeaderboard(),
-        if (userId != null) _followRepo.getFollowing(userId),
       ]);
 
       final global = futures[0];
       final weekly = futures[1];
-      final following = userId != null ? futures[2] : <Map<String, dynamic>>[];
 
       int? globalRank;
       int? weeklyRank;
@@ -89,10 +87,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
         globalLeaderboard = global;
         weeklyLeaderboard = weekly;
         themeLeaderboard = theme;
-        _followingIds = {
-          if (userId != null) userId,
-          ...following.map((u) => u['user_id'] as String? ?? '').where((id) => id.isNotEmpty),
-        };
+        _currentUserId = userId;
         myGlobalRank = globalRank;
         myWeeklyRank = weeklyRank;
         myThemeRank = themeRank;
@@ -126,12 +121,13 @@ class _LeaderboardPageState extends State<LeaderboardPage>
     List<Map<String, dynamic>> leaderboard,
     int? myRank,
     String scoreKey,
+    Set<String> effectiveFollowingIds,
   ) {
     final l10n = AppLocalizations.of(context)!;
     final userId = _authRepo.getCurrentUserId();
 
     final filtered = _friendsOnly
-        ? leaderboard.where((item) => _followingIds.contains(item['user_id'] as String?)).toList()
+        ? leaderboard.where((item) => effectiveFollowingIds.contains(item['user_id'] as String?)).toList()
         : leaderboard;
 
     if (filtered.isEmpty) {
@@ -315,6 +311,11 @@ class _LeaderboardPageState extends State<LeaderboardPage>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final followingIds = context.watch<FollowProvider>().followingIds;
+    final effectiveFollowingIds = {
+      if (_currentUserId != null) _currentUserId!,
+      ...followingIds,
+    };
 
     return Scaffold(
       body: Container(
@@ -398,13 +399,13 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                         controller: _tabController,
                         children: widget.themeId != null
                             ? [
-                                _buildLeaderboardList(themeLeaderboard, myThemeRank, 'xp'),
-                                _buildLeaderboardList(globalLeaderboard, myGlobalRank, 'total_xp'),
-                                _buildLeaderboardList(weeklyLeaderboard, myWeeklyRank, 'xp_earned'),
+                                _buildLeaderboardList(themeLeaderboard, myThemeRank, 'xp', effectiveFollowingIds),
+                                _buildLeaderboardList(globalLeaderboard, myGlobalRank, 'total_xp', effectiveFollowingIds),
+                                _buildLeaderboardList(weeklyLeaderboard, myWeeklyRank, 'xp_earned', effectiveFollowingIds),
                               ]
                             : [
-                                _buildLeaderboardList(globalLeaderboard, myGlobalRank, 'total_xp'),
-                                _buildLeaderboardList(weeklyLeaderboard, myWeeklyRank, 'xp_earned'),
+                                _buildLeaderboardList(globalLeaderboard, myGlobalRank, 'total_xp', effectiveFollowingIds),
+                                _buildLeaderboardList(weeklyLeaderboard, myWeeklyRank, 'xp_earned', effectiveFollowingIds),
                               ],
                       ),
               ),
