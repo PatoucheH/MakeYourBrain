@@ -307,6 +307,7 @@ CRITICAL REQUIREMENTS:
 - 4 answers per question (exactly 1 correct)
 - Interesting and educational
 - Questions should range from basic facts to deeper analysis
+- The four answers must be the same time max 10 characters between the good answer size and the average bad answer size
 
 Difficulty guidelines:
 - EASY: Requires genuine knowledge of the concept, not just common sense. The answer should not be guessable by someone unfamiliar with "${conceptName}". Ask about well-known but specific facts. (${easyCount} questions)
