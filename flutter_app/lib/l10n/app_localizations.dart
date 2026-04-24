@@ -1531,6 +1531,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Follow players to invite them!'**
   String get noFriendsToInvite;
+
+  /// No description provided for @resultExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent!'**
+  String get resultExcellent;
+
+  /// No description provided for @resultGoodJob.
+  ///
+  /// In en, this message translates to:
+  /// **'Well done!'**
+  String get resultGoodJob;
+
+  /// No description provided for @resultKeepGoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep going!'**
+  String get resultKeepGoing;
 }
 
 class _AppLocalizationsDelegate

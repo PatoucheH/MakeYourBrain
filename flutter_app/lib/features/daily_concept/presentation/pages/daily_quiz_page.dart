@@ -45,7 +45,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiController = ConfettiController(duration: const Duration(seconds: 4));
     _loadQuestions();
   }
 
@@ -168,8 +168,26 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
 
     if (!mounted) return;
 
-    _confettiController.play();
-    _audioPlayer.play(AssetSource('sounds/success.flac')).catchError((_) {});
+    final starCount = percentage >= 80 ? 3 : percentage >= 50 ? 2 : 1;
+    final mascotImage = percentage >= 80
+        ? 'assets/branding/mascot/brainly_victory.png'
+        : percentage >= 50
+            ? 'assets/branding/mascot/brainly_happy.png'
+            : 'assets/branding/mascot/brainly_encourage.png';
+    final resultTitle = percentage >= 80
+        ? l10n.resultExcellent
+        : percentage >= 50
+            ? l10n.resultGoodJob
+            : l10n.resultKeepGoing;
+
+    if (percentage >= 50) {
+      _confettiController.play();
+    }
+    if (percentage >= 80) {
+      _audioPlayer.play(AssetSource('sounds/victory_epic.mp3')).catchError((_) {});
+    } else if (percentage >= 50) {
+      _audioPlayer.play(AssetSource('sounds/victory.mp3')).catchError((_) {});
+    }
 
     showDialog(
       context: context,
@@ -181,159 +199,159 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
           clipBehavior: Clip.none,
           children: [
             Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Image.asset(
-                    'assets/branding/mascot/brainly_victory.png',
-                    height: 80,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  l10n.quizCompleted,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.brainPurple,
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Score circle
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error,
-                        (percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error).withValues(alpha: 0.7),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error).withValues(alpha: 0.4),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        gradient: AppColors.primaryGradient,
+                        shape: BoxShape.circle,
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${percentage.toStringAsFixed(0)}%',
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      child: Image.asset(mascotImage, height: 80),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      resultTitle,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.brainPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(3, (i) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Icon(
+                          i < starCount ? Icons.star_rounded : Icons.star_outline_rounded,
+                          color: i < starCount ? const Color(0xFFFFD700) : Colors.grey.shade300,
+                          size: 36,
+                        ),
+                      )),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error,
+                            (percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error).withValues(alpha: 0.7),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (percentage >= 70 ? AppColors.success : percentage >= 40 ? AppColors.warning : AppColors.error).withValues(alpha: 0.4),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${percentage.toStringAsFixed(0)}%',
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            '$score/${questions.length}',
+                            style: const TextStyle(fontSize: 16, color: Colors.white70),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF1B8A3C), Color(0xFF52BE80)],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF1B8A3C).withValues(alpha: 0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.star_rounded, color: Colors.white, size: 28),
+                          const SizedBox(width: 8),
+                          Text(
+                            '+$xpEarned ${l10n.xp} (x3!)',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          gradient: AppColors.primaryGradient,
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop(true);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          child: Text(
+                            l10n.backToThemes,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
-                      Text(
-                        '$score/${questions.length}',
-                        style: const TextStyle(fontSize: 16, color: Colors.white70),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // XP Badge with x3
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF1B8A3C), Color(0xFF52BE80)],
                     ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF1B8A3C).withValues(alpha: 0.4),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.star_rounded, color: Colors.white, size: 28),
-                      const SizedBox(width: 8),
-                      Text(
-                        '+$xpEarned ${l10n.xp} (x3!)',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 28),
-
-                // Back button only (no restart)
-                SizedBox(
-                  width: double.infinity,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: AppColors.primaryGradient,
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // close dialog
-                        Navigator.of(context).pop(); // close daily quiz
-                        Navigator.of(context).pop(true); // close daily concept page, signal completion
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: Text(
-                        l10n.backToThemes,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-          ),
-          ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirectionality: BlastDirectionality.explosive,
-            numberOfParticles: 10,
-            gravity: 0.5,
-            emissionFrequency: 0.04,
-            colors: const [
-              AppColors.brainPurple,
-              Color(0xFFFFD700),
-              AppColors.accentGreen,
-              Color(0xFFFF6B9D),
-              Color(0xFF64B5F6),
-            ],
-          ),
-        ],
+            if (percentage >= 50)
+              ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirectionality: BlastDirectionality.explosive,
+                numberOfParticles: percentage >= 80 ? 18 : 8,
+                gravity: 0.25,
+                emissionFrequency: percentage >= 80 ? 0.05 : 0.02,
+                colors: percentage >= 80
+                    ? const [Color(0xFFFFD700), Colors.white, Color(0xFFC0C0C0), Color(0xFFFFE066)]
+                    : const [Color(0xFFFFD700), Color(0xFFFFA500), Colors.white],
+              ),
+          ],
         ),
       ),
     );

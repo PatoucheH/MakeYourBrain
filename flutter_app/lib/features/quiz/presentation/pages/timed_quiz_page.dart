@@ -80,7 +80,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiController = ConfettiController(duration: const Duration(seconds: 4));
     remainingSeconds = widget.totalSeconds;
     loadQuestions();
   }
@@ -253,8 +253,28 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
 
     if (!mounted) return;
 
-    _confettiController.play();
-    _audioPlayer.play(AssetSource('sounds/success.flac')).catchError((_) {});
+    final starCount = percentage >= 80 ? 3 : percentage >= 50 ? 2 : 1;
+    final mascotImage = percentage >= 80
+        ? 'assets/branding/mascot/brainly_victory.png'
+        : percentage >= 50
+            ? 'assets/branding/mascot/brainly_happy.png'
+            : 'assets/branding/mascot/brainly_encourage.png';
+    final resultTitle = remainingSeconds <= 0
+        ? l10n.timesUp
+        : percentage >= 80
+            ? l10n.resultExcellent
+            : percentage >= 50
+                ? l10n.resultGoodJob
+                : l10n.resultKeepGoing;
+
+    if (percentage >= 50) {
+      _confettiController.play();
+    }
+    if (percentage >= 80) {
+      _audioPlayer.play(AssetSource('sounds/victory_epic.mp3')).catchError((_) {});
+    } else if (percentage >= 50) {
+      _audioPlayer.play(AssetSource('sounds/victory.mp3')).catchError((_) {});
+    }
 
     showDialog(
       context: context,
@@ -275,7 +295,6 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Timer icon with result
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -284,21 +303,30 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                     ),
                     shape: BoxShape.circle,
                   ),
-                  child: Image.asset(
-                    'assets/branding/mascot/brainly_victory.png',
-                    height: 80,
-                  ),
+                  child: Image.asset(mascotImage, height: 80),
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  remainingSeconds <= 0 ? l10n.timesUp : l10n.quizCompleted,
+                  resultTitle,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppColors.brainPurple,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(3, (i) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Icon(
+                      i < starCount ? Icons.star_rounded : Icons.star_outline_rounded,
+                      color: i < starCount ? const Color(0xFFFFD700) : Colors.grey.shade300,
+                      size: 36,
+                    ),
+                  )),
+                ),
+                const SizedBox(height: 20),
 
                 // Score circle
                 Container(
@@ -479,19 +507,16 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
             ),
           ),
           ),
-          ConfettiWidget(
+          if (percentage >= 50)
+            ConfettiWidget(
               confettiController: _confettiController,
               blastDirectionality: BlastDirectionality.explosive,
-              numberOfParticles: 10,
-              gravity: 0.5,
-              emissionFrequency: 0.04,
-              colors: const [
-                AppColors.brainPurple,
-                Color(0xFFFFD700),
-                AppColors.accentGreen,
-                Color(0xFFFF6B9D),
-                Color(0xFF64B5F6),
-              ],
+              numberOfParticles: percentage >= 80 ? 18 : 8,
+              gravity: 0.25,
+              emissionFrequency: percentage >= 80 ? 0.05 : 0.02,
+              colors: percentage >= 80
+                  ? const [Color(0xFFFFD700), Colors.white, Color(0xFFC0C0C0), Color(0xFFFFE066)]
+                  : const [Color(0xFFFFD700), Color(0xFFFFA500), Colors.white],
             ),
           ],
         ),

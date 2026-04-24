@@ -767,4 +767,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noFriendsToInvite => 'Follow players to invite them!';
+
+  @override
+  String get resultExcellent => 'Excellent!';
+
+  @override
+  String get resultGoodJob => 'Well done!';
+
+  @override
+  String get resultKeepGoing => 'Keep going!';
 }

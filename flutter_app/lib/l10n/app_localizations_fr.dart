@@ -775,4 +775,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noFriendsToInvite => 'Suis des joueurs pour les inviter !';
+
+  @override
+  String get resultExcellent => 'Excellent !';
+
+  @override
+  String get resultGoodJob => 'Bien joué !';
+
+  @override
+  String get resultKeepGoing => 'Continue !';
 }

@@ -340,5 +340,8 @@
   "acceptInvite": "Accept",
   "declineInvite": "Decline",
   "challengesYou": "challenges you to a match!",
-  "noFriendsToInvite": "Follow players to invite them!"
+  "noFriendsToInvite": "Follow players to invite them!",
+  "resultExcellent": "Excellent!",
+  "resultGoodJob": "Well done!",
+  "resultKeepGoing": "Keep going!"
 }

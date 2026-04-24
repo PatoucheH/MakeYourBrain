@@ -312,5 +312,8 @@
   "acceptInvite": "Accepter",
   "declineInvite": "Refuser",
   "challengesYou": "vous défie en match !",
-  "noFriendsToInvite": "Suis des joueurs pour les inviter !"
+  "noFriendsToInvite": "Suis des joueurs pour les inviter !",
+  "resultExcellent": "Excellent !",
+  "resultGoodJob": "Bien joué !",
+  "resultKeepGoing": "Continue !"
 }
