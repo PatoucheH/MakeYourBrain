@@ -1623,18 +1623,33 @@ abstract class AppLocalizations {
   String get passwordUpdateFailed;
 
   /// No description provided for @passwordReqLength.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 8 characters'**
   String get passwordReqLength;
 
   /// No description provided for @passwordReqUppercase.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one uppercase letter'**
   String get passwordReqUppercase;
 
   /// No description provided for @passwordReqNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one number'**
   String get passwordReqNumber;
 
   /// No description provided for @passwordReqSymbol.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one symbol (!@#\$%...)'**
   String get passwordReqSymbol;
 
   /// No description provided for @passwordTooWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Password does not meet the requirements'**
   String get passwordTooWeak;
 
   /// No description provided for @send.
