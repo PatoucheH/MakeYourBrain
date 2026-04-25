@@ -784,4 +784,62 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get resultKeepGoing => 'Continue !';
+
+  @override
+  String get appearance => 'Apparence';
+
+  @override
+  String get darkMode => 'Mode sombre';
+
+  @override
+  String get lightMode => 'Mode clair';
+
+  @override
+  String get forgotPassword => 'Mot de passe oublié ?';
+
+  @override
+  String get resetPasswordTitle => 'Réinitialiser le mot de passe';
+
+  @override
+  String get resetPasswordHint =>
+      'Entrez votre email pour recevoir un lien de réinitialisation.';
+
+  @override
+  String get resetPasswordSent =>
+      'Vérifiez votre email pour le lien de réinitialisation !';
+
+  @override
+  String get resetPasswordFailed =>
+      'Impossible d\'envoyer l\'email. Réessayez.';
+
+  @override
+  String get newPassword => 'Nouveau mot de passe';
+
+  @override
+  String get updatePassword => 'Mettre à jour le mot de passe';
+
+  @override
+  String get passwordUpdated => 'Mot de passe mis à jour !';
+
+  @override
+  String get passwordUpdateFailed =>
+      'Impossible de mettre à jour le mot de passe.';
+
+  @override
+  String get passwordReqLength => 'Au moins 8 caractères';
+
+  @override
+  String get passwordReqUppercase => 'Au moins une majuscule';
+
+  @override
+  String get passwordReqNumber => 'Au moins un chiffre';
+
+  @override
+  String get passwordReqSymbol => 'Au moins un symbole (!@#\$%...)';
+
+  @override
+  String get passwordTooWeak => 'Le mot de passe ne respecte pas les exigences';
+
+  @override
+  String get send => 'Envoyer';
 }

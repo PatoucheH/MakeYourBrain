@@ -21,6 +21,7 @@ class QuestionModel {
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
     final answers = ((json['answers'] as List?) ?? [])
+        .whereType<Map<String, dynamic>>()
         .map((a) => AnswerModel.fromJson(a))
         .toList()
       ..shuffle();

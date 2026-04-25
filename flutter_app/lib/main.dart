@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'shared/services/supabase_service.dart';
 import 'features/auth/presentation/pages/login_page.dart';
+import 'features/auth/presentation/pages/new_password_page.dart';
 import 'features/auth/presentation/pages/username_setup_page.dart';
 import 'features/quiz/presentation/pages/home_page.dart';
 import 'features/quiz/presentation/pages/theme_preferences_page.dart';
@@ -14,6 +15,8 @@ import 'core/providers/language_provider.dart';
 import 'features/social/providers/follow_provider.dart';
 import 'features/auth/providers/user_stats_provider.dart';
 import 'core/theme/app_colors.dart';
+import 'core/theme/app_theme.dart';
+import 'core/providers/theme_provider.dart';
 import 'l10n/app_localizations.dart';
 import 'features/lives/data/providers/lives_provider.dart';
 import 'shared/services/ad_service.dart';
@@ -86,6 +89,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => LanguageProvider()),
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => LivesProvider()),
         ChangeNotifierProvider(create: (context) => PvPProvider()),
         ChangeNotifierProvider(create: (context) => FollowProvider()),
@@ -125,160 +129,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<LanguageProvider>(
-      builder: (context, languageProvider, child) {
+    return Consumer2<LanguageProvider, ThemeProvider>(
+      builder: (context, languageProvider, themeProvider, child) {
         return MaterialApp(
           title: 'Make Your Brain',
           debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: AppColors.brainPurple,
-              primary: AppColors.brainPurple,
-              secondary: AppColors.brainLightPurple,
-              surface: AppColors.backgroundLight,
-            ),
-            useMaterial3: true,
-            scaffoldBackgroundColor: AppColors.backgroundLight,
-
-            // AppBar Theme
-            appBarTheme: AppBarTheme(
-              backgroundColor: Colors.transparent,
-              foregroundColor: AppColors.brainPurple,
-              elevation: 0,
-              centerTitle: true,
-              titleTextStyle: const TextStyle(
-                color: AppColors.brainPurple,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-              iconTheme: const IconThemeData(
-                color: AppColors.brainPurple,
-              ),
-            ),
-
-            // Card Theme
-            cardTheme: CardThemeData(
-              elevation: 0,
-              color: AppColors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              shadowColor: AppColors.brainPurple.withValues(alpha:0.1),
-            ),
-
-            // Elevated Button Theme
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.brainPurple,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            // Text Button Theme
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.brainPurple,
-                textStyle: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            // Outlined Button Theme
-            outlinedButtonTheme: OutlinedButtonThemeData(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.brainPurple,
-                side: const BorderSide(color: AppColors.brainPurple, width: 2),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-            ),
-
-            // Input Decoration Theme
-            inputDecorationTheme: InputDecorationTheme(
-              filled: true,
-              fillColor: AppColors.white,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: AppColors.brainPurple.withValues(alpha:0.2)),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: AppColors.brainPurple.withValues(alpha:0.2)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: AppColors.brainPurple, width: 2),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: AppColors.error),
-              ),
-              labelStyle: const TextStyle(color: AppColors.textSecondary),
-              hintStyle: TextStyle(color: AppColors.textSecondary.withValues(alpha:0.7)),
-            ),
-
-            // Chip Theme
-            chipTheme: ChipThemeData(
-              backgroundColor: AppColors.brainPurpleLight,
-              labelStyle: const TextStyle(
-                color: AppColors.brainPurple,
-                fontWeight: FontWeight.w600,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-
-            // Dialog Theme
-            dialogTheme: DialogThemeData(
-              backgroundColor: AppColors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-              titleTextStyle: const TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            // Snackbar Theme
-            snackBarTheme: SnackBarThemeData(
-              backgroundColor: AppColors.brainPurple,
-              contentTextStyle: const TextStyle(color: Colors.white),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              behavior: SnackBarBehavior.floating,
-            ),
-
-            // Progress Indicator Theme
-            progressIndicatorTheme: const ProgressIndicatorThemeData(
-              color: AppColors.brainPurple,
-              linearTrackColor: AppColors.brainPurpleLight,
-            ),
-
-            // Divider Theme
-            dividerTheme: DividerThemeData(
-              color: AppColors.brainPurple.withValues(alpha:0.1),
-              thickness: 1,
-            ),
-          ),
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeProvider.themeMode,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -317,6 +175,7 @@ class AuthGate extends StatefulWidget {
 class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
   bool _isInitialized = false;
   int _authVersion = 0;
+  bool _isPasswordRecovery = false;
   StreamSubscription<AuthState>? _authSub;
 
   @override
@@ -326,9 +185,19 @@ class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
     _initialize();
     _authSub = SupabaseService().client.auth.onAuthStateChange.listen((state) {
       if (!mounted) return;
-      if (state.event == AuthChangeEvent.signedIn ||
-          state.event == AuthChangeEvent.signedOut) {
-        setState(() => _authVersion++);
+      if (state.event == AuthChangeEvent.passwordRecovery) {
+        setState(() => _isPasswordRecovery = true);
+      } else if (state.event == AuthChangeEvent.signedIn) {
+        // Supabase fires signedIn right after passwordRecovery — ignore it
+        // so NewPasswordPage stays visible until the password is actually reset.
+        if (!_isPasswordRecovery) {
+          setState(() => _authVersion++);
+        }
+      } else if (state.event == AuthChangeEvent.signedOut) {
+        setState(() {
+          _isPasswordRecovery = false;
+          _authVersion++;
+        });
       }
     });
   }
@@ -358,7 +227,10 @@ class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
   }
 
   Future<void> _initialize() async {
-    await context.read<LanguageProvider>().initialize();
+    await Future.wait([
+      context.read<LanguageProvider>().initialize(),
+      context.read<ThemeProvider>().initialize(),
+    ]);
     if (!mounted) return;
     setState(() => _isInitialized = true);
   }
@@ -367,6 +239,10 @@ class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     if (!_isInitialized) {
       return const SplashScreen();
+    }
+
+    if (_isPasswordRecovery) {
+      return const NewPasswordPage();
     }
 
     return AuthChecker(key: ValueKey(_authVersion));
@@ -381,8 +257,8 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.backgroundGradient,
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradientOf(context),
         ),
         child: Center(
           child: Column(
@@ -392,7 +268,7 @@ class SplashScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: AppColors.cardColorOf(context),
                   shape: BoxShape.circle,
                   boxShadow: AppColors.cardShadow,
                 ),

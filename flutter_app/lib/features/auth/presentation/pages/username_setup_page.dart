@@ -143,8 +143,8 @@ class _UsernameSetupPageState extends State<UsernameSetupPage> {
       canPop: false,
       child: Scaffold(
         body: Container(
-          decoration: const BoxDecoration(
-            gradient: AppColors.backgroundGradient,
+          decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradientOf(context),
           ),
           child: SafeArea(
             child: SingleChildScrollView(
@@ -158,7 +158,7 @@ class _UsernameSetupPageState extends State<UsernameSetupPage> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: AppColors.white,
+                        color: AppColors.cardColorOf(context),
                         shape: BoxShape.circle,
                         boxShadow: AppColors.cardShadow,
                       ),
@@ -181,7 +181,7 @@ class _UsernameSetupPageState extends State<UsernameSetupPage> {
                       ).createShader(bounds),
                       child: Text(
                         l10n.chooseYourUsername,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -192,9 +192,9 @@ class _UsernameSetupPageState extends State<UsernameSetupPage> {
                     const SizedBox(height: 8),
                     Text(
                       l10n.chooseYourUsernameHint,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textSecondaryOf(context),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -204,7 +204,7 @@ class _UsernameSetupPageState extends State<UsernameSetupPage> {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: AppColors.white,
+                        color: AppColors.cardColorOf(context),
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: AppColors.cardShadow,
                       ),
@@ -242,7 +242,7 @@ class _UsernameSetupPageState extends State<UsernameSetupPage> {
                                     )
                                   : Text(
                                       l10n.confirmUsername,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -290,7 +290,7 @@ class _UsernameSetupPageState extends State<UsernameSetupPage> {
       children: [
         TextField(
           controller: _usernameController,
-          style: const TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 16),
           onChanged: _checkUsername,
           decoration: InputDecoration(
             labelText: l10n.username,
@@ -323,7 +323,7 @@ class _UsernameSetupPageState extends State<UsernameSetupPage> {
             padding: const EdgeInsets.only(top: 4, left: 12),
             child: Text(
               _usernameError!,
-              style: const TextStyle(color: AppColors.error, fontSize: 12),
+              style: TextStyle(color: AppColors.error, fontSize: 12),
             ),
           ),
         if (_isUsernameAvailable == true)
@@ -331,7 +331,7 @@ class _UsernameSetupPageState extends State<UsernameSetupPage> {
             padding: const EdgeInsets.only(top: 4, left: 12),
             child: Text(
               l10n.usernameAvailable,
-              style: const TextStyle(color: AppColors.success, fontSize: 12),
+              style: TextStyle(color: AppColors.success, fontSize: 12),
             ),
           ),
       ],

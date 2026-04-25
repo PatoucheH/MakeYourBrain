@@ -776,4 +776,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resultKeepGoing => 'Keep going!';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get darkMode => 'Dark mode';
+
+  @override
+  String get lightMode => 'Light mode';
+
+  @override
+  String get forgotPassword => 'Forgot Password?';
+
+  @override
+  String get resetPasswordTitle => 'Reset Password';
+
+  @override
+  String get resetPasswordHint => 'Enter your email to receive a reset link.';
+
+  @override
+  String get resetPasswordSent => 'Check your email for a reset link!';
+
+  @override
+  String get resetPasswordFailed => 'Failed to send reset email.';
+
+  @override
+  String get newPassword => 'New Password';
+
+  @override
+  String get updatePassword => 'Update Password';
+
+  @override
+  String get passwordUpdated => 'Password updated successfully!';
+
+  @override
+  String get passwordUpdateFailed => 'Failed to update password.';
+
+  @override
+  String get passwordReqLength => 'At least 8 characters';
+
+  @override
+  String get passwordReqUppercase => 'At least one uppercase letter';
+
+  @override
+  String get passwordReqNumber => 'At least one number';
+
+  @override
+  String get passwordReqSymbol => 'At least one symbol (!@#\$%...)';
+
+  @override
+  String get passwordTooWeak => 'Password does not meet the requirements';
+
+  @override
+  String get send => 'Send';
 }

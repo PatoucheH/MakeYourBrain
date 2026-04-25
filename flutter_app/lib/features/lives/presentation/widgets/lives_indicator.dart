@@ -29,7 +29,7 @@ class LivesIndicator extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.cardColorOf(context),
             borderRadius: BorderRadius.circular(24),
           ),
           child: Column(
@@ -48,10 +48,10 @@ class LivesIndicator extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 l10n.getMoreLifes,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: AppColors.textPrimaryOf(context),
                 ),
               ),
               const SizedBox(height: 16),
@@ -77,7 +77,7 @@ class LivesIndicator extends StatelessWidget {
                         ),
                         Text(
                           '${livesProvider.currentLives}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -88,7 +88,7 @@ class LivesIndicator extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       '/${livesProvider.maxLives}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: AppColors.brainPurple,
@@ -112,7 +112,7 @@ class LivesIndicator extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         '${l10n.nextLife} ${livesProvider.getTimeUntilNextLife()}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: AppColors.info,
@@ -142,7 +142,7 @@ class LivesIndicator extends StatelessWidget {
                     icon: const Icon(Icons.play_circle_outline, color: Colors.white),
                     label: Text(
                       l10n.watchAdd,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
@@ -163,7 +163,7 @@ class LivesIndicator extends StatelessWidget {
                   child: Text(
                     l10n.cancel,
                     style: TextStyle(
-                      color: AppColors.textSecondary,
+                      color: AppColors.textSecondaryOf(context),
                       fontSize: 16,
                     ),
                   ),
@@ -270,7 +270,7 @@ class LivesIndicator extends StatelessWidget {
                   style: TextStyle(
                     fontSize: iconSize * 0.75,
                     fontWeight: FontWeight.bold,
-                    color: isLow ? AppColors.error : AppColors.textSecondary,
+                    color: isLow ? AppColors.error : AppColors.textSecondaryOf(context),
                   ),
                 ),
 

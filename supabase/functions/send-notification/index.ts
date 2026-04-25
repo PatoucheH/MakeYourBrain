@@ -5,20 +5,6 @@ import { create, getNumericDate } from "https://deno.land/x/djwt@v2.8/mod.ts"
 const jsonHeader = { 'Content-Type': 'application/json' }
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-function getJwtPayload(authHeader: string): Record<string, unknown> | null {
-  const token = authHeader.replace('Bearer ', '')
-  const parts = token.split('.')
-  if (parts.length !== 3) return null
-  try {
-    const base64Url = parts[1]
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-    const padded = base64 + '='.repeat((4 - base64.length % 4) % 4)
-    return JSON.parse(atob(padded))
-  } catch {
-    return null
-  }
-}
-
 async function getAccessToken(serviceAccount: Record<string, string>): Promise<string> {
   const pemContents = serviceAccount.private_key
     .replace('-----BEGIN PRIVATE KEY-----', '')
@@ -71,18 +57,33 @@ serve(async (req) => {
     return new Response('ok', { status: 200 })
   }
 
-  // Réservé aux utilisateurs authentifiés (pas à l'anon key)
-  const payload = getJwtPayload(req.headers.get('Authorization') ?? '')
-  if (!payload || payload.role !== 'authenticated') {
+  const authHeader = req.headers.get('Authorization')
+  if (!authHeader) {
     return new Response(
       JSON.stringify({ success: false, error: 'Forbidden' }),
       { headers: jsonHeader, status: 403 }
     )
   }
 
-  // C1: L'appelant doit être un UUID valide extrait du JWT
-  const callerId = payload.sub as string
-  if (!callerId || !UUID_REGEX.test(callerId)) {
+  // Vérification cryptographique du JWT via auth.getUser() (même pattern que delete-account)
+  const supabaseClient = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    {
+      global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false },
+    }
+  )
+  const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
+  if (userError || !user) {
+    return new Response(
+      JSON.stringify({ success: false, error: 'Forbidden' }),
+      { headers: jsonHeader, status: 403 }
+    )
+  }
+
+  const callerId = user.id
+  if (!UUID_REGEX.test(callerId)) {
     return new Response(
       JSON.stringify({ success: false, error: 'Forbidden' }),
       { headers: jsonHeader, status: 403 }

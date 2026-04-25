@@ -62,7 +62,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
     }
   }
 
-  Color _getMedalColor(int rank) {
+  Color _getMedalColor(int rank, BuildContext context) {
     switch (rank) {
       case 1:
         return const Color(0xFFFFD700);
@@ -71,7 +71,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
       case 3:
         return const Color(0xFFCD7F32);
       default:
-        return AppColors.textSecondary;
+        return AppColors.textSecondaryOf(context);
     }
   }
 
@@ -82,7 +82,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -101,7 +101,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                       selectedColor: AppColors.brainPurpleLight,
                       checkmarkColor: AppColors.brainPurple,
                       labelStyle: TextStyle(
-                        color: !showFollowingOnly ? AppColors.brainPurple : AppColors.textSecondary,
+                        color: !showFollowingOnly ? AppColors.brainPurple : AppColors.textSecondaryOf(context),
                         fontWeight: !showFollowingOnly ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
@@ -113,7 +113,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                       selectedColor: AppColors.brainPurpleLight,
                       checkmarkColor: AppColors.brainPurple,
                       labelStyle: TextStyle(
-                        color: showFollowingOnly ? AppColors.brainPurple : AppColors.textSecondary,
+                        color: showFollowingOnly ? AppColors.brainPurple : AppColors.textSecondaryOf(context),
                         fontWeight: showFollowingOnly ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
@@ -154,7 +154,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                           ),
                           Text(
                             '#${showFollowingOnly ? myFollowingRank : myRank}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -186,7 +186,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                                   l10n.noMatchesYet,
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: AppColors.textSecondary,
+                                    color: AppColors.textSecondaryOf(context),
                                   ),
                                 ),
                               ],
@@ -215,7 +215,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                                   decoration: BoxDecoration(
                                     color: isMe
                                         ? AppColors.brainPurpleLight.withValues(alpha:0.3)
-                                        : AppColors.white,
+                                        : AppColors.cardColorOf(context),
                                     borderRadius: BorderRadius.circular(16),
                                     border: isMe
                                         ? Border.all(color: AppColors.brainPurple, width: 2)
@@ -234,8 +234,8 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                                             gradient: rank <= 3
                                                 ? LinearGradient(
                                                     colors: [
-                                                      _getMedalColor(rank),
-                                                      _getMedalColor(rank).withValues(alpha:0.7),
+                                                      _getMedalColor(rank, context),
+                                                      _getMedalColor(rank, context).withValues(alpha:0.7),
                                                     ],
                                                   )
                                                 : null,
@@ -244,7 +244,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                                             boxShadow: rank <= 3
                                                 ? [
                                                     BoxShadow(
-                                                      color: _getMedalColor(rank).withValues(alpha:0.4),
+                                                      color: _getMedalColor(rank, context).withValues(alpha:0.4),
                                                       blurRadius: 8,
                                                       offset: const Offset(0, 2),
                                                     ),
@@ -260,7 +260,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                                                     style: TextStyle(
                                                       fontWeight: FontWeight.bold,
                                                       fontSize: 13,
-                                                      color: AppColors.textSecondary,
+                                                      color: AppColors.textSecondaryOf(context),
                                                     ),
                                                   ),
                                           ),
@@ -282,7 +282,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                                                   fontSize: 15,
                                                   color: isMe
                                                       ? AppColors.brainPurple
-                                                      : AppColors.textPrimary,
+                                                      : AppColors.textPrimaryOf(context),
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -335,7 +335,7 @@ class _PvPLeaderboardPageState extends State<PvPLeaderboardPage> {
                                               const SizedBox(width: 4),
                                               Text(
                                                 '$rating',
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.white,
                                                   fontSize: 15,

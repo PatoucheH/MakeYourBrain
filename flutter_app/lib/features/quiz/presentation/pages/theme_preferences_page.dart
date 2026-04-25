@@ -96,7 +96,7 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                     children: [
                       Text(
                         l10n.whatTopicsInterestYou,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
@@ -146,7 +146,7 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                         child: ListTile(
                           leading: Text(
                             theme.icon,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 40,
                               fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
                             ),
@@ -198,7 +198,7 @@ class _ThemePreferencesPageState extends State<ThemePreferencesPage> {
                           ? const CircularProgressIndicator()
                           : Text(
                               l10n.continueWithCount(selectedThemeIds.length),
-                              style: const TextStyle(fontSize: 18),
+                              style: TextStyle(fontSize: 18),
                             ),
                     ),
                   ),

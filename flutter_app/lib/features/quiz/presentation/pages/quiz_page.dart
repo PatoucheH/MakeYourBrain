@@ -257,7 +257,7 @@ class _QuizPageState extends State<QuizPage> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: AppColors.cardColorOf(context),
                 borderRadius: BorderRadius.circular(24),
               ),
               child: SingleChildScrollView(
@@ -275,7 +275,7 @@ class _QuizPageState extends State<QuizPage> {
                     const SizedBox(height: 20),
                     Text(
                       resultTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: AppColors.brainPurple,
@@ -320,7 +320,7 @@ class _QuizPageState extends State<QuizPage> {
                         children: [
                           Text(
                             '${percentage.toStringAsFixed(0)}%',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -328,7 +328,7 @@ class _QuizPageState extends State<QuizPage> {
                           ),
                           Text(
                             '$score/${questions.length}',
-                            style: const TextStyle(fontSize: 16, color: Colors.white70),
+                            style: TextStyle(fontSize: 16, color: Colors.white70),
                           ),
                         ],
                       ),
@@ -356,7 +356,7 @@ class _QuizPageState extends State<QuizPage> {
                           const SizedBox(width: 8),
                           Text(
                             '+$xpEarned ${l10n.xp}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -413,7 +413,7 @@ class _QuizPageState extends State<QuizPage> {
                                 ),
                                 child: Text(
                                   l10n.tryAgain,
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
@@ -486,7 +486,7 @@ class _QuizPageState extends State<QuizPage> {
                       const SizedBox(width: 8),
                       Text(
                         isCorrect ? l10n.correctAnswer : l10n.incorrectAnswer,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -531,7 +531,7 @@ class _QuizPageState extends State<QuizPage> {
                     ),
                     child: Text(
                       l10n.continueButton,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -550,7 +550,7 @@ class _QuizPageState extends State<QuizPage> {
     if (isLoading) {
       return Scaffold(
         body: Container(
-          decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+          decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
           child: const Center(
             child: CircularProgressIndicator(color: AppColors.brainPurple),
           ),
@@ -561,7 +561,7 @@ class _QuizPageState extends State<QuizPage> {
     if (questions.isEmpty) {
       return Scaffold(
         body: Container(
-          decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+          decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
           child: SafeArea(
             child: Column(
               children: [
@@ -578,9 +578,9 @@ class _QuizPageState extends State<QuizPage> {
                         const SizedBox(height: 24),
                         Text(
                           l10n.noQuestionsAvailable,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
-                            color: AppColors.textSecondary,
+                            color: AppColors.textSecondaryOf(context),
                           ),
                         ),
                       ],
@@ -599,7 +599,7 @@ class _QuizPageState extends State<QuizPage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -615,9 +615,9 @@ class _QuizPageState extends State<QuizPage> {
                       children: [
                         Text(
                           'Question ${currentQuestionIndex + 1}/${questions.length}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                            color: AppColors.textSecondaryOf(context),
                           ),
                         ),
                         Container(
@@ -628,7 +628,7 @@ class _QuizPageState extends State<QuizPage> {
                           ),
                           child: Text(
                             '${l10n.yourScore}: $score',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: AppColors.brainPurple,
                             ),
@@ -699,7 +699,7 @@ class _QuizPageState extends State<QuizPage> {
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: AppColors.white,
+                          color: AppColors.cardColorOf(context),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: AppColors.cardShadow,
                         ),
@@ -707,7 +707,7 @@ class _QuizPageState extends State<QuizPage> {
                           children: [
                             Text(
                               widget.theme.icon,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 40,
                                 fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
                               ),
@@ -715,10 +715,10 @@ class _QuizPageState extends State<QuizPage> {
                             const SizedBox(height: 16),
                             Text(
                               currentQuestion.questionText,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                                color: AppColors.textPrimaryOf(context),
                                 height: 1.4,
                               ),
                               textAlign: TextAlign.center,
@@ -734,9 +734,9 @@ class _QuizPageState extends State<QuizPage> {
                         final showCorrect = hasAnswered && answer.isCorrect;
                         final showWrong = hasAnswered && isSelected && !answer.isCorrect;
 
-                        Color bgColor = AppColors.white;
+                        Color bgColor = AppColors.cardColorOf(context);
                         Color borderColor = AppColors.brainPurple.withValues(alpha:0.2);
-                        Color textColor = AppColors.textPrimary;
+                        Color textColor = AppColors.textPrimaryOf(context);
 
                         if (showCorrect) {
                           bgColor = AppColors.successLight;
@@ -816,7 +816,7 @@ class _QuizPageState extends State<QuizPage> {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: AppColors.cardColorOf(context),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: AppColors.softShadow,
                 ),
@@ -832,7 +832,7 @@ class _QuizPageState extends State<QuizPage> {
           Expanded(
             child: Text(
               widget.theme.name,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.brainPurple,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -842,7 +842,7 @@ class _QuizPageState extends State<QuizPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardColorOf(context),
               borderRadius: BorderRadius.circular(20),
               boxShadow: AppColors.softShadow,
             ),
@@ -887,7 +887,7 @@ class _ExplanationToggleState extends State<_ExplanationToggle> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.cardColorOf(context),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -911,7 +911,7 @@ class _ExplanationToggleState extends State<_ExplanationToggle> {
             const SizedBox(height: 8),
             Text(
               _expanded ? widget.explanation : preview,
-              style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+              style: TextStyle(fontSize: 14, color: AppColors.textPrimaryOf(context)),
             ),
             if (isLong)
               Align(

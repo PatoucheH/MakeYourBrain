@@ -1549,6 +1549,99 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep going!'**
   String get resultKeepGoing;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode'**
+  String get darkMode;
+
+  /// No description provided for @lightMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light mode'**
+  String get lightMode;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password?'**
+  String get forgotPassword;
+
+  /// No description provided for @resetPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get resetPasswordTitle;
+
+  /// No description provided for @resetPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email to receive a reset link.'**
+  String get resetPasswordHint;
+
+  /// No description provided for @resetPasswordSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email for a reset link!'**
+  String get resetPasswordSent;
+
+  /// No description provided for @resetPasswordFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send reset email.'**
+  String get resetPasswordFailed;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPassword;
+
+  /// No description provided for @updatePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Password'**
+  String get updatePassword;
+
+  /// No description provided for @passwordUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated successfully!'**
+  String get passwordUpdated;
+
+  /// No description provided for @passwordUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update password.'**
+  String get passwordUpdateFailed;
+
+  /// No description provided for @passwordReqLength.
+  String get passwordReqLength;
+
+  /// No description provided for @passwordReqUppercase.
+  String get passwordReqUppercase;
+
+  /// No description provided for @passwordReqNumber.
+  String get passwordReqNumber;
+
+  /// No description provided for @passwordReqSymbol.
+  String get passwordReqSymbol;
+
+  /// No description provided for @passwordTooWeak.
+  String get passwordTooWeak;
+
+  /// No description provided for @send.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get send;
 }
 
 class _AppLocalizationsDelegate

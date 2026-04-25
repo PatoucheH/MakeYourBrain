@@ -291,7 +291,7 @@ class _PvPGamePageState extends State<PvPGamePage>
         return Scaffold(
           body: Container(
             decoration:
-                const BoxDecoration(gradient: AppColors.backgroundGradient),
+                BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
             child: SafeArea(
               child: Column(
                 children: [
@@ -322,7 +322,7 @@ class _PvPGamePageState extends State<PvPGamePage>
     return Scaffold(
       body: Container(
         decoration:
-            const BoxDecoration(gradient: AppColors.backgroundGradient),
+            BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -333,7 +333,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                     margin: const EdgeInsets.all(24),
                     padding: const EdgeInsets.all(32),
                     decoration: BoxDecoration(
-                      color: AppColors.white,
+                      color: AppColors.cardColorOf(context),
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: AppColors.cardShadow,
                     ),
@@ -366,10 +366,10 @@ class _PvPGamePageState extends State<PvPGamePage>
                         Text(
                           l10n.waitingForThemeSelection,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: AppColors.textPrimaryOf(context),
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -407,7 +407,7 @@ class _PvPGamePageState extends State<PvPGamePage>
     return Scaffold(
       body: Container(
         decoration:
-            const BoxDecoration(gradient: AppColors.backgroundGradient),
+            BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -419,7 +419,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                       margin: const EdgeInsets.all(24),
                       padding: const EdgeInsets.all(32),
                       decoration: BoxDecoration(
-                        color: AppColors.white,
+                        color: AppColors.cardColorOf(context),
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: AppColors.cardShadow,
                       ),
@@ -451,19 +451,19 @@ class _PvPGamePageState extends State<PvPGamePage>
                         const SizedBox(height: 24),
                         Text(
                           l10n.opponentsTurn,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: AppColors.textPrimaryOf(context),
                           ),
                         ),
                         const SizedBox(height: 12),
                         Text(
                           l10n.waitingOpponentTurn,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
-                            color: AppColors.textSecondary,
+                            color: AppColors.textSecondaryOf(context),
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -504,7 +504,7 @@ class _PvPGamePageState extends State<PvPGamePage>
     return Scaffold(
       body: Container(
         decoration:
-            const BoxDecoration(gradient: AppColors.backgroundGradient),
+            BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Center(
             child: Column(
@@ -523,7 +523,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                       child: Text(
                         error,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppColors.error, fontSize: 14),
+                        style: TextStyle(color: AppColors.error, fontSize: 14),
                       ),
                     ),
                   ),
@@ -538,7 +538,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                   const SizedBox(height: 16),
                   Text(
                     l10n.loadingQuestions,
-                    style: const TextStyle(color: AppColors.textSecondary),
+                    style: TextStyle(color: AppColors.textSecondaryOf(context)),
                   ),
                 ],
               ],
@@ -565,13 +565,13 @@ class _PvPGamePageState extends State<PvPGamePage>
             padding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardColorOf(context),
               borderRadius: BorderRadius.circular(20),
               boxShadow: AppColors.softShadow,
             ),
             child: Text(
               '${l10n.round} $currentRound/3',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.brainPurple,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -598,13 +598,13 @@ class _PvPGamePageState extends State<PvPGamePage>
                 ),
                 Text(
                   '$myScore',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const Text(
+                Text(
                   ' - ',
                   style: TextStyle(
                     color: Colors.white,
@@ -651,13 +651,13 @@ class _PvPGamePageState extends State<PvPGamePage>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: AppColors.cardColorOf(context),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: AppColors.softShadow,
                 ),
                 child: Text(
                   '${l10n.round} $currentRound/3',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.brainPurple,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -754,7 +754,7 @@ class _PvPGamePageState extends State<PvPGamePage>
             width: double.infinity,
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardColorOf(context),
               borderRadius: BorderRadius.circular(24),
               boxShadow: AppColors.cardShadow,
             ),
@@ -799,10 +799,10 @@ class _PvPGamePageState extends State<PvPGamePage>
                 const SizedBox(height: 20),
                 Text(
                   question.questionText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textPrimaryOf(context),
                     height: 1.4,
                   ),
                 ),
@@ -829,7 +829,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                       width: double.infinity,
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: AppColors.white,
+                        color: AppColors.cardColorOf(context),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                             color: Colors.grey.shade300, width: 2),
@@ -837,10 +837,10 @@ class _PvPGamePageState extends State<PvPGamePage>
                       ),
                       child: Text(
                         answer.text,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
+                          color: AppColors.textPrimaryOf(context),
                         ),
                       ),
                     ),
@@ -872,15 +872,15 @@ class _PvPGamePageState extends State<PvPGamePage>
       // Waiting for opponent to finish
       return Scaffold(
         body: Container(
-          decoration: const BoxDecoration(
-              gradient: AppColors.backgroundGradient),
+          decoration: BoxDecoration(
+              gradient: AppColors.backgroundGradientOf(context)),
           child: SafeArea(
             child: Center(
               child: Container(
                 margin: const EdgeInsets.all(24),
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: AppColors.cardColorOf(context),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: AppColors.cardShadow,
                 ),
@@ -912,14 +912,14 @@ class _PvPGamePageState extends State<PvPGamePage>
                     const SizedBox(height: 24),
                     Text(
                       l10n.score,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textSecondaryOf(context),
                       ),
                     ),
                     Text(
                       '$myRoundScore ${l10n.points}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                         color: AppColors.brainPurple,
@@ -928,9 +928,9 @@ class _PvPGamePageState extends State<PvPGamePage>
                     const SizedBox(height: 8),
                     Text(
                       '$answeredCount ${l10n.questionsAnswered}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textSecondaryOf(context),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -943,7 +943,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                         fontWeight: FontWeight.w500,
                         color: opponentFinished
                             ? AppColors.warning
-                            : AppColors.textSecondary,
+                            : AppColors.textSecondaryOf(context),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -1021,15 +1021,15 @@ class _PvPGamePageState extends State<PvPGamePage>
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-            gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Center(
             child: Container(
               margin: const EdgeInsets.all(24),
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: AppColors.cardColorOf(context),
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: AppColors.cardShadow,
               ),
@@ -1038,10 +1038,10 @@ class _PvPGamePageState extends State<PvPGamePage>
                 children: [
                   Text(
                     l10n.roundComplete(roundNumber),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: AppColors.textPrimaryOf(context),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -1077,11 +1077,11 @@ class _PvPGamePageState extends State<PvPGamePage>
                           color: Colors.grey.shade100,
                           shape: BoxShape.circle,
                         ),
-                        child: const Text(
+                        child: Text(
                           'VS',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textSecondary,
+                            color: AppColors.textSecondaryOf(context),
                           ),
                         ),
                       ),
@@ -1151,14 +1151,14 @@ class _PvPGamePageState extends State<PvPGamePage>
     return Scaffold(
       body: Container(
         decoration:
-            const BoxDecoration(gradient: AppColors.backgroundGradient),
+            BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Center(
             child: Container(
               margin: const EdgeInsets.all(24),
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: AppColors.cardColorOf(context),
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: AppColors.cardShadow,
               ),
@@ -1167,10 +1167,10 @@ class _PvPGamePageState extends State<PvPGamePage>
                 children: [
                   Text(
                     l10n.roundComplete(_resultsRoundNumber),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: AppColors.textPrimaryOf(context),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -1324,7 +1324,7 @@ class _PvPGamePageState extends State<PvPGamePage>
         child: Container(
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.cardColorOf(context),
             borderRadius: BorderRadius.circular(24),
           ),
           child: Column(
@@ -1398,14 +1398,14 @@ class _PvPGamePageState extends State<PvPGamePage>
                         children: [
                           Text(
                             l10n.you,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: AppColors.textSecondary,
+                              color: AppColors.textSecondaryOf(context),
                             ),
                           ),
                           Text(
                             '$myScore',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 36,
                               fontWeight: FontWeight.bold,
                               color: AppColors.brainPurple,
@@ -1414,11 +1414,11 @@ class _PvPGamePageState extends State<PvPGamePage>
                         ],
                       ),
                     ),
-                    const Text(
+                    Text(
                       '-',
                       style: TextStyle(
                         fontSize: 28,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textSecondaryOf(context),
                       ),
                     ),
                     Flexible(
@@ -1426,9 +1426,9 @@ class _PvPGamePageState extends State<PvPGamePage>
                         children: [
                           Text(
                             l10n.opponent,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: AppColors.textSecondary,
+                              color: AppColors.textSecondaryOf(context),
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -1508,7 +1508,7 @@ class _PvPGamePageState extends State<PvPGamePage>
                   ),
                   child: Text(
                     l10n.backToMenu,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,

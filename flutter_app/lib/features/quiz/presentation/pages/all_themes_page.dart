@@ -101,7 +101,7 @@ class _AllThemesPageState extends State<AllThemesPage> with RouteAware {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -145,7 +145,7 @@ class _AllThemesPageState extends State<AllThemesPage> with RouteAware {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardColorOf(context),
         borderRadius: BorderRadius.circular(20),
         boxShadow: AppColors.cardShadow,
       ),
@@ -188,7 +188,7 @@ class _AllThemesPageState extends State<AllThemesPage> with RouteAware {
                   child: Center(
                     child: Text(
                       theme.icon,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 36,
                         fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
                       ),
@@ -207,10 +207,10 @@ class _AllThemesPageState extends State<AllThemesPage> with RouteAware {
                           Expanded(
                             child: Text(
                               theme.name,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
+                                color: AppColors.textPrimaryOf(context),
                               ),
                             ),
                           ),
@@ -232,7 +232,7 @@ class _AllThemesPageState extends State<AllThemesPage> with RouteAware {
                             ),
                             child: Text(
                               '${l10n.level} $level',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -278,7 +278,7 @@ class _AllThemesPageState extends State<AllThemesPage> with RouteAware {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondary,
+                              color: AppColors.textSecondaryOf(context),
                             ),
                           ),
                           Text(

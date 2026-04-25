@@ -1,6 +1,41 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
+  // Dark mode — near-black with subtle purple tint for good contrast
+  static const Color darkBackground = Color(0xFF13111E);
+  static const Color darkSurface = Color(0xFF1E1C2B);
+  static const Color darkInputFill = Color(0xFF272438);
+  static const Color darkTextPrimary = Color(0xFFEEEEF5);
+  static const Color darkTextSecondary = Color(0xFF9A97B4);
+
+  static const LinearGradient darkBackgroundGradient = LinearGradient(
+    colors: [Color(0xFF13111E), Color(0xFF1A1825)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  // Theme-aware helpers
+  static LinearGradient backgroundGradientOf(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkBackgroundGradient
+        : backgroundGradient;
+  }
+
+  static Color cardColorOf(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark ? darkSurface : white;
+  }
+
+  static Color textPrimaryOf(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark ? darkTextPrimary : textPrimary;
+  }
+
+  static Color textSecondaryOf(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark ? darkTextSecondary : textSecondary;
+  }
+
+  static Color innerCardColorOf(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark ? darkBackground : backgroundLight;
+  }
   // Main colors (Brainly)
   static const Color brainPink = Color(0xFFFFB6D9);
   static const Color brainPinkLight = Color(0xFFFFD6EB);

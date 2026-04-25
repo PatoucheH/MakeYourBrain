@@ -155,7 +155,7 @@ class _NoLivesDialogState extends State<NoLivesDialog>
                 width: double.infinity,
                 padding: const EdgeInsets.only(
                     top: 32, bottom: 28, left: 24, right: 24),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Color(0xFF2D0A6B), AppColors.brainPurple],
                     begin: Alignment.topCenter,
@@ -177,7 +177,7 @@ class _NoLivesDialogState extends State<NoLivesDialog>
                     // Title
                     Text(
                       l10n.noLife,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -200,7 +200,7 @@ class _NoLivesDialogState extends State<NoLivesDialog>
 
               // ── Body ────────────────────────────────────────────────
               Container(
-                color: AppColors.white,
+                color: AppColors.cardColorOf(context),
                 padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
                 child: Column(
                   children: [
@@ -210,9 +210,9 @@ class _NoLivesDialogState extends State<NoLivesDialog>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 16),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
+                        gradient: LinearGradient(
                           colors: [
-                            AppColors.backgroundLight,
+                            AppColors.innerCardColorOf(context),
                             AppColors.brainPurpleLight,
                           ],
                           begin: Alignment.topLeft,
@@ -251,16 +251,16 @@ class _NoLivesDialogState extends State<NoLivesDialog>
                             children: [
                               Text(
                                 l10n.nextLife,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
-                                  color: AppColors.textSecondary,
+                                  color: AppColors.textSecondaryOf(context),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 livesProvider.getTimeUntilNextLife(),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.brainPurple,
@@ -320,7 +320,7 @@ class _NoLivesDialogState extends State<NoLivesDialog>
                                     color: Colors.white, size: 24),
                                 label: Text(
                                   l10n.watchAdd,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -361,7 +361,7 @@ class _NoLivesDialogState extends State<NoLivesDialog>
                         ),
                         child: Text(
                           l10n.backToThemes,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.brainPurple,
                             fontSize: 15,
                             fontWeight: FontWeight.w600,

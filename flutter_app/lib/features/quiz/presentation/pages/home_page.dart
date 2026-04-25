@@ -126,8 +126,8 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.backgroundGradient,
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradientOf(context),
         ),
         child: SafeArea(
           child: Column(
@@ -209,7 +209,7 @@ class _HomePageState extends State<HomePage> {
           Text(
             l10n.welcome,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -297,7 +297,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text(
                       l10n.dailyQuiz,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white70,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -306,7 +306,7 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: 4),
                     Text(
                       concept.conceptName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
@@ -317,7 +317,7 @@ class _HomePageState extends State<HomePage> {
                     if (isCompleted)
                       Text(
                         l10n.dailyQuizCompleted,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
                         ),
@@ -334,7 +334,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Text(
                     l10n.xpTriple,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -360,10 +360,10 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(width: 8),
             Text(
               l10n.myFavoriteThemes,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimaryOf(context),
               ),
             ),
             const Spacer(),
@@ -375,7 +375,7 @@ class _HomePageState extends State<HomePage> {
               ),
               child: Text(
                 '${favoriteThemes.length}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.brainPurple,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -469,7 +469,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(width: 12),
               Text(
                 l10n.pvpArena,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -488,7 +488,7 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(width: 4),
                     Text(
                       '$pvpRating',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
@@ -517,7 +517,7 @@ class _HomePageState extends State<HomePage> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.cardColorOf(context),
             borderRadius: BorderRadius.circular(16),
             boxShadow: AppColors.cardShadow,
             border: Border.all(color: color.withValues(alpha:0.3), width: 2),
@@ -555,7 +555,7 @@ class _HomePageState extends State<HomePage> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: AppColors.cardColorOf(context),
                 shape: BoxShape.circle,
                 boxShadow: AppColors.cardShadow,
               ),
@@ -567,10 +567,10 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 24),
             Text(
               l10n.noFavoriteThemes,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimaryOf(context),
               ),
               textAlign: TextAlign.center,
             ),
@@ -579,7 +579,7 @@ class _HomePageState extends State<HomePage> {
               l10n.tapAddTheme,
               style: TextStyle(
                 fontSize: 16,
-                color: AppColors.textSecondary,
+                color: AppColors.textSecondaryOf(context),
               ),
               textAlign: TextAlign.center,
             ),
@@ -595,7 +595,7 @@ class _HomePageState extends State<HomePage> {
                 icon: const Icon(Icons.add, color: Colors.white),
                 label: Text(
                   l10n.addTheme,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
@@ -643,7 +643,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Text(
                       '${_currentPage + 1} / $totalPages',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.brainPurple,
                         fontSize: 14,
@@ -677,7 +677,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardColorOf(context),
         borderRadius: BorderRadius.circular(20),
         boxShadow: AppColors.cardShadow,
       ),
@@ -721,7 +721,7 @@ class _HomePageState extends State<HomePage> {
                   child: Center(
                     child: Text(
                       theme.icon,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 36,
                         fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
                       ),
@@ -740,10 +740,10 @@ class _HomePageState extends State<HomePage> {
                           Expanded(
                             child: Text(
                               theme.name,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
+                                color: AppColors.textPrimaryOf(context),
                               ),
                             ),
                           ),
@@ -765,7 +765,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             child: Text(
                               '${l10n.level} $level',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -811,7 +811,7 @@ class _HomePageState extends State<HomePage> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondary,
+                              color: AppColors.textSecondaryOf(context),
                             ),
                           ),
                           Text(

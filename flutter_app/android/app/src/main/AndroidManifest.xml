@@ -32,11 +32,12 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="makeyourbrain"/>
             </intent-filter>
+            <!-- Handles all com.patou.makeyourbrain:// deep links (OAuth, password reset, etc.) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="com.patou.makeyourbrain" android:host="login-callback"/>
+                <data android:scheme="com.patou.makeyourbrain"/>
             </intent-filter>
         </activity>
         <meta-data

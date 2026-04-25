@@ -316,6 +316,19 @@ Future<bool> signInWithFacebook() async {
     });
   }
 
+  // Send password reset email
+  Future<void> resetPassword(String email) async {
+    await _supabase.auth.resetPasswordForEmail(
+      email,
+      redirectTo: 'com.patou.makeyourbrain://reset-password',
+    );
+  }
+
+  // Update password (called after PASSWORD_RECOVERY event)
+  Future<void> updatePassword(String newPassword) async {
+    await _supabase.auth.updateUser(UserAttributes(password: newPassword));
+  }
+
   // Listen to auth state changes
   Stream<AuthState> get authStateChanges => _supabase.auth.onAuthStateChange;
 }

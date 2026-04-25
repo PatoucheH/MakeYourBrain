@@ -56,7 +56,7 @@ class _BrainAppBarState extends State<BrainAppBar> {
                     Flexible(
                       child: Text(
                         l10n.appName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.brainPurple,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -74,7 +74,7 @@ class _BrainAppBarState extends State<BrainAppBar> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardColorOf(context),
               borderRadius: BorderRadius.circular(16),
               boxShadow: AppColors.softShadow,
             ),
@@ -89,10 +89,10 @@ class _BrainAppBarState extends State<BrainAppBar> {
                 const SizedBox(width: 2),
                 Text(
                   '$currentStreak',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textPrimaryOf(context),
                   ),
                 ),
               ],
@@ -104,7 +104,7 @@ class _BrainAppBarState extends State<BrainAppBar> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardColorOf(context),
               borderRadius: BorderRadius.circular(16),
               boxShadow: AppColors.softShadow,
             ),
@@ -115,7 +115,7 @@ class _BrainAppBarState extends State<BrainAppBar> {
           // Menu Button
           Container(
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardColorOf(context),
               borderRadius: BorderRadius.circular(10),
               boxShadow: AppColors.softShadow,
             ),
@@ -214,7 +214,7 @@ class _BrainAppBarState extends State<BrainAppBar> {
                       const Icon(Icons.logout, color: AppColors.error),
                       const SizedBox(width: 12),
                       Text(l10n.logout,
-                          style: const TextStyle(color: AppColors.error)),
+                          style: TextStyle(color: AppColors.error)),
                     ],
                   ),
                 ));

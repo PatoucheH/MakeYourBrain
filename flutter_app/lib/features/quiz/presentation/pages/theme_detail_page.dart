@@ -97,7 +97,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -146,7 +146,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                                     child: Center(
                                       child: Text(
                                         widget.theme.icon,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 56,
                                           fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
                                         ),
@@ -191,7 +191,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                                         children: [
                                           Text(
                                             '$xp / $xpForNextLevel ${l10n.xp}',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w600,
                                               color: Colors.white,
@@ -281,7 +281,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                                     const SizedBox(width: 12),
                                     Text(
                                       l10n.startQuiz,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -328,7 +328,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                                     const SizedBox(width: 12),
                                     Text(
                                       l10n.timedQuiz,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -344,7 +344,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                             Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: AppColors.white,
+                                color: AppColors.cardColorOf(context),
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: AppColors.cardShadow,
                                 border: Border.all(
@@ -386,10 +386,10 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                                         const SizedBox(width: 12),
                                         Text(
                                           l10n.viewLeaderboard,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
-                                            color: AppColors.textPrimary,
+                                            color: AppColors.textPrimaryOf(context),
                                           ),
                                         ),
                                       ],
@@ -405,7 +405,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                               width: double.infinity,
                               padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
-                                color: AppColors.white,
+                                color: AppColors.cardColorOf(context),
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: AppColors.cardShadow,
                               ),
@@ -429,10 +429,10 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                                       const SizedBox(width: 12),
                                       Text(
                                         l10n.aboutThisTheme,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: AppColors.textPrimary,
+                                          color: AppColors.textPrimaryOf(context),
                                         ),
                                       ),
                                     ],
@@ -442,7 +442,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                                     widget.theme.description,
                                     style: TextStyle(
                                       fontSize: 15,
-                                      color: AppColors.textSecondary,
+                                      color: AppColors.textSecondaryOf(context),
                                       height: 1.5,
                                     ),
                                   ),
@@ -479,7 +479,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.cardColorOf(context),
             borderRadius: BorderRadius.circular(24),
           ),
           child: SingleChildScrollView(
@@ -504,7 +504,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
               const SizedBox(height: 20),
               Text(
                 l10n.timedQuiz,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: AppColors.brainPurple,
@@ -513,9 +513,9 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
               const SizedBox(height: 12),
               Text(
                 l10n.chooseYourTime,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
-                  color: AppColors.textSecondary,
+                  color: AppColors.textSecondaryOf(context),
                 ),
               ),
               const SizedBox(height: 8),
@@ -532,7 +532,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                     Expanded(
                       child: Text(
                         l10n.timedQuizDescription,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           color: AppColors.warning,
                         ),
@@ -574,8 +574,8 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                 onPressed: () => Navigator.pop(dialogContext),
                 child: Text(
                   l10n.cancel,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
+                  style: TextStyle(
+                    color: AppColors.textSecondaryOf(context),
                     fontSize: 16,
                   ),
                 ),
@@ -644,7 +644,7 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                 ),
                 child: Text(
                   bonus,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,

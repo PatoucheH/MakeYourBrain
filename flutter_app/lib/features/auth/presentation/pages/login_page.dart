@@ -18,6 +18,26 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
+  Future<void> _showForgotPasswordDialog() async {
+    final sent = await showDialog<bool>(
+      context: context,
+      builder: (_) => _ForgotPasswordDialog(
+        initialEmail: _emailController.text.trim(),
+        repository: _repository,
+      ),
+    );
+
+    if (!mounted) return;
+    if (sent == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.resetPasswordSent),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
+  }
+
   Future<void> _login() async {
     final l10n = AppLocalizations.of(context)!;
 
@@ -97,8 +117,8 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.backgroundGradient,
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradientOf(context),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
@@ -112,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: AppColors.white,
+                      color: AppColors.cardColorOf(context),
                       shape: BoxShape.circle,
                       boxShadow: AppColors.cardShadow,
                     ),
@@ -130,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                     ).createShader(bounds),
                     child: Text(
                       l10n.appName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -142,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                     l10n.welcome,
                     style: TextStyle(
                       fontSize: 16,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textSecondaryOf(context),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -152,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: AppColors.white,
+                      color: AppColors.cardColorOf(context),
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: AppColors.cardShadow,
                     ),
@@ -200,7 +220,7 @@ class _LoginPageState extends State<LoginPage> {
                               child: Text(
                                 l10n.orDivider,
                                 style: TextStyle(
-                                  color: AppColors.textSecondary,
+                                  color: AppColors.textSecondaryOf(context),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -242,14 +262,36 @@ class _LoginPageState extends State<LoginPage> {
                               _obscurePassword
                                   ? Icons.visibility_outlined
                                   : Icons.visibility_off_outlined,
-                              color: AppColors.textSecondary,
+                              color: AppColors.textSecondaryOf(context),
                             ),
                             onPressed: () {
                               setState(() => _obscurePassword = !_obscurePassword);
                             },
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 8),
+
+                        // Forgot Password link
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: _showForgotPasswordDialog,
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: Text(
+                              l10n.forgotPassword,
+                              style: TextStyle(
+                                color: AppColors.brainPurple,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
 
                         // Login Button
                         Container(
@@ -276,7 +318,7 @@ class _LoginPageState extends State<LoginPage> {
                                   )
                                 : Text(
                                     l10n.login,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -295,7 +337,7 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Text(
                         '${l10n.dontHaveAccountPrefix} ',
-                        style: TextStyle(color: AppColors.textSecondary),
+                        style: TextStyle(color: AppColors.textSecondaryOf(context)),
                       ),
                       MouseRegion(
                         cursor: SystemMouseCursors.click,
@@ -310,7 +352,7 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: Text(
                             l10n.register,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.brainPurple,
                               fontWeight: FontWeight.bold,
                             ),
@@ -341,7 +383,7 @@ class _LoginPageState extends State<LoginPage> {
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
-      style: const TextStyle(fontSize: 16),
+      style: TextStyle(fontSize: 16),
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon, color: AppColors.brainPurple),
@@ -408,7 +450,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Center(
                 child: Text(
                   isLoading ? AppLocalizations.of(context)!.connecting : label,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -424,5 +466,108 @@ class _LoginPageState extends State<LoginPage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+}
+
+class _ForgotPasswordDialog extends StatefulWidget {
+  final String initialEmail;
+  final AuthRepository repository;
+
+  const _ForgotPasswordDialog({
+    required this.initialEmail,
+    required this.repository,
+  });
+
+  @override
+  State<_ForgotPasswordDialog> createState() => _ForgotPasswordDialogState();
+}
+
+class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
+  late final TextEditingController _emailController;
+  bool _isSending = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController(text: widget.initialEmail);
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Text(
+        l10n.resetPasswordTitle,
+        style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.brainPurple),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.resetPasswordHint,
+            style: TextStyle(color: AppColors.textSecondaryOf(context)),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _emailController,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(
+              labelText: l10n.email,
+              prefixIcon: const Icon(Icons.email_outlined, color: AppColors.brainPurple),
+              filled: true,
+              fillColor: AppColors.brainPurpleLight.withValues(alpha: 0.3),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(
+            l10n.cancel,
+            style: TextStyle(color: AppColors.textSecondaryOf(context)),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: _isSending
+              ? null
+              : () async {
+                  if (_emailController.text.trim().isEmpty) return;
+                  setState(() => _isSending = true);
+                  try {
+                    await widget.repository.resetPassword(_emailController.text.trim());
+                    if (mounted) Navigator.of(context).pop(true);
+                  } catch (e) {
+                    if (mounted) setState(() => _isSending = false);
+                  }
+                },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.brainPurple,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          child: _isSending
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                )
+              : Text(l10n.send),
+        ),
+      ],
+    );
   }
 }

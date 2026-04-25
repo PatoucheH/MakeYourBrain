@@ -201,7 +201,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: AppColors.cardColorOf(context),
                 borderRadius: BorderRadius.circular(24),
               ),
               child: SingleChildScrollView(
@@ -219,7 +219,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                     const SizedBox(height: 20),
                     Text(
                       resultTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: AppColors.brainPurple,
@@ -264,7 +264,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                         children: [
                           Text(
                             '${percentage.toStringAsFixed(0)}%',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -272,7 +272,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                           ),
                           Text(
                             '$score/${questions.length}',
-                            style: const TextStyle(fontSize: 16, color: Colors.white70),
+                            style: TextStyle(fontSize: 16, color: Colors.white70),
                           ),
                         ],
                       ),
@@ -300,7 +300,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                           const SizedBox(width: 8),
                           Text(
                             '+$xpEarned ${l10n.xp} (x3!)',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -331,7 +331,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                           child: Text(
                             l10n.backToThemes,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -401,7 +401,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                       const SizedBox(width: 8),
                       Text(
                         isCorrect ? l10n.correctAnswer : l10n.incorrectAnswer,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -447,7 +447,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                     ),
                     child: Text(
                       l10n.continueButton,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -466,7 +466,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
     if (isLoading) {
       return Scaffold(
         body: Container(
-          decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+          decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
           child: const Center(
             child: CircularProgressIndicator(color: AppColors.brainPurple),
           ),
@@ -477,7 +477,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
     if (questions.isEmpty) {
       return Scaffold(
         body: Container(
-          decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+          decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
           child: SafeArea(
             child: Column(
               children: [
@@ -494,9 +494,9 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                         const SizedBox(height: 24),
                         Text(
                           l10n.noQuestionsAvailable,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
-                            color: AppColors.textSecondary,
+                            color: AppColors.textSecondaryOf(context),
                           ),
                         ),
                       ],
@@ -515,7 +515,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -531,9 +531,9 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                       children: [
                         Text(
                           'Question ${currentQuestionIndex + 1}/${questions.length}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                            color: AppColors.textSecondaryOf(context),
                           ),
                         ),
                         Container(
@@ -544,7 +544,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                           ),
                           child: Text(
                             '${l10n.yourScore}: $score',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: AppColors.brainPurple,
                             ),
@@ -620,7 +620,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                             ),
                             child: Text(
                               l10n.xpTriple,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                                 fontSize: 12,
@@ -635,7 +635,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: AppColors.white,
+                          color: AppColors.cardColorOf(context),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: AppColors.cardShadow,
                         ),
@@ -645,10 +645,10 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                             const SizedBox(height: 16),
                             Text(
                               currentQuestion.questionText,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                                color: AppColors.textPrimaryOf(context),
                                 height: 1.4,
                               ),
                               textAlign: TextAlign.center,
@@ -664,9 +664,9 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                         final showCorrect = hasAnswered && answer.isCorrect;
                         final showWrong = hasAnswered && isSelected && !answer.isCorrect;
 
-                        Color bgColor = AppColors.white;
+                        Color bgColor = AppColors.cardColorOf(context);
                         Color borderColor = AppColors.brainPurple.withValues(alpha: 0.2);
-                        Color textColor = AppColors.textPrimary;
+                        Color textColor = AppColors.textPrimaryOf(context);
 
                         if (showCorrect) {
                           bgColor = AppColors.successLight;
@@ -748,7 +748,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: AppColors.cardColorOf(context),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: AppColors.softShadow,
                 ),
@@ -775,7 +775,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                   ),
                   child: Text(
                     l10n.discoveryQuizBadge,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Color(0xFF1B8A3C),
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -787,7 +787,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                 // Concept name
                 Text(
                   widget.concept.conceptName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.brainPurple,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -799,7 +799,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                   Text(
                     themeName,
                     style: TextStyle(
-                      color: AppColors.textSecondary.withValues(alpha: 0.8),
+                      color: AppColors.textSecondaryOf(context).withValues(alpha: 0.8),
                       fontSize: 11,
                     ),
                     maxLines: 1,
@@ -826,7 +826,7 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
                 const SizedBox(width: 4),
                 Text(
                   l10n.xpTriple,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
@@ -869,7 +869,7 @@ class _ExplanationToggleState extends State<_ExplanationToggle> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.cardColorOf(context),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -896,7 +896,7 @@ class _ExplanationToggleState extends State<_ExplanationToggle> {
               const SizedBox(height: 8),
               Text(
                 widget.explanation,
-                style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                style: TextStyle(fontSize: 14, color: AppColors.textPrimaryOf(context)),
               ),
             ],
           ],

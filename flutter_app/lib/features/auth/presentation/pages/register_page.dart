@@ -164,8 +164,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.backgroundGradient,
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradientOf(context),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
@@ -180,7 +180,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     alignment: Alignment.centerLeft,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: AppColors.white,
+                        color: AppColors.cardColorOf(context),
                         shape: BoxShape.circle,
                         boxShadow: AppColors.softShadow,
                       ),
@@ -196,7 +196,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: AppColors.white,
+                      color: AppColors.cardColorOf(context),
                       shape: BoxShape.circle,
                       boxShadow: AppColors.cardShadow,
                     ),
@@ -214,7 +214,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ).createShader(bounds),
                     child: Text(
                       l10n.createAccount,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -226,7 +226,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     l10n.registerSubtitle,
                     style: TextStyle(
                       fontSize: 16,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textSecondaryOf(context),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -236,7 +236,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: AppColors.white,
+                      color: AppColors.cardColorOf(context),
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: AppColors.cardShadow,
                     ),
@@ -267,7 +267,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               _obscurePassword
                                   ? Icons.visibility_outlined
                                   : Icons.visibility_off_outlined,
-                              color: AppColors.textSecondary,
+                              color: AppColors.textSecondaryOf(context),
                             ),
                             onPressed: () {
                               setState(() => _obscurePassword = !_obscurePassword);
@@ -287,7 +287,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               _obscureConfirmPassword
                                   ? Icons.visibility_outlined
                                   : Icons.visibility_off_outlined,
-                              color: AppColors.textSecondary,
+                              color: AppColors.textSecondaryOf(context),
                             ),
                             onPressed: () {
                               setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
@@ -321,7 +321,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   )
                                 : Text(
                                     l10n.register,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -340,7 +340,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     children: [
                       Text(
                         '${l10n.alreadyHaveAccountPrefix} ',
-                        style: TextStyle(color: AppColors.textSecondary),
+                        style: TextStyle(color: AppColors.textSecondaryOf(context)),
                       ),
                       MouseRegion(
                         cursor: SystemMouseCursors.click,
@@ -348,7 +348,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           onTap: () => Navigator.pop(context),
                           child: Text(
                             l10n.login,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.brainPurple,
                               fontWeight: FontWeight.bold,
                             ),
@@ -393,7 +393,7 @@ class _RegisterPageState extends State<RegisterPage> {
       children: [
         TextField(
           controller: _usernameController,
-          style: const TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 16),
           onChanged: (value) => _checkUsername(value),
           decoration: InputDecoration(
             labelText: l10n.username,
@@ -426,7 +426,7 @@ class _RegisterPageState extends State<RegisterPage> {
             padding: const EdgeInsets.only(top: 4, left: 12),
             child: Text(
               _usernameError!,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.error,
                 fontSize: 12,
               ),
@@ -437,7 +437,7 @@ class _RegisterPageState extends State<RegisterPage> {
             padding: const EdgeInsets.only(top: 4, left: 12),
             child: Text(
               l10n.usernameAvailable,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.success,
                 fontSize: 12,
               ),
@@ -459,7 +459,7 @@ class _RegisterPageState extends State<RegisterPage> {
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
-      style: const TextStyle(fontSize: 16),
+      style: TextStyle(fontSize: 16),
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon, color: AppColors.brainPurple),

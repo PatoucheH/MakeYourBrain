@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/providers/language_provider.dart';
+import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/brain_app_bar.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
@@ -187,7 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (isLoading) {
       return Scaffold(
         body: Container(
-          decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+          decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
           child: const Center(
             child: CircularProgressIndicator(color: AppColors.brainPurple),
           ),
@@ -197,7 +198,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -232,6 +233,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         _buildProgressSection(l10n),
                         const SizedBox(height: 32),
 
+                        // Appearance
+                        _buildSectionTitle(l10n.appearance),
+                        const SizedBox(height: 12),
+                        _buildAppearanceSection(l10n),
+                        const SizedBox(height: 24),
+
                         // Danger zone
                         SizedBox(
                           width: double.infinity,
@@ -240,7 +247,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             icon: const Icon(Icons.delete_forever,
                                 color: Colors.white, size: 22),
                             label: Text(l10n.deleteAccount,
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold)),
@@ -303,7 +310,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         Expanded(
                           child: Text(
                             userStats?.displayName ?? 'Player',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -340,7 +347,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         Expanded(
                           child: Text(
                             userStats?.email ?? l10n.noEmail,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white70,
                               fontSize: 13,
                             ),
@@ -366,7 +373,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             dropdownColor: AppColors.brainPurple,
                             underline: const SizedBox(),
                             icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                             items: [
                               DropdownMenuItem(value: 'en', child: Text(context.read<LanguageProvider>().getLanguageName('en'))),
                               DropdownMenuItem(value: 'fr', child: Text(context.read<LanguageProvider>().getLanguageName('fr'))),
@@ -402,7 +409,7 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.cardColorOf(context),
           borderRadius: BorderRadius.circular(20),
           boxShadow: AppColors.cardShadow,
         ),
@@ -448,7 +455,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(width: 6),
             Text(
               count,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: AppColors.brainPurple,
@@ -461,7 +468,7 @@ class _ProfilePageState extends State<ProfilePage> {
           label,
           style: TextStyle(
             fontSize: 13,
-            color: AppColors.textSecondary,
+            color: AppColors.textSecondaryOf(context),
           ),
         ),
       ],
@@ -550,7 +557,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (userStats?.username != null) ...[
                   Text(
                     '${l10n.currentUsername}: ${userStats!.username}',
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                    style: TextStyle(color: AppColors.textSecondaryOf(context), fontSize: 14),
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -602,14 +609,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 8),
                   Text(
                     errorMessage!,
-                    style: const TextStyle(color: AppColors.error, fontSize: 12),
+                    style: TextStyle(color: AppColors.error, fontSize: 12),
                   ),
                 ],
                 if (isAvailable == true) ...[
                   const SizedBox(height: 8),
                   Text(
                     l10n.usernameAvailable,
-                    style: const TextStyle(color: AppColors.success, fontSize: 12),
+                    style: TextStyle(color: AppColors.success, fontSize: 12),
                   ),
                 ],
               ],
@@ -665,10 +672,71 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
+        color: AppColors.textPrimaryOf(context),
+      ),
+    );
+  }
+
+  Widget _buildAppearanceSection(AppLocalizations l10n) {
+    final themeProvider = context.watch<ThemeProvider>();
+    // Use actual rendered brightness — handles ThemeMode.system correctly
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.cardColorOf(context),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: AppColors.cardShadow,
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.brainPurple.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+              color: AppColors.brainPurple,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.appearance,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimaryOf(context),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  isDark ? l10n.darkMode : l10n.lightMode,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondaryOf(context),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: isDark,
+            onChanged: (val) => themeProvider.setThemeMode(
+              val ? ThemeMode.dark : ThemeMode.light,
+            ),
+            activeThumbColor: AppColors.brainPurple,
+          ),
+        ],
       ),
     );
   }
@@ -681,7 +749,7 @@ class _ProfilePageState extends State<ProfilePage> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.cardColorOf(context),
             borderRadius: BorderRadius.circular(20),
             boxShadow: AppColors.cardShadow,
           ),
@@ -704,15 +772,15 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Text(
                       '${userStatsProvider.effectiveStreak} ${l10n.days}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: AppColors.textPrimaryOf(context),
                       ),
                     ),
                     Text(
                       l10n.currentStreak,
-                      style: TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: AppColors.textSecondaryOf(context)),
                     ),
                   ],
                 ),
@@ -726,7 +794,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     '${l10n.bestStreak}: ${userStatsProvider.bestStreak}',
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textSecondaryOf(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -772,7 +840,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardColorOf(context),
         borderRadius: BorderRadius.circular(20),
         boxShadow: AppColors.cardShadow,
       ),
@@ -789,10 +857,10 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 12),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: AppColors.textPrimaryOf(context),
             ),
           ),
           const SizedBox(height: 4),
@@ -800,7 +868,7 @@ class _ProfilePageState extends State<ProfilePage> {
             label,
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: AppColors.textSecondaryOf(context),
             ),
           ),
         ],
@@ -813,7 +881,7 @@ class _ProfilePageState extends State<ProfilePage> {
       return Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.cardColorOf(context),
           borderRadius: BorderRadius.circular(20),
           boxShadow: AppColors.cardShadow,
         ),
@@ -827,7 +895,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Text(
               l10n.noProgressYet,
               style: TextStyle(
-                color: AppColors.textSecondary,
+                color: AppColors.textSecondaryOf(context),
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,
@@ -856,7 +924,7 @@ class _ProfilePageState extends State<ProfilePage> {
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.cardColorOf(context),
             borderRadius: BorderRadius.circular(20),
             boxShadow: AppColors.cardShadow,
           ),
@@ -880,7 +948,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Center(
                       child: Text(
                         theme['icon'] ?? '?',
-                        style: const TextStyle(fontSize: 28),
+                        style: TextStyle(fontSize: 28),
                       ),
                     ),
                   ),
@@ -891,10 +959,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         Text(
                           themeName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: AppColors.textPrimaryOf(context),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -902,7 +970,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           '$correct / $total ${l10n.correct}',
                           style: TextStyle(
                             fontSize: 13,
-                            color: AppColors.textSecondary,
+                            color: AppColors.textSecondaryOf(context),
                           ),
                         ),
                       ],
@@ -923,7 +991,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     child: Text(
                       '${l10n.level} $level',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
@@ -940,7 +1008,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textSecondaryOf(context),
                     ),
                   ),
                   const Spacer(),
@@ -1019,7 +1087,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       backgroundColor: AppColors.error,
                       side: BorderSide.none,
                       padding: const EdgeInsets.symmetric(vertical: 8),
-                      textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      textStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),

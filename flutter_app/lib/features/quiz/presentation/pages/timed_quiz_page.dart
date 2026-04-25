@@ -288,7 +288,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
             Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.cardColorOf(context),
             borderRadius: BorderRadius.circular(24),
           ),
           child: SingleChildScrollView(
@@ -308,7 +308,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                 const SizedBox(height: 20),
                 Text(
                   resultTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppColors.brainPurple,
@@ -355,7 +355,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                     children: [
                       Text(
                         '${percentage.toStringAsFixed(0)}%',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -363,7 +363,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                       ),
                       Text(
                         '$score/$questionsAnswered',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           color: Colors.white70,
                         ),
@@ -397,7 +397,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                           const SizedBox(width: 4),
                           Text(
                             '+${score * 10} ${l10n.xp}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -422,7 +422,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                           const SizedBox(width: 4),
                           Text(
                             '+$timeBonus ${l10n.xp}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -436,9 +436,9 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                 const SizedBox(height: 8),
                 Text(
                   '${l10n.timeBonus}: ${widget.totalSeconds}s',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.textSecondary,
+                    color: AppColors.textSecondaryOf(context),
                   ),
                 ),
                 const SizedBox(height: 28),
@@ -495,7 +495,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                           ),
                           child: Text(
                             l10n.tryAgain,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -581,7 +581,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
     if (isLoading) {
       return Scaffold(
         body: Container(
-          decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+          decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
           child: const Center(
             child: CircularProgressIndicator(color: AppColors.brainPurple),
           ),
@@ -592,7 +592,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
     if (questions.isEmpty) {
       return Scaffold(
         body: Container(
-          decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+          decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
           child: SafeArea(
             child: Column(
               children: [
@@ -609,9 +609,9 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                         const SizedBox(height: 24),
                         Text(
                           l10n.noQuestionsAvailable,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
-                            color: AppColors.textSecondary,
+                            color: AppColors.textSecondaryOf(context),
                           ),
                         ),
                       ],
@@ -630,7 +630,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -652,9 +652,9 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                       children: [
                         Text(
                           'Question ${currentQuestionIndex + 1}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                            color: AppColors.textSecondaryOf(context),
                           ),
                         ),
                         Container(
@@ -665,7 +665,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                           ),
                           child: Text(
                             '${l10n.yourScore}: $score',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: AppColors.brainPurple,
                             ),
@@ -743,7 +743,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: AppColors.white,
+                          color: AppColors.cardColorOf(context),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: AppColors.cardShadow,
                         ),
@@ -751,7 +751,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                           children: [
                             Text(
                               widget.theme.icon,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 40,
                                 fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
                               ),
@@ -759,10 +759,10 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                             const SizedBox(height: 16),
                             Text(
                               currentQuestion.questionText,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                                color: AppColors.textPrimaryOf(context),
                                 height: 1.4,
                               ),
                               textAlign: TextAlign.center,
@@ -778,9 +778,9 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                         final showCorrect = hasAnswered && answer.isCorrect;
                         final showWrong = hasAnswered && isSelected && !answer.isCorrect;
 
-                        Color bgColor = AppColors.white;
+                        Color bgColor = AppColors.cardColorOf(context);
                         Color borderColor = AppColors.brainPurple.withValues(alpha:0.2);
-                        Color textColor = AppColors.textPrimary;
+                        Color textColor = AppColors.textPrimaryOf(context);
 
                         if (showCorrect) {
                           bgColor = AppColors.successLight;
@@ -863,7 +863,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: AppColors.cardColorOf(context),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: AppColors.softShadow,
                 ),
@@ -884,7 +884,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
                 Expanded(
                   child: Text(
                     widget.theme.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.brainPurple,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -898,7 +898,7 @@ class _TimedQuizPageState extends State<TimedQuizPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardColorOf(context),
               borderRadius: BorderRadius.circular(20),
               boxShadow: AppColors.softShadow,
             ),

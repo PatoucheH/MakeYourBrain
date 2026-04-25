@@ -85,7 +85,7 @@ class _AddThemePageState extends State<AddThemePage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -109,7 +109,7 @@ class _AddThemePageState extends State<AddThemePage> {
                             Text(
                               l10n.allThemesInFavorites,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -148,7 +148,7 @@ class _AddThemePageState extends State<AddThemePage> {
                                 child: Center(
                                   child: Text(
                                     theme.icon,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 32,
                                       fontFamilyFallback: ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji'],
                                     ),
@@ -163,7 +163,7 @@ class _AddThemePageState extends State<AddThemePage> {
                                   children: [
                                     Text(
                                       theme.name,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),

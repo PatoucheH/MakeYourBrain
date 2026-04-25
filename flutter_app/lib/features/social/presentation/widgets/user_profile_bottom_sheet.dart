@@ -92,8 +92,8 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
     final isOwnProfile = widget.userId == widget.currentUserId;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.white,
+      decoration: BoxDecoration(
+        color: AppColors.cardColorOf(context),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: isLoading
@@ -109,7 +109,7 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
                   child: Center(
                     child: Text(
                       l10n.userNotFound,
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
+                      style: TextStyle(color: AppColors.textSecondaryOf(context), fontSize: 16),
                     ),
                   ),
                 )
@@ -176,7 +176,7 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
               errorBuilder: (context, error, stackTrace) => Container(
                 width: 64,
                 height: 64,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: AppColors.primaryGradient,
                   shape: BoxShape.circle,
                 ),
@@ -186,10 +186,10 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
             const SizedBox(height: 12),
             Text(
               displayName,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimaryOf(context),
               ),
             ),
             const SizedBox(height: 8),
@@ -226,7 +226,7 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
                         ),
                   label: Text(isFollowing ? l10n.unfollow : l10n.follow),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isFollowing ? AppColors.textSecondary : AppColors.brainPurple,
+                    backgroundColor: isFollowing ? AppColors.textSecondaryOf(context) : AppColors.brainPurple,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -241,7 +241,7 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.backgroundLight,
+                color: AppColors.innerCardColorOf(context),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -296,7 +296,7 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.backgroundLight,
+                color: AppColors.innerCardColorOf(context),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -308,10 +308,10 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
                       const SizedBox(width: 8),
                       Text(
                         l10n.pvpArena,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
-                          color: AppColors.textPrimary,
+                          color: AppColors.textPrimaryOf(context),
                         ),
                       ),
                       const Spacer(),
@@ -323,7 +323,7 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
                         ),
                         child: Text(
                           '$pvpRating',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
@@ -338,7 +338,7 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
                     children: [
                       _buildPvpStat('$pvpWins', l10n.wins, AppColors.success),
                       _buildPvpStat('$pvpLosses', l10n.losses, AppColors.error),
-                      _buildPvpStat('$pvpDraws', l10n.draws, AppColors.textSecondary),
+                      _buildPvpStat('$pvpDraws', l10n.draws, AppColors.textSecondaryOf(context)),
                     ],
                   ),
                 ],
@@ -355,7 +355,7 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
       children: [
         Text(
           count,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.brainPurple,
@@ -365,7 +365,7 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
           label,
           style: TextStyle(
             fontSize: 13,
-            color: AppColors.textSecondary,
+            color: AppColors.textSecondaryOf(context),
           ),
         ),
       ],
@@ -379,17 +379,17 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
-            color: AppColors.textPrimary,
+            color: AppColors.textPrimaryOf(context),
           ),
         ),
         Text(
           label,
           style: TextStyle(
             fontSize: 12,
-            color: AppColors.textSecondary,
+            color: AppColors.textSecondaryOf(context),
           ),
           textAlign: TextAlign.center,
         ),
@@ -412,7 +412,7 @@ class _UserProfileBottomSheetState extends State<UserProfileBottomSheet> {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: AppColors.textSecondary,
+            color: AppColors.textSecondaryOf(context),
           ),
         ),
       ],

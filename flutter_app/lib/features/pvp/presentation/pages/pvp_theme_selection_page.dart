@@ -102,7 +102,7 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -123,8 +123,8 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
                                 const SizedBox(height: 16),
                                 Text(
                                   l10n.chooseTheme,
-                                  style: const TextStyle(
-                                    color: AppColors.textSecondary,
+                                  style: TextStyle(
+                                    color: AppColors.textSecondaryOf(context),
                                   ),
                                 ),
                               ],
@@ -150,13 +150,13 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: AppColors.cardColorOf(context),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: AppColors.softShadow,
                 ),
                 child: Text(
                   '${AppLocalizations.of(context)!.round} ${widget.roundNumber}/3',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.brainPurple,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -170,7 +170,7 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardColorOf(context),
               borderRadius: BorderRadius.circular(20),
               boxShadow: AppColors.cardShadow,
             ),
@@ -192,19 +192,19 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
                 Text(
                   l10n.selectThemeForRound(widget.roundNumber),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textPrimaryOf(context),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   l10n.chooseTheme,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: AppColors.textSecondaryOf(context),
                   ),
                 ),
               ],
@@ -259,10 +259,10 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
         const SizedBox(width: 12),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: AppColors.textPrimaryOf(context),
           ),
         ),
       ],
@@ -280,7 +280,7 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.cardColorOf(context),
             borderRadius: BorderRadius.circular(16),
             boxShadow: isUsed ? null : AppColors.softShadow,
             border: Border.all(
@@ -304,7 +304,7 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
                 child: Center(
                   child: Text(
                     theme.icon,
-                    style: const TextStyle(fontSize: 28),
+                    style: TextStyle(fontSize: 28),
                   ),
                 ),
               ),
@@ -318,10 +318,10 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
                         Expanded(
                           child: Text(
                             theme.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                              color: AppColors.textPrimaryOf(context),
                             ),
                           ),
                         ),
@@ -339,9 +339,9 @@ class _PvPThemeSelectionPageState extends State<PvPThemeSelectionPage> {
                         theme.description,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: AppColors.textSecondaryOf(context),
                         ),
                       ),
                     ],

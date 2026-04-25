@@ -151,7 +151,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -238,10 +238,10 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
             const SizedBox(width: 12),
             Text(
               l10n.activeMatches,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimaryOf(context),
               ),
             ),
           ],
@@ -261,7 +261,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.cardColorOf(context),
               borderRadius: BorderRadius.circular(16),
               boxShadow: AppColors.cardShadow,
               border: Border.all(color: statusColor.withValues(alpha:0.3), width: 2),
@@ -293,15 +293,15 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                       ClickableUsername(
                         userId: opponentId ?? '',
                         displayName: 'vs $opponentName',
-                        style: const TextStyle(fontSize: 13, color: AppColors.brainPurple, fontWeight: FontWeight.w600),
+                        style: TextStyle(fontSize: 13, color: AppColors.brainPurple, fontWeight: FontWeight.w600),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
                       Text(
                         '${l10n.round} ${match.currentRound}/3 · ${l10n.score}: ${match.getPlayerScore(userId ?? '')} - ${userId == match.player1Id ? match.player2TotalScore : match.player1TotalScore}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: AppColors.textSecondaryOf(context),
                         ),
                       ),
                     ],
@@ -327,7 +327,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                     ),
                     child: Text(
                       l10n.resumeMatch,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
@@ -387,7 +387,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
           const SizedBox(height: 4),
           Text(
             rating.toString(),
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 48,
               fontWeight: FontWeight.bold,
@@ -428,7 +428,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
               children: [
                 Text(
                   '${l10n.winRate}: ${winRate.toStringAsFixed(1)}%',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Color(0xFF6366F1),
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -507,7 +507,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
               const SizedBox(width: 10),
               Text(
                 l10n.pvpRating,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -566,7 +566,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                 ],
                 Text(
                   isSearching ? l10n.searchingMatch : l10n.findMatch,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -594,7 +594,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.cardColorOf(context),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.brainPurple.withValues(alpha: 0.4), width: 2),
             boxShadow: AppColors.softShadow,
@@ -606,7 +606,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
               const SizedBox(width: 10),
               Text(
                 l10n.inviteFriend,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: AppColors.brainPurple,
@@ -636,10 +636,10 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
             const SizedBox(width: 12),
             Text(
               l10n.pendingInvitations,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimaryOf(context),
               ),
             ),
           ],
@@ -659,7 +659,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardColorOf(context),
         borderRadius: BorderRadius.circular(16),
         boxShadow: AppColors.cardShadow,
         border: Border.all(color: AppColors.brainPurple.withValues(alpha: 0.3), width: 2),
@@ -676,7 +676,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
             child: Center(
               child: Text(
                 senderName.isNotEmpty ? senderName[0].toUpperCase() : '?',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
               ),
             ),
           ),
@@ -688,12 +688,12 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                 ClickableUsername(
                   userId: senderId,
                   displayName: senderName,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.brainPurple),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.brainPurple),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   l10n.challengesYou,
-                  style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 13, color: AppColors.textSecondaryOf(context)),
                 ),
               ],
             ),
@@ -711,7 +711,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                   minimumSize: Size.zero,
                 ),
                 child: Text(l10n.declineInvite,
-                    style: const TextStyle(color: AppColors.error, fontSize: 13, fontWeight: FontWeight.bold)),
+                    style: TextStyle(color: AppColors.error, fontSize: 13, fontWeight: FontWeight.bold)),
               ),
               const SizedBox(width: 8),
               ElevatedButton(
@@ -724,7 +724,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                   minimumSize: Size.zero,
                 ),
                 child: Text(l10n.acceptInvite,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -810,10 +810,10 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
             const SizedBox(width: 12),
             Text(
               l10n.matchHistory,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimaryOf(context),
               ),
             ),
           ],
@@ -850,7 +850,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardColorOf(context),
         borderRadius: BorderRadius.circular(16),
         boxShadow: AppColors.cardShadow,
       ),
@@ -927,7 +927,7 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.cardColorOf(context),
         borderRadius: BorderRadius.circular(16),
         boxShadow: AppColors.cardShadow,
         border: Border.all(
@@ -965,16 +965,16 @@ class _PvPMenuPageState extends State<PvPMenuPage> with RouteAware {
                 ClickableUsername(
                   userId: opponentId ?? '',
                   displayName: 'vs $opponentName',
-                  style: const TextStyle(fontSize: 13, color: AppColors.brainPurple, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 13, color: AppColors.brainPurple, fontWeight: FontWeight.w600),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 if (match.isCompleted)
                   Text(
                     '${l10n.score}: $myScore - $opponentScore',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textSecondaryOf(context),
                     ),
                   ),
                 Text(

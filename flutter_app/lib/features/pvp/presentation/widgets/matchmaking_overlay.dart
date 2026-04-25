@@ -229,7 +229,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
         width: 280,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.cardColorOf(context),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: AppColors.brainPurple.withValues(alpha: 0.3),
@@ -258,10 +258,10 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                     children: [
                       Text(
                         l10n.searchingOpponent,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: AppColors.textPrimaryOf(context),
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -298,7 +298,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                     const SizedBox(width: 6),
                     Text(
                       l10n.cancel,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.error,
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
@@ -357,7 +357,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                     children: [
                       Text(
                         l10n.matchFound,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -446,7 +446,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                     children: [
                       Text(
                         '${l10n.matchFound} vs $opponentName',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -486,7 +486,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                     const SizedBox(width: 6),
                     Text(
                       l10n.goToMatch,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
@@ -557,7 +557,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                     children: [
                       Text(
                         l10n.roundAgainst(roundNumber, opponentName),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -597,7 +597,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                     const SizedBox(width: 6),
                     Text(
                       l10n.goToMatch,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
@@ -690,7 +690,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                     children: [
                       Text(
                         l10n.matchEndedAgainst(opponentName),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -730,7 +730,7 @@ class _MatchmakingOverlayState extends State<MatchmakingOverlay> {
                     const SizedBox(width: 6),
                     Text(
                       l10n.seeResults,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,

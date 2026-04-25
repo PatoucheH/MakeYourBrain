@@ -129,7 +129,7 @@ class _FollowListPageState extends State<FollowListPage>
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -147,14 +147,14 @@ class _FollowListPageState extends State<FollowListPage>
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: AppColors.white,
+                    color: AppColors.cardColorOf(context),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: AppColors.softShadow,
                   ),
                   child: TabBar(
                     controller: _tabController,
                     labelColor: AppColors.brainPurple,
-                    unselectedLabelColor: AppColors.textSecondary,
+                    unselectedLabelColor: AppColors.textSecondaryOf(context),
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicator: BoxDecoration(
                       color: AppColors.brainPurpleLight.withValues(alpha:0.3),
@@ -210,7 +210,7 @@ class _FollowListPageState extends State<FollowListPage>
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.cardColorOf(context),
           borderRadius: BorderRadius.circular(16),
           boxShadow: AppColors.softShadow,
         ),
@@ -223,7 +223,7 @@ class _FollowListPageState extends State<FollowListPage>
             prefixIcon: const Icon(Icons.search, color: AppColors.brainPurple),
             suffixIcon: showSearchResults
                 ? IconButton(
-                    icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                    icon: Icon(Icons.close, color: AppColors.textSecondaryOf(context)),
                     onPressed: () {
                       _searchController.clear();
                       setState(() {
@@ -265,7 +265,7 @@ class _FollowListPageState extends State<FollowListPage>
             const SizedBox(height: 12),
             Text(
               l10n.userNotFound,
-              style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 16, color: AppColors.textSecondaryOf(context)),
             ),
           ],
         ),
@@ -327,7 +327,7 @@ class _FollowListPageState extends State<FollowListPage>
               const SizedBox(height: 12),
               Text(
                 emptyMessage,
-                style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 16, color: AppColors.textSecondaryOf(context)),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -382,7 +382,7 @@ class _FollowListPageState extends State<FollowListPage>
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: isMe ? AppColors.brainPurpleLight.withValues(alpha:0.3) : AppColors.white,
+        color: isMe ? AppColors.brainPurpleLight.withValues(alpha:0.3) : AppColors.cardColorOf(context),
         borderRadius: BorderRadius.circular(16),
         border: isMe ? Border.all(color: AppColors.brainPurple, width: 2) : null,
         boxShadow: AppColors.cardShadow,
@@ -417,7 +417,7 @@ class _FollowListPageState extends State<FollowListPage>
                   style: TextStyle(
                     fontWeight: isMe ? FontWeight.bold : FontWeight.w600,
                     fontSize: 15,
-                    color: isMe ? AppColors.brainPurple : AppColors.textPrimary,
+                    color: isMe ? AppColors.brainPurple : AppColors.textPrimaryOf(context),
                     decoration: TextDecoration.underline,
                     decorationStyle: TextDecorationStyle.dotted,
                   ),
@@ -446,7 +446,7 @@ class _FollowListPageState extends State<FollowListPage>
                   isFollowingUser
                       ? AppLocalizations.of(context)!.unfollow
                       : AppLocalizations.of(context)!.follow,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                 ),
               ),
           ],

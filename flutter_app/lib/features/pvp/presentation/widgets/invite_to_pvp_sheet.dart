@@ -141,8 +141,8 @@ class _InviteToPvpSheetState extends State<InviteToPvpSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: keyboardHeight),
       child: Container(
-      decoration: const BoxDecoration(
-        color: AppColors.white,
+      decoration: BoxDecoration(
+        color: AppColors.cardColorOf(context),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SafeArea(
@@ -171,16 +171,16 @@ class _InviteToPvpSheetState extends State<InviteToPvpSheet> {
                   const SizedBox(width: 10),
                   Text(
                     l10n.inviteFriend,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: AppColors.textPrimaryOf(context),
                     ),
                   ),
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                    icon: Icon(Icons.close, color: AppColors.textSecondaryOf(context)),
                   ),
                 ],
               ),
@@ -192,7 +192,7 @@ class _InviteToPvpSheetState extends State<InviteToPvpSheet> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: l10n.searchPlayer,
-                  prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
+                  prefixIcon: Icon(Icons.search, color: AppColors.textSecondaryOf(context)),
                   suffixIcon: _isSearching
                       ? const Padding(
                           padding: EdgeInsets.all(12),
@@ -226,10 +226,10 @@ class _InviteToPvpSheetState extends State<InviteToPvpSheet> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     l10n.suggested,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textSecondaryOf(context),
                     ),
                   ),
                 ),
@@ -254,7 +254,7 @@ class _InviteToPvpSheetState extends State<InviteToPvpSheet> {
                               _hasSearched || isSearchActive
                                   ? l10n.usernameNotFound
                                   : l10n.noFriendsToInvite,
-                              style: const TextStyle(color: AppColors.textSecondary),
+                              style: TextStyle(color: AppColors.textSecondaryOf(context)),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -274,14 +274,14 @@ class _InviteToPvpSheetState extends State<InviteToPvpSheet> {
                               leading: Container(
                                 width: 44,
                                 height: 44,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   gradient: AppColors.primaryGradient,
                                   shape: BoxShape.circle,
                                 ),
                                 child: Center(
                                   child: Text(
                                     name.isNotEmpty ? name[0].toUpperCase() : '?',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
@@ -291,9 +291,9 @@ class _InviteToPvpSheetState extends State<InviteToPvpSheet> {
                               ),
                               title: Text(
                                 name,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
+                                  color: AppColors.textPrimaryOf(context),
                                 ),
                               ),
                               trailing: isSending
@@ -317,7 +317,7 @@ class _InviteToPvpSheetState extends State<InviteToPvpSheet> {
                                       ),
                                       child: Text(
                                         l10n.sendInvitation,
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                                       ),
                                     ),
                             );

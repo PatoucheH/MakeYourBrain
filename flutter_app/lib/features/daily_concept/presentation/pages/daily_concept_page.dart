@@ -27,7 +27,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -43,7 +43,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: AppColors.white,
+                            color: AppColors.cardColorOf(context),
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: AppColors.softShadow,
                           ),
@@ -59,7 +59,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                     Expanded(
                       child: Text(
                         l10n.dailyQuiz,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.brainPurple,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -105,7 +105,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                               ),
                               child: Text(
                                 l10n.discoveryQuizBadge,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -118,7 +118,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                             const SizedBox(height: 12),
                             Text(
                               l10n.todaysConcept,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white70,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -127,7 +127,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                             const SizedBox(height: 8),
                             Text(
                               widget.concept.conceptName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -143,7 +143,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                                   const SizedBox(width: 4),
                                   Text(
                                     widget.concept.themeName,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: Colors.white70,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
@@ -163,7 +163,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: AppColors.white,
+                            color: AppColors.cardColorOf(context),
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: AppColors.cardShadow,
                           ),
@@ -176,7 +176,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                                   const SizedBox(width: 8),
                                   Text(
                                     l10n.explanationLabel,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.brainPurple,
@@ -187,9 +187,9 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                               const SizedBox(height: 12),
                               Text(
                                 widget.concept.conceptDescription,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 15,
-                                  color: AppColors.textPrimary,
+                                  color: AppColors.textPrimaryOf(context),
                                   height: 1.5,
                                 ),
                               ),
@@ -237,7 +237,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                             Expanded(
                               child: Text(
                                 l10n.dailyQuizInfo,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
                                   color: AppColors.info,
                                 ),
@@ -291,7 +291,7 @@ class _DailyConceptPageState extends State<DailyConceptPage> {
                               widget.concept.alreadyCompleted
                                   ? l10n.dailyQuizCompleted
                                   : l10n.startDailyQuiz,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

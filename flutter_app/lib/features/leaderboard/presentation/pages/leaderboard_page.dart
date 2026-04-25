@@ -104,7 +104,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
     }
   }
 
-  Color _getMedalColor(int rank) {
+  Color _getMedalColor(int rank, BuildContext context) {
     switch (rank) {
       case 1:
         return const Color(0xFFFFD700); // Gold
@@ -113,7 +113,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
       case 3:
         return const Color(0xFFCD7F32); // Bronze
       default:
-        return AppColors.textSecondary;
+        return AppColors.textSecondaryOf(context);
     }
   }
 
@@ -148,7 +148,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                   l10n.noPlayersYet,
                   style: TextStyle(
                     fontSize: 16,
-                    color: AppColors.textSecondary,
+                    color: AppColors.textSecondaryOf(context),
                   ),
                 ),
               ],
@@ -179,7 +179,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
-              color: isCurrentUser ? AppColors.brainPurpleLight.withValues(alpha:0.3) : AppColors.white,
+              color: isCurrentUser ? AppColors.brainPurpleLight.withValues(alpha:0.3) : AppColors.cardColorOf(context),
               borderRadius: BorderRadius.circular(16),
               border: isCurrentUser
                   ? Border.all(color: AppColors.brainPurple, width: 2)
@@ -198,8 +198,8 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                       gradient: rank <= 3
                           ? LinearGradient(
                               colors: [
-                                _getMedalColor(rank),
-                                _getMedalColor(rank).withValues(alpha:0.7),
+                                _getMedalColor(rank, context),
+                                _getMedalColor(rank, context).withValues(alpha:0.7),
                               ],
                             )
                           : null,
@@ -208,7 +208,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                       boxShadow: rank <= 3
                           ? [
                               BoxShadow(
-                                color: _getMedalColor(rank).withValues(alpha:0.4),
+                                color: _getMedalColor(rank, context).withValues(alpha:0.4),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -222,7 +222,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                               '#$rank',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textSecondary,
+                                color: AppColors.textSecondaryOf(context),
                               ),
                             ),
                     ),
@@ -240,7 +240,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                           style: TextStyle(
                             fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.w600,
                             fontSize: 15,
-                            color: isCurrentUser ? AppColors.brainPurple : AppColors.textPrimary,
+                            color: isCurrentUser ? AppColors.brainPurple : AppColors.textPrimaryOf(context),
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -253,7 +253,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                               '$accuracy% ${l10n.accuracy}',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: AppColors.textSecondary,
+                                color: AppColors.textSecondaryOf(context),
                               ),
                             ),
                           ],
@@ -278,7 +278,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                         ),
                         child: Text(
                           scoreKey == 'total_xp' ? '$score XP' : '$score pts',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                             fontSize: 14,
@@ -292,7 +292,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                             '${l10n.level} ${item['level'] ?? 0}',
                             style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textSecondary,
+                              color: AppColors.textSecondaryOf(context),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -319,7 +319,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradientOf(context)),
         child: SafeArea(
           child: Column(
             children: [
@@ -338,7 +338,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
-                          color: AppColors.white,
+                          color: AppColors.cardColorOf(context),
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: AppColors.softShadow,
                         ),
@@ -347,7 +347,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                           isScrollable: true,
                           tabAlignment: TabAlignment.center,
                           labelColor: AppColors.brainPurple,
-                          unselectedLabelColor: AppColors.textSecondary,
+                          unselectedLabelColor: AppColors.textSecondaryOf(context),
                           indicatorSize: TabBarIndicatorSize.tab,
                           indicator: BoxDecoration(
                             color: AppColors.brainPurpleLight.withValues(alpha: 0.3),
@@ -373,13 +373,13 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: _friendsOnly ? AppColors.brainPurple : AppColors.white,
+                          color: _friendsOnly ? AppColors.brainPurple : AppColors.cardColorOf(context),
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: AppColors.softShadow,
                         ),
                         child: Icon(
                           Icons.people,
-                          color: _friendsOnly ? Colors.white : AppColors.textSecondary,
+                          color: _friendsOnly ? Colors.white : AppColors.textSecondaryOf(context),
                           size: 22,
                         ),
                       ),
@@ -453,7 +453,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
         const SizedBox(height: 8),
         Text(
           '#$rank',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
