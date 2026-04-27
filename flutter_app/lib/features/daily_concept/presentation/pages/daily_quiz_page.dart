@@ -12,6 +12,7 @@ import '../../../profile/data/repositories/profile_repository.dart';
 import '../../../auth/providers/user_stats_provider.dart';
 import '../../data/models/daily_concept_model.dart';
 import '../../data/repositories/daily_concept_repository.dart';
+import '../../../achievements/presentation/widgets/achievement_unlock_overlay.dart';
 
 class DailyQuizPage extends StatefulWidget {
   final DailyConceptModel concept;
@@ -163,6 +164,16 @@ class _DailyQuizPageState extends State<DailyQuizPage> {
         await _dailyRepo.completeDailyConcept(authRepo.getCurrentUserId()!);
       } catch (e) {
         debugPrint('Error adding XP / completing daily: $e');
+      }
+
+    }
+
+    // Check achievements before result dialog (page is always mounted here)
+    if (mounted) {
+      final userId = authRepo.getCurrentUserId();
+      if (userId != null) {
+        final lang = context.read<LanguageProvider>().currentLanguage;
+        await AchievementUnlockOverlay.checkAndShow(context, userId, lang);
       }
     }
 

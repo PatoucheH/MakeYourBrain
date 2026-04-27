@@ -549,7 +549,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                   setState(() => _isSending = true);
                   try {
                     await widget.repository.resetPassword(_emailController.text.trim());
-                    if (mounted) Navigator.of(context).pop(true);
+                    if (context.mounted) Navigator.of(context).pop(true);
                   } catch (e) {
                     if (mounted) setState(() => _isSending = false);
                   }

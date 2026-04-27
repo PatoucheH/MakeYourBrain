@@ -361,5 +361,8 @@
   "passwordReqNumber": "At least one number",
   "passwordReqSymbol": "At least one symbol (!@#$%...)",
   "passwordTooWeak": "Password does not meet the requirements",
+  "achievements": "Achievements",
+  "badgeUnlocked": "Badge Unlocked!",
+  "noAchievementsYet": "No achievements found",
   "send": "Send"
 }

@@ -333,5 +333,8 @@
   "passwordReqNumber": "Au moins un chiffre",
   "passwordReqSymbol": "Au moins un symbole (!@#$%...)",
   "passwordTooWeak": "Le mot de passe ne respecte pas les exigences",
+  "achievements": "Succès",
+  "badgeUnlocked": "Badge Débloqué !",
+  "noAchievementsYet": "Aucun succès trouvé",
   "send": "Envoyer"
 }

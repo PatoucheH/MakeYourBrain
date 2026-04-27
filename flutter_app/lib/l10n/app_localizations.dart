@@ -1652,6 +1652,24 @@ abstract class AppLocalizations {
   /// **'Password does not meet the requirements'**
   String get passwordTooWeak;
 
+  /// No description provided for @achievements.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements'**
+  String get achievements;
+
+  /// No description provided for @badgeUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Badge Unlocked!'**
+  String get badgeUnlocked;
+
+  /// No description provided for @noAchievementsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No achievements found'**
+  String get noAchievementsYet;
+
   /// No description provided for @send.
   ///
   /// In en, this message translates to:

@@ -2,8 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/providers/language_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../quiz/data/models/question_model.dart';
+import '../../../auth/data/repositories/auth_repository.dart';
+import '../../../achievements/presentation/widgets/achievement_unlock_overlay.dart';
 import '../../data/providers/pvp_provider.dart';
 import 'pvp_theme_selection_page.dart';
 
@@ -1287,8 +1290,8 @@ class _PvPGamePageState extends State<PvPGamePage>
 
   // ===================== FINAL RESULTS =====================
 
-  void _showFinalResultsDialog(
-      PvPProvider pvpProvider, AppLocalizations l10n) {
+  Future<void> _showFinalResultsDialog(
+      PvPProvider pvpProvider, AppLocalizations l10n) async {
     final currentMatch = pvpProvider.currentMatch;
     if (currentMatch == null) return;
 
@@ -1315,7 +1318,7 @@ class _PvPGamePageState extends State<PvPGamePage>
       resultIcon = Icons.handshake;
     }
 
-    showDialog(
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => Dialog(
@@ -1521,5 +1524,13 @@ class _PvPGamePageState extends State<PvPGamePage>
         ),
       ),
     );
+
+    // Check for newly unlocked achievements after the dialog closes
+    if (!mounted) return;
+    final userId = AuthRepository().getCurrentUserId();
+    if (userId != null) {
+      final lang = context.read<LanguageProvider>().currentLanguage;
+      await AchievementUnlockOverlay.checkAndShow(context, userId, lang);
+    }
   }
 }

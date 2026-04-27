@@ -841,5 +841,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get passwordTooWeak => 'Le mot de passe ne respecte pas les exigences';
 
   @override
+  String get achievements => 'Succès';
+
+  @override
+  String get badgeUnlocked => 'Badge Débloqué !';
+
+  @override
+  String get noAchievementsYet => 'Aucun succès trouvé';
+
+  @override
   String get send => 'Envoyer';
 }

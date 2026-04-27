@@ -829,5 +829,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordTooWeak => 'Password does not meet the requirements';
 
   @override
+  String get achievements => 'Achievements';
+
+  @override
+  String get badgeUnlocked => 'Badge Unlocked!';
+
+  @override
+  String get noAchievementsYet => 'No achievements found';
+
+  @override
   String get send => 'Send';
 }
