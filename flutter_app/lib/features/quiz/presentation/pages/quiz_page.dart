@@ -200,6 +200,8 @@ class _QuizPageState extends State<QuizPage> {
     final percentage = (score / questions.length) * 100;
 
     final authRepo = AuthRepository();
+    final userId = authRepo.getCurrentUserId();
+    final lang = context.read<LanguageProvider>().currentLanguage;
     if (authRepo.isLoggedIn()) {
       try {
         await ProfileRepository().updateStreak(authRepo.getCurrentUserId()!);
@@ -220,15 +222,6 @@ class _QuizPageState extends State<QuizPage> {
         } catch (e) {
           debugPrint('Error adding XP: $e');
         }
-      }
-    }
-
-    // Check achievements before result dialog (page is always mounted here)
-    if (mounted) {
-      final userId = authRepo.getCurrentUserId();
-      if (userId != null) {
-        final lang = context.read<LanguageProvider>().currentLanguage;
-        await AchievementUnlockOverlay.checkAndShow(context, userId, lang);
       }
     }
 
@@ -255,7 +248,7 @@ class _QuizPageState extends State<QuizPage> {
       _audioPlayer.play(AssetSource('sounds/victory.mp3')).catchError((_) {});
     }
 
-    showDialog(
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => Dialog(
@@ -450,6 +443,10 @@ class _QuizPageState extends State<QuizPage> {
         ),
       ),
     );
+    if (!mounted) return;
+    if (userId != null) {
+      await AchievementUnlockOverlay.checkAndShow(context, userId, lang);
+    }
   }
 
   void showAnswerDialog(bool isCorrect) {

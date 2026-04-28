@@ -8,6 +8,7 @@ class AchievementModel {
   final String icon;
   final String category;
   final int xpReward;
+  final int conditionValue;
   final DateTime? unlockedAt;
 
   const AchievementModel({
@@ -20,6 +21,7 @@ class AchievementModel {
     required this.icon,
     required this.category,
     required this.xpReward,
+    required this.conditionValue,
     this.unlockedAt,
   });
 
@@ -39,9 +41,10 @@ class AchievementModel {
       nameFr: json['name_fr'] as String? ?? '',
       descriptionEn: json['description_en'] as String? ?? '',
       descriptionFr: json['description_fr'] as String? ?? '',
-      icon: json['icon'] as String? ?? '🏆',
+      icon: json['icon'] as String? ?? '',
       category: json['category'] as String? ?? 'general',
       xpReward: (json['xp_reward'] as num?)?.toInt() ?? 0,
+      conditionValue: (json['condition_value'] as num?)?.toInt() ?? 0,
       unlockedAt: json['unlocked_at'] != null
           ? DateTime.tryParse(json['unlocked_at'].toString())
           : unlockedAt,

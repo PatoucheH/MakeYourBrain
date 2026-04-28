@@ -6,6 +6,7 @@ import '../../../../core/providers/language_provider.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 import '../../data/models/achievement_model.dart';
 import '../../data/repositories/achievement_repository.dart';
+import '../widgets/achievement_icon_mapper.dart';
 
 class AchievementsPage extends StatefulWidget {
   const AchievementsPage({super.key});
@@ -51,26 +52,27 @@ class _AchievementsPageState extends State<AchievementsPage> {
 
   String _categoryLabel(String category, String lang) {
     const labels = {
-      'quiz': {'en': 'Quiz', 'fr': 'Quiz'},
-      'streak': {'en': 'Streak', 'fr': 'Streak'},
-      'accuracy': {'en': 'Accuracy', 'fr': 'Précision'},
-      'pvp': {'en': 'PvP Arena', 'fr': 'Arène PvP'},
+      'quiz':         {'en': 'Quiz',          'fr': 'Quiz'},
+      'streak':       {'en': 'Streak',        'fr': 'Streak'},
+      'accuracy':     {'en': 'Accuracy',      'fr': 'Précision'},
+      'pvp':          {'en': 'PvP Arena',     'fr': 'Arène PvP'},
+      'daily_streak': {'en': 'Daily Quiz',    'fr': 'Quiz Quotidien'},
+      'theme_master': {'en': 'Exploration',   'fr': 'Exploration'},
+      'social':       {'en': 'Social',        'fr': 'Social'},
     };
     return labels[category]?[lang] ?? category;
   }
 
   IconData _categoryIcon(String category) {
     switch (category) {
-      case 'quiz':
-        return Icons.quiz_rounded;
-      case 'streak':
-        return Icons.local_fire_department_rounded;
-      case 'accuracy':
-        return Icons.gps_fixed_rounded;
-      case 'pvp':
-        return Icons.sports_esports_rounded;
-      default:
-        return Icons.star_rounded;
+      case 'quiz':          return Icons.menu_book_rounded;
+      case 'streak':        return Icons.local_fire_department_rounded;
+      case 'accuracy':      return Icons.gps_fixed_rounded;
+      case 'pvp':           return Icons.shield_rounded;
+      case 'daily_streak':  return Icons.today_rounded;
+      case 'theme_master':  return Icons.auto_stories_rounded;
+      case 'social':        return Icons.people_rounded;
+      default:              return Icons.star_rounded;
     }
   }
 
@@ -79,7 +81,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
     final l10n = AppLocalizations.of(context)!;
     final lang = context.watch<LanguageProvider>().currentLanguage;
     final grouped = _grouped();
-    final categoryOrder = ['quiz', 'streak', 'accuracy', 'pvp'];
+    final categoryOrder = ['quiz', 'streak', 'daily_streak', 'accuracy', 'pvp', 'theme_master', 'social'];
 
     final unlockedCount = _achievements.where((a) => a.isUnlocked).length;
 
@@ -241,58 +243,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
-              // Icon with glow when unlocked
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  if (unlocked)
-                    Container(
-                      width: 52,
-                      height: 52,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                const Color(0xFFFFD700).withValues(alpha: 0.3),
-                            blurRadius: 12,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                        gradient: const RadialGradient(
-                          colors: [
-                            Color(0x33FFD700),
-                            Colors.transparent,
-                          ],
-                        ),
-                      ),
-                    ),
-                  Opacity(
-                    opacity: unlocked ? 1.0 : 0.35,
-                    child: Text(
-                      achievement.icon,
-                      style: const TextStyle(fontSize: 36),
-                    ),
-                  ),
-                  if (!unlocked)
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: AppColors.cardColorOf(context),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.lock_rounded,
-                          size: 13,
-                          color: AppColors.textSecondaryOf(context),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
+              _buildBadgeIcon(achievement, unlocked),
               const SizedBox(width: 14),
               // Text
               Expanded(
@@ -336,6 +287,82 @@ class _AchievementsPageState extends State<AchievementsPage> {
             color: AppColors.brainPurple.withValues(alpha: 0.08),
           ),
       ],
+    );
+  }
+
+  Widget _buildBadgeIcon(AchievementModel achievement, bool unlocked) {
+    final tier = AchievementIconMapper.tierData(
+        achievement.category, achievement.conditionValue);
+    final icon = AchievementIconMapper.iconForCategory(achievement.category);
+    final lang = context.read<LanguageProvider>().currentLanguage;
+
+    return Opacity(
+      opacity: unlocked ? 1.0 : 0.3,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: tier.gradient,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: unlocked
+                  ? [
+                      BoxShadow(
+                        color: tier.glowColor.withValues(alpha: 0.45),
+                        blurRadius: 14,
+                        spreadRadius: 2,
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Icon(icon, color: Colors.white, size: 26),
+          ),
+          // Tier label chip below icon
+          Positioned(
+            bottom: -2,
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(
+                color: tier.glowColor,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                tier.label(lang).toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 7,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          ),
+          if (!unlocked)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: AppColors.cardColorOf(context),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.lock_rounded,
+                  size: 12,
+                  color: AppColors.textSecondaryOf(context),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

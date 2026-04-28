@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/models/achievement_model.dart';
 import '../../data/repositories/achievement_repository.dart';
+import 'achievement_icon_mapper.dart';
 
 class AchievementUnlockOverlay extends StatefulWidget {
   final AchievementModel achievement;
@@ -164,6 +165,10 @@ class _AchievementUnlockOverlayState extends State<AchievementUnlockOverlay>
   Widget _buildCard(AppLocalizations l10n) {
     final name = widget.achievement.nameFor(widget.language);
     final description = widget.achievement.descriptionFor(widget.language);
+    final tier = AchievementIconMapper.tierData(
+        widget.achievement.category, widget.achievement.conditionValue);
+    final categoryIcon =
+        AchievementIconMapper.iconForCategory(widget.achievement.category);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 32),
@@ -227,8 +232,10 @@ class _AchievementUnlockOverlayState extends State<AchievementUnlockOverlay>
                               animation: _starburstProgress,
                               builder: (_, __) => CustomPaint(
                                 size: const Size(170, 170),
-                                painter:
-                                    _StarburstPainter(_starburstProgress.value),
+                                painter: _StarburstPainter(
+                                  _starburstProgress.value,
+                                  tier.glowColor,
+                                ),
                               ),
                             ),
                             // Glow ring
@@ -239,14 +246,14 @@ class _AchievementUnlockOverlayState extends State<AchievementUnlockOverlay>
                                 shape: BoxShape.circle,
                                 gradient: RadialGradient(
                                   colors: [
-                                    const Color(0xFFFFD700).withValues(
+                                    tier.glowColor.withValues(
                                         alpha: 0.18 * _glowPulse.value),
                                     Colors.transparent,
                                   ],
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFFD700).withValues(
+                                    color: tier.glowColor.withValues(
                                         alpha: 0.45 * _glowPulse.value),
                                     blurRadius: 24,
                                     spreadRadius: 6,
@@ -254,10 +261,28 @@ class _AchievementUnlockOverlayState extends State<AchievementUnlockOverlay>
                                 ],
                               ),
                             ),
-                            // Badge emoji
-                            Text(
-                              widget.achievement.icon,
-                              style: const TextStyle(fontSize: 62),
+                            // Badge icon with tier gradient
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: tier.gradient,
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: tier.glowColor
+                                        .withValues(alpha: 0.5),
+                                    blurRadius: 16,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: Icon(categoryIcon,
+                                  color: Colors.white, size: 42),
                             ),
                           ],
                         ),
@@ -283,6 +308,24 @@ class _AchievementUnlockOverlayState extends State<AchievementUnlockOverlay>
                         color: AppColors.textPrimaryOf(context),
                       ),
                       textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: tier.gradient),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        tier.label(widget.language).toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -330,8 +373,9 @@ class _AchievementUnlockOverlayState extends State<AchievementUnlockOverlay>
 
 class _StarburstPainter extends CustomPainter {
   final double progress;
+  final Color color;
 
-  const _StarburstPainter(this.progress);
+  const _StarburstPainter(this.progress, this.color);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -366,8 +410,8 @@ class _StarburstPainter extends CustomPainter {
       canvas.drawPath(
         path,
         Paint()
-          ..color = const Color(0xFFFFD700)
-              .withValues(alpha: (isLong ? 0.88 : 0.55) * progress)
+          ..color =
+              color.withValues(alpha: (isLong ? 0.88 : 0.55) * progress)
           ..style = PaintingStyle.fill,
       );
 
@@ -383,5 +427,6 @@ class _StarburstPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_StarburstPainter old) => old.progress != progress;
+  bool shouldRepaint(_StarburstPainter old) =>
+      old.progress != progress || old.color != color;
 }
