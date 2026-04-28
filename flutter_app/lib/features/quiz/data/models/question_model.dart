@@ -26,7 +26,7 @@ class QuestionModel {
         .toList()
       ..shuffle();
     return QuestionModel(
-      id: json['question_id']?.toString() ?? '',
+      id: json['question_id']?.toString() ?? json['id']?.toString() ?? '',
       themeId: json['theme_id']?.toString() ?? '',
       difficulty: json['difficulty']?.toString() ?? 'easy',
       questionText: json['question_text']?.toString() ?? '',
@@ -91,8 +91,8 @@ class AnswerModel {
 
   factory AnswerModel.fromJson(Map<String, dynamic> json) {
     return AnswerModel(
-      id: json['answer_id']?.toString() ?? '',
-      text: json['answer_text']?.toString() ?? '',
+      id: json['answer_id']?.toString() ?? json['id']?.toString() ?? '',
+      text: json['answer_text']?.toString() ?? json['text']?.toString() ?? '',
       isCorrect: json['is_correct'] == true,
       displayOrder: (json['display_order'] as int?) ?? 0,
     );
