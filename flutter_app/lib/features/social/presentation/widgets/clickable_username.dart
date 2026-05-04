@@ -25,10 +25,7 @@ class ClickableUsername extends StatelessWidget {
       },
       child: Text(
         displayName,
-        style: (style ?? TextStyle()).copyWith(
-          decoration: TextDecoration.underline,
-          decorationStyle: TextDecorationStyle.dotted,
-        ),
+        style: style,
         overflow: overflow ?? TextOverflow.ellipsis,
       ),
     );

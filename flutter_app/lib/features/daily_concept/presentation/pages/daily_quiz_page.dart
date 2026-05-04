@@ -868,14 +868,19 @@ class _ExplanationToggle extends StatefulWidget {
 }
 
 class _ExplanationToggleState extends State<_ExplanationToggle> {
-  bool _showExplanation = false;
+  static const int _previewLength = 80;
+  bool _expanded = false;
 
   @override
   Widget build(BuildContext context) {
     final color = widget.isCorrect ? AppColors.success : AppColors.error;
+    final isLong = widget.explanation.length > _previewLength;
+    final preview = isLong
+        ? '${widget.explanation.substring(0, _previewLength).trimRight()}...'
+        : widget.explanation;
 
     return GestureDetector(
-      onTap: () => setState(() => _showExplanation = !_showExplanation),
+      onTap: isLong ? () => setState(() => _expanded = !_expanded) : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
@@ -887,29 +892,34 @@ class _ExplanationToggleState extends State<_ExplanationToggle> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Icon(Icons.lightbulb_outline, size: 16, color: color),
+                const SizedBox(width: 6),
                 Text(
                   widget.label,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: 13,
                     color: color,
                   ),
                 ),
-                Icon(
-                  _showExplanation ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                  color: color,
-                ),
               ],
             ),
-            if (_showExplanation) ...[
-              const SizedBox(height: 8),
-              Text(
-                widget.explanation,
-                style: TextStyle(fontSize: 14, color: AppColors.textPrimaryOf(context)),
+            const SizedBox(height: 8),
+            Text(
+              _expanded ? widget.explanation : preview,
+              style: TextStyle(fontSize: 14, color: AppColors.textPrimaryOf(context)),
+            ),
+            if (isLong)
+              Align(
+                alignment: Alignment.centerRight,
+                child: Icon(
+                  _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                  size: 20,
+                  color: color,
+                ),
               ),
-            ],
           ],
         ),
       ),
