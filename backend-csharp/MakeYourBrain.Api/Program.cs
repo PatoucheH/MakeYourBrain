@@ -131,7 +131,7 @@ app.UseHangfireDashboard("/hangfire");
 RecurringJob.AddOrUpdate<GenerateQuestionsJob>(
     "generate-questions",
     job => job.ExecuteAsync(),
-    "0 0 * * *",                       // daily at midnight UTC
+    "0 3,4,5,6 * * *",                // 4 attempts/day at 03-06h UTC, matching Supabase pg_cron
     new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
 
 RecurringJob.AddOrUpdate<SendStreakRemindersJob>(

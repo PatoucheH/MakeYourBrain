@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using MakeYourBrain.Api.Models.Dtos;
 
 namespace MakeYourBrain.Api.Services;
 
@@ -135,6 +136,60 @@ public class FirebaseFcmService(IConfiguration configuration, IHttpClientFactory
         }
 
         return staleTokens;
+    }
+
+    public async Task<(IReadOnlyList<string> StaleTokens, IReadOnlyList<FcmTokenResult> Results)> SendWithResultsAsync(
+        IEnumerable<string> tokens,
+        string title,
+        string body,
+        Dictionary<string, string>? data = null)
+    {
+        var staleTokens = new List<string>();
+        var results     = new List<FcmTokenResult>();
+        var tokenList   = tokens.ToList();
+        if (tokenList.Count == 0) return (staleTokens, results);
+
+        var serviceAccount = JsonSerializer.Deserialize<Dictionary<string, string>>(_serviceAccountJson)!;
+        var projectId      = serviceAccount["project_id"];
+        var accessToken    = await GetAccessTokenAsync(serviceAccount);
+        var fcmUrl         = $"https://fcm.googleapis.com/v1/projects/{projectId}/messages:send";
+        var client         = httpFactory.CreateClient();
+
+        foreach (var token in tokenList)
+        {
+            var payload = new
+            {
+                message = new { token, notification = new { title, body }, data }
+            };
+
+            var req = new HttpRequestMessage(HttpMethod.Post, fcmUrl);
+            req.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            req.Content = new StringContent(
+                JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+
+            var response   = await client.SendAsync(req);
+            var httpStatus = (int)response.StatusCode;
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var body2 = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(body2);
+                var fcmStatus = doc.RootElement
+                    .TryGetProperty("error", out var errEl) &&
+                    errEl.TryGetProperty("status", out var statusEl)
+                    ? statusEl.GetString() : null;
+
+                if (fcmStatus is "UNREGISTERED" or "INVALID_ARGUMENT" or "NOT_FOUND")
+                    staleTokens.Add(token);
+            }
+
+            results.Add(new FcmTokenResult(
+                token[..Math.Min(20, token.Length)] + "...",
+                httpStatus));
+        }
+
+        return (staleTokens, results);
     }
 
     private async Task<string> GetAccessTokenAsync(Dictionary<string, string> serviceAccount)

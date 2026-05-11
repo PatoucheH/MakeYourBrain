@@ -7,6 +7,7 @@ import '../../../auth/data/repositories/auth_repository.dart';
 import '../../data/repositories/leaderboard_repository.dart';
 import '../../../social/presentation/widgets/clickable_username.dart';
 import '../../../social/providers/follow_provider.dart';
+import '../../../quiz/data/repositories/quiz_repository.dart';
 
 class LeaderboardPage extends StatefulWidget {
   final String? themeId;
@@ -26,11 +27,13 @@ class _LeaderboardPageState extends State<LeaderboardPage>
     with SingleTickerProviderStateMixin {
   final _leaderboardRepo = LeaderboardRepository();
   final _authRepo = AuthRepository();
+  final _quizRepo = QuizRepository();
 
   late TabController _tabController;
   List<Map<String, dynamic>> globalLeaderboard = [];
   List<Map<String, dynamic>> weeklyLeaderboard = [];
   List<Map<String, dynamic>> themeLeaderboard = [];
+  List<Map<String, dynamic>> survivalLeaderboard = [];
   String? _currentUserId;
   bool isLoading = true;
   bool _friendsOnly = false;
@@ -42,7 +45,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: widget.themeId != null ? 3 : 2,
+      length: 2,
       vsync: this,
     );
     loadLeaderboards();
@@ -58,41 +61,54 @@ class _LeaderboardPageState extends State<LeaderboardPage>
     try {
       final userId = _authRepo.getCurrentUserId();
 
-      final futures = await Future.wait([
-        _leaderboardRepo.getGlobalLeaderboard(),
-        _leaderboardRepo.getWeeklyLeaderboard(),
-      ]);
+      if (widget.themeId != null) {
+        // Theme context: load theme XP + survival leaderboards only
+        final futures = await Future.wait([
+          _leaderboardRepo.getThemeLeaderboard(widget.themeId!),
+          _quizRepo.getSurvivalLeaderboard(themeId: widget.themeId!),
+        ]);
 
-      final global = futures[0];
-      final weekly = futures[1];
-
-      int? globalRank;
-      int? weeklyRank;
-      int? themeRank;
-      List<Map<String, dynamic>> theme = [];
-
-      if (userId != null) {
-        globalRank = await _leaderboardRepo.getUserGlobalRank(userId);
-        final weeklyIndex = weekly.indexWhere((item) => item['user_id'] == userId);
-        weeklyRank = weeklyIndex >= 0 ? weeklyIndex + 1 : null;
-
-        if (widget.themeId != null) {
-          theme = await _leaderboardRepo.getThemeLeaderboard(widget.themeId!);
+        int? themeRank;
+        if (userId != null) {
           themeRank = await _leaderboardRepo.getUserThemeRank(userId, widget.themeId!);
         }
-      }
 
-      if (!mounted) return;
-      setState(() {
-        globalLeaderboard = global;
-        weeklyLeaderboard = weekly;
-        themeLeaderboard = theme;
-        _currentUserId = userId;
-        myGlobalRank = globalRank;
-        myWeeklyRank = weeklyRank;
-        myThemeRank = themeRank;
-        isLoading = false;
-      });
+        if (!mounted) return;
+        setState(() {
+          themeLeaderboard = futures[0];
+          survivalLeaderboard = futures[1];
+          _currentUserId = userId;
+          myThemeRank = themeRank;
+          isLoading = false;
+        });
+      } else {
+        // Global context: load global + weekly leaderboards
+        final futures = await Future.wait([
+          _leaderboardRepo.getGlobalLeaderboard(),
+          _leaderboardRepo.getWeeklyLeaderboard(),
+        ]);
+
+        final global = futures[0];
+        final weekly = futures[1];
+
+        int? globalRank;
+        int? weeklyRank;
+        if (userId != null) {
+          globalRank = await _leaderboardRepo.getUserGlobalRank(userId);
+          final weeklyIndex = weekly.indexWhere((item) => item['user_id'] == userId);
+          weeklyRank = weeklyIndex >= 0 ? weeklyIndex + 1 : null;
+        }
+
+        if (!mounted) return;
+        setState(() {
+          globalLeaderboard = global;
+          weeklyLeaderboard = weekly;
+          _currentUserId = userId;
+          myGlobalRank = globalRank;
+          myWeeklyRank = weeklyRank;
+          isLoading = false;
+        });
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => isLoading = false);
@@ -308,6 +324,139 @@ class _LeaderboardPageState extends State<LeaderboardPage>
     );
   }
 
+  Widget _buildSurvivalList(List<Map<String, dynamic>> leaderboard) {
+    final l10n = AppLocalizations.of(context)!;
+    final userId = _authRepo.getCurrentUserId();
+
+    if (leaderboard.isEmpty) {
+      return Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset('assets/branding/mascot/brainly_thinking.png', height: 80),
+                const SizedBox(height: 12),
+                Text(
+                  l10n.noSurvivalScoresYet,
+                  style: TextStyle(fontSize: 16, color: AppColors.textSecondaryOf(context)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: loadLeaderboards,
+      color: AppColors.brainPurple,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: leaderboard.length,
+        itemBuilder: (context, index) {
+          final item = leaderboard[index];
+          final rank = index + 1;
+          final isCurrentUser = item['user_id'] == userId;
+          final score = (item['best_score'] as num?)?.toInt() ?? 0;
+          final displayName = item['username']?.toString() ?? item['display_name']?.toString() ?? 'Unknown';
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: isCurrentUser
+                  ? const Color(0xFFD32F2F).withValues(alpha: 0.1)
+                  : AppColors.cardColorOf(context),
+              borderRadius: BorderRadius.circular(16),
+              border: isCurrentUser
+                  ? Border.all(color: const Color(0xFFD32F2F), width: 2)
+                  : null,
+              boxShadow: AppColors.cardShadow,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: rank <= 3
+                          ? LinearGradient(colors: [
+                              _getMedalColor(rank, context),
+                              _getMedalColor(rank, context).withValues(alpha: 0.7),
+                            ])
+                          : null,
+                      color: rank > 3 ? AppColors.backgroundGray : null,
+                      shape: BoxShape.circle,
+                      boxShadow: rank <= 3
+                          ? [BoxShadow(
+                              color: _getMedalColor(rank, context).withValues(alpha: 0.4),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            )]
+                          : null,
+                    ),
+                    child: Center(
+                      child: rank <= 3
+                          ? const Icon(Icons.emoji_events, color: Colors.white, size: 24)
+                          : Text(
+                              '#$rank',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textSecondaryOf(context),
+                              ),
+                            ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ClickableUsername(
+                      userId: item['user_id'] ?? '',
+                      displayName: displayName,
+                      style: TextStyle(
+                        fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.w600,
+                        fontSize: 15,
+                        color: isCurrentUser ? const Color(0xFFD32F2F) : AppColors.textPrimaryOf(context),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFD32F2F), Color(0xFFFF5722)],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.bolt, color: Colors.white, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$score',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -326,9 +475,11 @@ class _LeaderboardPageState extends State<LeaderboardPage>
               // Custom AppBar
               const BrainAppBar(currentPage: AppPage.leaderboard),
 
-              // My Rank Card
-              if (!isLoading && (myGlobalRank != null || myWeeklyRank != null || myThemeRank != null))
+                      // My Rank Card
+              if (!isLoading && widget.themeId == null && (myGlobalRank != null || myWeeklyRank != null))
                 _buildMyRankCard(l10n),
+              if (!isLoading && widget.themeId != null && myThemeRank != null)
+                _buildMyThemeRankCard(l10n),
 
               // Tabs + Friends filter
               Padding(
@@ -344,8 +495,6 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                         ),
                         child: TabBar(
                           controller: _tabController,
-                          isScrollable: true,
-                          tabAlignment: TabAlignment.center,
                           labelColor: AppColors.brainPurple,
                           unselectedLabelColor: AppColors.textSecondaryOf(context),
                           indicatorSize: TabBarIndicatorSize.tab,
@@ -357,8 +506,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                           tabs: widget.themeId != null
                               ? [
                                   Tab(icon: const Icon(Icons.style, size: 20), text: widget.themeName ?? l10n.selectTheme),
-                                  Tab(icon: const Icon(Icons.public, size: 20), text: l10n.global),
-                                  Tab(icon: const Icon(Icons.calendar_today, size: 20), text: l10n.thisWeek),
+                                  Tab(icon: const Icon(Icons.bolt, size: 20), text: l10n.survivalMode),
                                 ]
                               : [
                                   Tab(icon: const Icon(Icons.public, size: 20), text: l10n.global),
@@ -400,8 +548,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                         children: widget.themeId != null
                             ? [
                                 _buildLeaderboardList(themeLeaderboard, myThemeRank, 'xp', effectiveFollowingIds),
-                                _buildLeaderboardList(globalLeaderboard, myGlobalRank, 'total_xp', effectiveFollowingIds),
-                                _buildLeaderboardList(weeklyLeaderboard, myWeeklyRank, 'xp_earned', effectiveFollowingIds),
+                                _buildSurvivalList(survivalLeaderboard),
                               ]
                             : [
                                 _buildLeaderboardList(globalLeaderboard, myGlobalRank, 'total_xp', effectiveFollowingIds),
@@ -413,6 +560,19 @@ class _LeaderboardPageState extends State<LeaderboardPage>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMyThemeRankCard(AppLocalizations l10n) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: AppColors.buttonShadow,
+      ),
+      child: _buildRankItem(l10n.yourThemeRank, myThemeRank!, Icons.style, AppColors.accentGreen),
     );
   }
 

@@ -16,3 +16,5 @@ public record StreakReminderResponse(
     int Sent,
     string? Message = null
 );
+
+public record FcmTokenResult(string Token, int Status);

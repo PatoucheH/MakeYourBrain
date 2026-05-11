@@ -364,5 +364,17 @@
   "achievements": "Achievements",
   "badgeUnlocked": "Badge Unlocked!",
   "noAchievementsYet": "No achievements found",
-  "send": "Send"
+  "send": "Send",
+  "survivalMode": "Survival",
+  "survivalRules": "Survival Rules",
+  "survivalRulesDesc": "Answer as many questions as you can!\n\n• 3 mistakes and it's game over\n• Each mistake costs 1 life\n• Difficulty increases as you progress\n• 5 XP per correct answer",
+  "survivalStart": "Start Survival",
+  "survivalGameOver": "Game Over!",
+  "survivalBestScore": "Best Score",
+  "survivalLeaderboard": "Survival Leaderboard",
+  "noSurvivalScoresYet": "No scores yet. Be the first!",
+  "survivalMistakes": "Mistakes",
+  "survivalXpEarned": "XP Earned",
+  "newRecord": "New Record!",
+  "playAgain": "Play Again"
 }

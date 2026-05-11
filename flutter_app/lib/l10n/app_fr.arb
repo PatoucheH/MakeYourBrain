@@ -60,7 +60,7 @@
   "continueButton": "Continuer →",
   "leaderboard": "Classement",
   "viewLeaderboard": "Voir le Classement",
-  "global": "Mondial",
+  "global": "Global",
   "thisWeek": "Cette Semaine",
   "yourGlobalRank": "Votre Rang Mondial",
   "yourThemeRank": "Votre Rang",
@@ -336,5 +336,17 @@
   "achievements": "Succès",
   "badgeUnlocked": "Badge Débloqué !",
   "noAchievementsYet": "Aucun succès trouvé",
-  "send": "Envoyer"
+  "send": "Envoyer",
+  "survivalMode": "Survie",
+  "survivalRules": "Règles du Mode Survie",
+  "survivalRulesDesc": "Réponds à un maximum de questions !\n\n• 3 erreurs et c'est game over\n• Chaque erreur consomme 1 vie\n• La difficulté augmente avec ton score\n• 5 XP par bonne réponse",
+  "survivalStart": "Lancer la Survie",
+  "survivalGameOver": "Game Over !",
+  "survivalBestScore": "Meilleur Score",
+  "survivalLeaderboard": "Classement Survie",
+  "noSurvivalScoresYet": "Aucun score pour l'instant. Sois le premier !",
+  "survivalMistakes": "Erreurs",
+  "survivalXpEarned": "XP Gagnés",
+  "newRecord": "Nouveau Record !",
+  "playAgain": "Rejouer"
 }

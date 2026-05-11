@@ -8,21 +8,23 @@ public class SocialService(DapperConnectionFactory db)
     public async Task FollowUserAsync(Guid followerId, Guid followingId)
     {
         using var conn = db.CreateConnection();
+        using var tran = conn.BeginTransaction();
         await conn.ExecuteAsync(
-            """
-            INSERT INTO user_follows (follower_id, following_id)
-            VALUES (@followerId, @followingId)
-            ON CONFLICT (follower_id, following_id) DO NOTHING
-            """,
-            new { followerId, followingId });
+            "SELECT set_config('request.jwt.claim.sub', @sub, true)",
+            new { sub = followerId.ToString() }, tran);
+        await conn.ExecuteAsync("SELECT follow_user(@followingId)", new { followingId }, tran);
+        tran.Commit();
     }
 
     public async Task UnfollowUserAsync(Guid followerId, Guid followingId)
     {
         using var conn = db.CreateConnection();
+        using var tran = conn.BeginTransaction();
         await conn.ExecuteAsync(
-            "DELETE FROM user_follows WHERE follower_id = @followerId AND following_id = @followingId",
-            new { followerId, followingId });
+            "SELECT set_config('request.jwt.claim.sub', @sub, true)",
+            new { sub = followerId.ToString() }, tran);
+        await conn.ExecuteAsync("SELECT unfollow_user(@followingId)", new { followingId }, tran);
+        tran.Commit();
     }
 
     public async Task<dynamic?> GetFollowCountsAsync(Guid userId)
@@ -52,29 +54,14 @@ public class SocialService(DapperConnectionFactory db)
     public async Task<IEnumerable<dynamic>> SearchUsersAsync(Guid requesterId, string query)
     {
         using var conn = db.CreateConnection();
-        return await conn.QueryAsync(
-            """
-            SELECT
-              us.user_id,
-              us.username,
-              us.pvp_rating,
-              us.total_questions,
-              us.correct_answers,
-              EXISTS (
-                SELECT 1 FROM user_follows uf
-                WHERE uf.follower_id = @requesterId AND uf.following_id = us.user_id
-              ) AS is_following
-            FROM user_stats us
-            WHERE us.user_id != @requesterId
-              AND us.username ILIKE '%' || @query || '%'
-            ORDER BY
-              CASE WHEN us.username ILIKE @query THEN 0
-                   WHEN us.username ILIKE @query || '%' THEN 1
-                   ELSE 2 END,
-              us.username ASC
-            LIMIT 20
-            """,
-            new { requesterId, query });
+        using var tran = conn.BeginTransaction();
+        await conn.ExecuteAsync(
+            "SELECT set_config('request.jwt.claim.sub', @sub, true)",
+            new { sub = requesterId.ToString() }, tran);
+        var result = await conn.QueryAsync(
+            "SELECT * FROM search_users(@query)", new { query }, tran);
+        tran.Commit();
+        return result;
     }
 
     public async Task<string?> GetDisplayNameAsync(Guid userId, Guid? requesterId = null)

@@ -1675,6 +1675,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send'**
   String get send;
+
+  /// No description provided for @survivalMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Survival'**
+  String get survivalMode;
+
+  /// No description provided for @survivalRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Survival Rules'**
+  String get survivalRules;
+
+  /// No description provided for @survivalRulesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer as many questions as you can!\n\n• 3 mistakes and it\'s game over\n• Each mistake costs 1 life\n• Difficulty increases as you progress\n• 5 XP per correct answer'**
+  String get survivalRulesDesc;
+
+  /// No description provided for @survivalStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Survival'**
+  String get survivalStart;
+
+  /// No description provided for @survivalGameOver.
+  ///
+  /// In en, this message translates to:
+  /// **'Game Over!'**
+  String get survivalGameOver;
+
+  /// No description provided for @survivalBestScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Score'**
+  String get survivalBestScore;
+
+  /// No description provided for @survivalLeaderboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Survival Leaderboard'**
+  String get survivalLeaderboard;
+
+  /// No description provided for @noSurvivalScoresYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No scores yet. Be the first!'**
+  String get noSurvivalScoresYet;
+
+  /// No description provided for @survivalMistakes.
+  ///
+  /// In en, this message translates to:
+  /// **'Mistakes'**
+  String get survivalMistakes;
+
+  /// No description provided for @survivalXpEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'XP Earned'**
+  String get survivalXpEarned;
+
+  /// No description provided for @newRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'New Record!'**
+  String get newRecord;
+
+  /// No description provided for @playAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Play Again'**
+  String get playAgain;
 }
 
 class _AppLocalizationsDelegate

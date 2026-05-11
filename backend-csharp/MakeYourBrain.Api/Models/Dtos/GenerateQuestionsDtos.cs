@@ -9,17 +9,20 @@ public record GenerateQuestionsRequest(
 );
 
 public record GenerateQuestionsResponse(
-    bool Success,
-    string? Mode,
-    string? Theme,
-    string? ThemeIcon,
-    string? Concept,
-    int QuestionsGenerated,
-    DifficultyDistribution? DifficultyDistribution,
-    int TotalConceptsForTheme,
-    string? Message = null,
-    string? Error = null,
-    [property: JsonPropertyName("attempted_concept")] string? AttemptedConcept = null
+    [property: JsonPropertyName("success")]                   bool Success,
+    [property: JsonPropertyName("mode")]                      string? Mode,
+    [property: JsonPropertyName("theme")]                     string? Theme,
+    [property: JsonPropertyName("theme_icon")]                string? ThemeIcon,
+    [property: JsonPropertyName("concept")]                   string? Concept,
+    [property: JsonPropertyName("questions_generated")]       int QuestionsGenerated,
+    [property: JsonPropertyName("difficulty_distribution")]   DifficultyDistribution? DifficultyDistribution,
+    [property: JsonPropertyName("total_concepts_for_theme")]  int TotalConceptsForTheme,
+    [property: JsonPropertyName("message")]                   string? Message = null,
+    [property: JsonPropertyName("error")]                     string? Error = null,
+    [property: JsonPropertyName("attempted_concept")]         string? AttemptedConcept = null
 );
 
-public record DifficultyDistribution(int Easy, int Medium, int Hard);
+public record DifficultyDistribution(
+    [property: JsonPropertyName("easy")]   int Easy,
+    [property: JsonPropertyName("medium")] int Medium,
+    [property: JsonPropertyName("hard")]   int Hard);

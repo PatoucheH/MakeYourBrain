@@ -839,4 +839,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get send => 'Send';
+
+  @override
+  String get survivalMode => 'Survival';
+
+  @override
+  String get survivalRules => 'Survival Rules';
+
+  @override
+  String get survivalRulesDesc =>
+      'Answer as many questions as you can!\n\n• 3 mistakes and it\'s game over\n• Each mistake costs 1 life\n• Difficulty increases as you progress\n• 5 XP per correct answer';
+
+  @override
+  String get survivalStart => 'Start Survival';
+
+  @override
+  String get survivalGameOver => 'Game Over!';
+
+  @override
+  String get survivalBestScore => 'Best Score';
+
+  @override
+  String get survivalLeaderboard => 'Survival Leaderboard';
+
+  @override
+  String get noSurvivalScoresYet => 'No scores yet. Be the first!';
+
+  @override
+  String get survivalMistakes => 'Mistakes';
+
+  @override
+  String get survivalXpEarned => 'XP Earned';
+
+  @override
+  String get newRecord => 'New Record!';
+
+  @override
+  String get playAgain => 'Play Again';
 }

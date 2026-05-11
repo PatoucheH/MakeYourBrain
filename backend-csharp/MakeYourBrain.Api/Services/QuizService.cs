@@ -51,7 +51,7 @@ public class QuizService(DapperConnectionFactory db)
             """,
             new { questionIds, answerIds });
         int total = answerIds.Length;
-        int xpGained = correct * 10 * (isDaily ? 3 : 1);
+        int xpGained = correct * 10;
         await conn.ExecuteAsync(
             """
             INSERT INTO user_theme_progress (user_id, theme_id, xp, total_questions, correct_answers)
@@ -118,13 +118,12 @@ public class QuizService(DapperConnectionFactory db)
     public async Task UpdateUserLanguageAsync(Guid userId, string language)
     {
         using var conn = db.CreateConnection();
+        using var tran = conn.BeginTransaction();
         await conn.ExecuteAsync(
-            """
-            INSERT INTO user_stats (user_id, preferred_language, updated_at)
-            VALUES (@userId, @language, NOW())
-            ON CONFLICT (user_id) DO UPDATE SET preferred_language = @language, updated_at = NOW()
-            """,
-            new { userId, language });
+            "SELECT set_config('request.jwt.claim.sub', @sub, true)",
+            new { sub = userId.ToString() }, tran);
+        await conn.ExecuteAsync("SELECT update_user_language(@language)", new { language }, tran);
+        tran.Commit();
     }
 
     public async Task SaveUserAnswerAsync(

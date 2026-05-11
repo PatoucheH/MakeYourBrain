@@ -194,7 +194,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get viewLeaderboard => 'Voir le Classement';
 
   @override
-  String get global => 'Mondial';
+  String get global => 'Global';
 
   @override
   String get thisWeek => 'Cette Semaine';
@@ -851,4 +851,42 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get send => 'Envoyer';
+
+  @override
+  String get survivalMode => 'Survie';
+
+  @override
+  String get survivalRules => 'Règles du Mode Survie';
+
+  @override
+  String get survivalRulesDesc =>
+      'Réponds à un maximum de questions !\n\n• 3 erreurs et c\'est game over\n• Chaque erreur consomme 1 vie\n• La difficulté augmente avec ton score\n• 5 XP par bonne réponse';
+
+  @override
+  String get survivalStart => 'Lancer la Survie';
+
+  @override
+  String get survivalGameOver => 'Game Over !';
+
+  @override
+  String get survivalBestScore => 'Meilleur Score';
+
+  @override
+  String get survivalLeaderboard => 'Classement Survie';
+
+  @override
+  String get noSurvivalScoresYet =>
+      'Aucun score pour l\'instant. Sois le premier !';
+
+  @override
+  String get survivalMistakes => 'Erreurs';
+
+  @override
+  String get survivalXpEarned => 'XP Gagnés';
+
+  @override
+  String get newRecord => 'Nouveau Record !';
+
+  @override
+  String get playAgain => 'Rejouer';
 }

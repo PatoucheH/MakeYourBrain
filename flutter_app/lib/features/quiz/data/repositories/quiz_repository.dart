@@ -69,6 +69,64 @@ class QuizRepository {
     });
   }
 
+  // Save a survival score (one row per run)
+  Future<void> saveSurvivalScore({
+    required String userId,
+    required String themeId,
+    required int score,
+  }) async {
+    await _supabase.from('survival_scores').insert({
+      'user_id': userId,
+      'theme_id': themeId,
+      'score': score,
+    });
+  }
+
+  // Returns the user's personal best for a given theme, or null if none
+  Future<int?> getUserBestSurvivalScore({
+    required String userId,
+    required String themeId,
+  }) async {
+    final response = await _supabase
+        .from('survival_scores')
+        .select('score')
+        .eq('user_id', userId)
+        .eq('theme_id', themeId)
+        .order('score', ascending: false)
+        .limit(1);
+    final list = response as List?;
+    if (list == null || list.isEmpty) return null;
+    return (list.first['score'] as num?)?.toInt();
+  }
+
+  // Top scores for a theme (best score per user)
+  Future<List<Map<String, dynamic>>> getSurvivalLeaderboard({
+    required String themeId,
+    int limit = 20,
+  }) async {
+    final response = await _supabase.rpc('get_survival_leaderboard', params: {
+      'p_theme_id': themeId,
+      'p_limit': limit,
+    });
+    return (response as List? ?? [])
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+  }
+
+  // Add XP directly (used by survival mode: 5 XP per correct answer)
+  Future<void> addSurvivalXp({
+    required String userId,
+    required String themeId,
+    required int xp,
+  }) async {
+    if (xp <= 0) return;
+    await _supabase.rpc('add_bonus_xp', params: {
+      'p_user_id': userId,
+      'p_theme_id': themeId,
+      'p_bonus_xp': xp,
+    });
+  }
+
   // Add XP at the end of the quiz — (questionId, answerId) pairs are
   // verified server-side to prevent cheating on the number of correct answers.
   Future<void> addQuizCompletionXp({

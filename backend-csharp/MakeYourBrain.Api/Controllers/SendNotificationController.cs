@@ -90,7 +90,7 @@ public class SendNotificationController(
 
         try
         {
-            var staleTokens = await fcmService.SendAndGetStaleTokensAsync(tokens, title, body);
+            var (staleTokens, results) = await fcmService.SendWithResultsAsync(tokens, title, body);
 
             if (staleTokens.Count > 0)
             {
@@ -101,7 +101,7 @@ public class SendNotificationController(
                     staleTokens.Count, request.UserId);
             }
 
-            return Ok(new { success = true, sent = tokens.Count, stale_removed = staleTokens.Count });
+            return Ok(new { success = true, sent = tokens.Count, stale_removed = staleTokens.Count, results });
         }
         catch (Exception ex)
         {

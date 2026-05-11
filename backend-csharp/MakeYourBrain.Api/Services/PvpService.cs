@@ -53,6 +53,8 @@ public class PvpService(DapperConnectionFactory db)
         Guid matchId, int roundNumber, Guid playerId, string answersJson)
     {
         using var conn = db.CreateConnection();
+        // p_score (last arg) is required by the SQL signature but completely ignored:
+        // the function recalculates the score server-side from p_answers. Pass 0.
         await conn.ExecuteAsync(
             "SELECT pvp_submit_round_answers(@matchId, @roundNumber, @playerId, @answersJson::jsonb, 0)",
             new { matchId, roundNumber, playerId, answersJson });

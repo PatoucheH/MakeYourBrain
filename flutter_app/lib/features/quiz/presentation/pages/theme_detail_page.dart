@@ -8,6 +8,7 @@ import '../../../auth/data/repositories/auth_repository.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
 import 'quiz_page.dart';
 import 'timed_quiz_page.dart';
+import 'survival_quiz_page.dart';
 import '../../../leaderboard/presentation/pages/leaderboard_page.dart';
 import '../../../lives/data/providers/lives_provider.dart';
 import '../../../lives/presentation/widgets/no_lives_dialog.dart';
@@ -340,6 +341,53 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                             ),
                             const SizedBox(height: 16),
 
+                            // Survival Mode Button
+                            Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFD32F2F), Color(0xFFFF5722)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFD32F2F).withValues(alpha: 0.4),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton(
+                                onPressed: () => _showSurvivalRulesDialog(context, l10n),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.all(20),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.bolt, size: 28, color: Colors.white),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      l10n.survivalMode,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
                             // Leaderboard Button
                             Container(
                               width: double.infinity,
@@ -455,6 +503,129 @@ class _ThemeDetailPageState extends State<ThemeDetailPage> with RouteAware {
                       ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showSurvivalRulesDialog(BuildContext context, AppLocalizations l10n) {
+    final livesProvider = context.read<LivesProvider>();
+
+    if (livesProvider.currentLives <= 0) {
+      showDialog(
+        context: context,
+        builder: (context) => const NoLivesDialog(),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.cardColorOf(context),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFFD32F2F), Color(0xFFFF5722)],
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.bolt, color: Colors.white, size: 40),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  l10n.survivalRules,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFD32F2F),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD32F2F).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: const Color(0xFFD32F2F).withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Text(
+                    l10n.survivalRulesDesc,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textPrimaryOf(context),
+                      height: 1.6,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFD32F2F), Color(0xFFFF5722)],
+                      ),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SurvivalQuizPage(
+                              theme: widget.theme,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: Text(
+                        l10n.survivalStart,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: Text(
+                    l10n.cancel,
+                    style: TextStyle(
+                      color: AppColors.textSecondaryOf(context),
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
