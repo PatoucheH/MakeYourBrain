@@ -10,10 +10,14 @@ namespace MakeYourBrain.Api.Controllers;
 [Authorize]
 public class AchievementsController(AchievementService achievements) : ControllerBase
 {
-    /// <summary>
-    /// Runs check_achievements for the authenticated user and returns newly unlocked achievements.
-    /// Call this after any quiz completion or PvP match.
-    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var userId = User.GetUserId();
+        var all = await achievements.GetAllWithUserStatusAsync(userId);
+        return Ok(all);
+    }
+
     [HttpPost("check")]
     public async Task<IActionResult> Check()
     {

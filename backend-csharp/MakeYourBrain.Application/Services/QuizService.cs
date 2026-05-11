@@ -153,5 +153,13 @@ public class QuizService(IDbConnectionFactory db)
             "SELECT * FROM survival_scores WHERE user_id = @userId ORDER BY score DESC LIMIT 20",
             new { userId });
     }
+
+    public async Task<IEnumerable<dynamic>> GetThemesAsync(string language)
+    {
+        using var conn = db.CreateConnection();
+        return await conn.QueryAsync(
+            "SELECT * FROM themes_localized WHERE language_code = @language",
+            new { language });
+    }
 }
 

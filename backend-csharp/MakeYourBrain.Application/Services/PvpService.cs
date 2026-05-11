@@ -217,5 +217,27 @@ public class PvpService(IDbConnectionFactory db)
             "SELECT * FROM pvp_matches WHERE player1_id = @userId OR player2_id = @userId ORDER BY created_at DESC LIMIT @limit",
             new { userId, limit });
     }
+
+    public async Task<IEnumerable<dynamic>> GetGlobalPvPLeaderboardAsync(int limit = 50)
+    {
+        using var conn = db.CreateConnection();
+        return await conn.QueryAsync(
+            """
+            SELECT user_id, username, pvp_rating, pvp_wins, pvp_losses, pvp_draws
+            FROM user_stats
+            WHERE pvp_wins > 0
+            ORDER BY pvp_rating DESC
+            LIMIT @limit
+            """,
+            new { limit });
+    }
+
+    public async Task<IEnumerable<dynamic>> GetUsernamesBatchAsync(Guid[] userIds)
+    {
+        using var conn = db.CreateConnection();
+        return await conn.QueryAsync(
+            "SELECT user_id, username FROM user_stats WHERE user_id = ANY(@userIds)",
+            new { userIds });
+    }
 }
 

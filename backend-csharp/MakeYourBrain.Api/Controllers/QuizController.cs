@@ -121,6 +121,14 @@ public class QuizController(QuizService quiz) : ControllerBase
         var scores = await quiz.GetMySurvivalScoresAsync(userId);
         return Ok(scores);
     }
+
+    [HttpGet("themes")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetThemes([FromQuery] string language = "en")
+    {
+        var themes = await quiz.GetThemesAsync(language);
+        return Ok(themes);
+    }
 }
 
 

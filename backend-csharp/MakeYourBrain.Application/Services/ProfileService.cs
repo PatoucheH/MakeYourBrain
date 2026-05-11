@@ -92,5 +92,69 @@ public class ProfileService(IDbConnectionFactory db)
             "DELETE FROM user_fcm_tokens WHERE user_id = @userId AND token = @token",
             new { userId, token });
     }
+
+    public async Task UpdateUsernameAsync(Guid userId, string username)
+    {
+        using var conn = db.CreateConnection();
+        await conn.ExecuteAsync(
+            "UPDATE user_stats SET username = @username WHERE user_id = @userId",
+            new { userId, username });
+    }
+
+    public async Task UpdateTimezoneAsync(Guid userId, int offsetHours)
+    {
+        using var conn = db.CreateConnection();
+        await conn.ExecuteAsync(
+            "UPDATE user_stats SET timezone_offset_hours = @offsetHours WHERE user_id = @userId",
+            new { userId, offsetHours });
+    }
+
+    public async Task<IEnumerable<dynamic>> GetPreferencesAsync(Guid userId)
+    {
+        using var conn = db.CreateConnection();
+        return await conn.QueryAsync(
+            "SELECT theme_id FROM user_theme_preferences WHERE user_id = @userId",
+            new { userId });
+    }
+
+    public async Task SavePreferencesAsync(Guid userId, Guid[] themeIds)
+    {
+        using var conn = db.CreateConnection();
+        if (themeIds.Length == 0)
+        {
+            await conn.ExecuteAsync(
+                "DELETE FROM user_theme_preferences WHERE user_id = @userId",
+                new { userId });
+        }
+        else
+        {
+            foreach (var themeId in themeIds)
+                await conn.ExecuteAsync(
+                    "INSERT INTO user_theme_preferences (user_id, theme_id) VALUES (@userId, @themeId) ON CONFLICT (user_id, theme_id) DO NOTHING",
+                    new { userId, themeId });
+            await conn.ExecuteAsync(
+                "DELETE FROM user_theme_preferences WHERE user_id = @userId AND theme_id != ALL(@themeIds)",
+                new { userId, themeIds });
+        }
+        await conn.ExecuteAsync(
+            "UPDATE user_stats SET has_completed_onboarding = true WHERE user_id = @userId",
+            new { userId });
+    }
+
+    public async Task<bool> GetOnboardingStatusAsync(Guid userId)
+    {
+        using var conn = db.CreateConnection();
+        return await conn.ExecuteScalarAsync<bool>(
+            "SELECT COALESCE(has_completed_onboarding, false) FROM user_stats WHERE user_id = @userId",
+            new { userId });
+    }
+
+    public async Task CompleteOnboardingAsync(Guid userId)
+    {
+        using var conn = db.CreateConnection();
+        await conn.ExecuteAsync(
+            "UPDATE user_stats SET has_completed_onboarding = true WHERE user_id = @userId",
+            new { userId });
+    }
 }
 

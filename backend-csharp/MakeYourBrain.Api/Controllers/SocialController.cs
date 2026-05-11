@@ -73,6 +73,27 @@ public class SocialController(SocialService social) : ControllerBase
         var name = await social.GetDisplayNameAsync(userId, requesterId);
         return name is null ? NotFound() : Ok(new { display_name = name });
     }
+
+    [HttpGet("username-available")]
+    [AllowAnonymous]
+    public async Task<IActionResult> CheckUsernameAvailable([FromQuery] string username)
+    {
+        if (string.IsNullOrWhiteSpace(username) || username.Length < 3 || username.Length > 20)
+            return Ok(new { available = false });
+        var normalized = username.ToLowerInvariant().Trim();
+        if (!System.Text.RegularExpressions.Regex.IsMatch(normalized, @"^[a-z0-9_]+$"))
+            return Ok(new { available = false });
+        var available = await social.IsUsernameAvailableAsync(normalized);
+        return Ok(new { available });
+    }
+
+    [HttpGet("is-following/{userId:guid}")]
+    public async Task<IActionResult> IsFollowing(Guid userId)
+    {
+        var currentUserId = User.GetUserId();
+        var following = await social.IsFollowingAsync(currentUserId, userId);
+        return Ok(new { is_following = following });
+    }
 }
 
 

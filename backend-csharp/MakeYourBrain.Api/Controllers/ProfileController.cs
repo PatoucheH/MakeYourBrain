@@ -9,13 +9,16 @@ namespace MakeYourBrain.Api.Controllers;
 [ApiController]
 [Route("profile")]
 [Authorize]
-public class ProfileController(ProfileService profile, QuizService quiz) : ControllerBase
+public class ProfileController(ProfileService profile, QuizService quiz, SocialService social) : ControllerBase
 {
     public record UpdateDisplayNameRequest(string DisplayName);
+    public record UpdateUsernameRequest(string Username);
+    public record UpdateTimezoneRequest(int OffsetHours);
     public record AddBonusXpRequest(Guid ThemeId, int Xp);
     public record AddThemeXpRequest(Guid ThemeId, bool IsCorrect);
     public record RegisterDeviceRequest(string FcmToken, string Platform, int TimezoneOffsetHours);
     public record RemoveDeviceRequest(string FcmToken);
+    public record SavePreferencesRequest(Guid[] ThemeIds);
 
     // â”€â”€â”€ Profile summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpGet]
@@ -92,6 +95,70 @@ public class ProfileController(ProfileService profile, QuizService quiz) : Contr
     {
         var userId = User.GetUserId();
         await profile.RemoveFcmTokenAsync(userId, req.FcmToken);
+        return Ok();
+    }
+
+    [HttpPatch("username")]
+    public async Task<IActionResult> UpdateUsername([FromBody] UpdateUsernameRequest req)
+    {
+        var userId = User.GetUserId();
+        var normalized = req.Username.ToLowerInvariant().Trim();
+        if (normalized.Length < 3 || normalized.Length > 20)
+            return BadRequest(new { error = "Username must be 3-20 characters" });
+        if (!System.Text.RegularExpressions.Regex.IsMatch(normalized, @"^[a-z0-9_]+$"))
+            return BadRequest(new { error = "Username may only contain letters, numbers, and underscores" });
+        var available = await social.IsUsernameAvailableAsync(normalized, userId);
+        if (!available)
+            return Conflict(new { error = "Username already taken" });
+        await profile.UpdateUsernameAsync(userId, normalized);
+        return Ok();
+    }
+
+    [HttpPatch("timezone")]
+    public async Task<IActionResult> UpdateTimezone([FromBody] UpdateTimezoneRequest req)
+    {
+        var userId = User.GetUserId();
+        await profile.UpdateTimezoneAsync(userId, req.OffsetHours);
+        return Ok();
+    }
+
+    [HttpGet("preferences")]
+    public async Task<IActionResult> GetPreferences()
+    {
+        var userId = User.GetUserId();
+        var prefs = await profile.GetPreferencesAsync(userId);
+        return Ok(prefs);
+    }
+
+    [HttpPut("preferences")]
+    public async Task<IActionResult> SavePreferences([FromBody] SavePreferencesRequest req)
+    {
+        var userId = User.GetUserId();
+        await profile.SavePreferencesAsync(userId, req.ThemeIds);
+        return Ok();
+    }
+
+    [HttpDelete("preferences")]
+    public async Task<IActionResult> DeletePreferences()
+    {
+        var userId = User.GetUserId();
+        await profile.SavePreferencesAsync(userId, Array.Empty<Guid>());
+        return Ok();
+    }
+
+    [HttpGet("onboarding")]
+    public async Task<IActionResult> GetOnboardingStatus()
+    {
+        var userId = User.GetUserId();
+        var completed = await profile.GetOnboardingStatusAsync(userId);
+        return Ok(new { has_completed_onboarding = completed });
+    }
+
+    [HttpPatch("onboarding")]
+    public async Task<IActionResult> CompleteOnboarding()
+    {
+        var userId = User.GetUserId();
+        await profile.CompleteOnboardingAsync(userId);
         return Ok();
     }
 }

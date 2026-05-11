@@ -11,7 +11,7 @@ namespace MakeYourBrain.Api.Controllers;
 [Authorize]
 public class PvpController(PvpService pvp) : ControllerBase
 {
-    // â”€â”€â”€ Matchmaking â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // â"€â"€â"€ Matchmaking â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
     [HttpPost("queue/join")]
     public async Task<IActionResult> JoinQueue([FromBody] PvpJoinQueueRequest req)
@@ -37,7 +37,7 @@ public class PvpController(PvpService pvp) : ControllerBase
         return Content(statusJson, "application/json");
     }
 
-    // â”€â”€â”€ Polling (replaces Supabase Realtime streams) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // â"€â"€â"€ Polling (replaces Supabase Realtime streams) â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
     [HttpGet("match/{matchId:guid}")]
     public async Task<IActionResult> GetMatch(Guid matchId)
@@ -63,7 +63,7 @@ public class PvpController(PvpService pvp) : ControllerBase
         return Ok(matches);
     }
 
-    // â”€â”€â”€ Match lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // â"€â"€â"€ Match lifecycle â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
     [HttpPatch("match/{matchId:guid}/status")]
     public async Task<IActionResult> UpdateMatchStatus(Guid matchId, [FromBody] PvpUpdateMatchStatusRequest req)
@@ -85,7 +85,7 @@ public class PvpController(PvpService pvp) : ControllerBase
         return Ok();
     }
 
-    // â”€â”€â”€ Rounds â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // â"€â"€â"€ Rounds â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
     [HttpPost("rounds")]
     public async Task<IActionResult> CreateRound([FromBody] PvpCreateRoundRequest req)
@@ -107,7 +107,7 @@ public class PvpController(PvpService pvp) : ControllerBase
         return Ok();
     }
 
-    // â”€â”€â”€ Questions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // â"€â"€â"€ Questions â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
     [HttpGet("questions")]
     public async Task<IActionResult> GetRandomQuestions(
@@ -139,7 +139,7 @@ public class PvpController(PvpService pvp) : ControllerBase
         return theme is null ? NotFound() : Content(theme, "application/json");
     }
 
-    // â”€â”€â”€ Invitations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // â"€â"€â"€ Invitations â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
     [HttpPost("invitations")]
     public async Task<IActionResult> SendInvitation([FromBody] PvpSendInvitationRequest req)
@@ -166,7 +166,7 @@ public class PvpController(PvpService pvp) : ControllerBase
         return Ok(invitations);
     }
 
-    // â”€â”€â”€ PvP Leaderboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // â"€â"€â"€ PvP Leaderboard â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
     [HttpGet("leaderboard/following")]
     public async Task<IActionResult> GetFollowingLeaderboard()
@@ -176,7 +176,23 @@ public class PvpController(PvpService pvp) : ControllerBase
         return Ok(entries);
     }
 
-    // â”€â”€â”€ Nested request records â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    [HttpGet("leaderboard/global")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetGlobalPvPLeaderboard([FromQuery] int limit = 50)
+    {
+        var entries = await pvp.GetGlobalPvPLeaderboardAsync(limit);
+        return Ok(entries);
+    }
+
+    [HttpGet("usernames")]
+    public async Task<IActionResult> GetUsernamesBatch([FromQuery] Guid[] ids)
+    {
+        if (ids.Length == 0) return Ok(Array.Empty<object>());
+        var usernames = await pvp.GetUsernamesBatchAsync(ids);
+        return Ok(usernames);
+    }
+
+    // â"€â"€â"€ Nested request records â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
     public record GetQuestionsByIdsRequest(Guid[] QuestionIds, string Language = "en");
 }
 

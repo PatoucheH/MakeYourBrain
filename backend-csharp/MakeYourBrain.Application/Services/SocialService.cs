@@ -64,6 +64,27 @@ public class SocialService(IDbConnectionFactory db)
         return result;
     }
 
+    public async Task<bool> IsUsernameAvailableAsync(string username, Guid? excludeUserId = null)
+    {
+        using var conn = db.CreateConnection();
+        var count = excludeUserId.HasValue
+            ? await conn.ExecuteScalarAsync<int>(
+                "SELECT COUNT(*) FROM user_stats WHERE username = @username AND user_id != @excludeUserId",
+                new { username, excludeUserId = excludeUserId.Value })
+            : await conn.ExecuteScalarAsync<int>(
+                "SELECT COUNT(*) FROM user_stats WHERE username = @username",
+                new { username });
+        return count == 0;
+    }
+
+    public async Task<bool> IsFollowingAsync(Guid followerId, Guid followingId)
+    {
+        using var conn = db.CreateConnection();
+        return await conn.ExecuteScalarAsync<bool>(
+            "SELECT EXISTS(SELECT 1 FROM user_follows WHERE follower_id = @followerId AND following_id = @followingId)",
+            new { followerId, followingId });
+    }
+
     public async Task<string?> GetDisplayNameAsync(Guid userId, Guid? requesterId = null)
     {
         using var conn = db.CreateConnection();

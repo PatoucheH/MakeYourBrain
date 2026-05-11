@@ -42,6 +42,38 @@ public class LeaderboardController(LeaderboardService leaderboard, PvpService pv
         var entries = await pvp.GetFollowingLeaderboardAsync(userId);
         return Ok(entries);
     }
+
+    [HttpGet("global")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetGlobal([FromQuery] int limit = 100)
+    {
+        var entries = await leaderboard.GetGlobalLeaderboardAsync(limit);
+        return Ok(entries);
+    }
+
+    [HttpGet("theme/{themeId:guid}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetTheme(Guid themeId, [FromQuery] int limit = 100)
+    {
+        var entries = await leaderboard.GetThemeLeaderboardAsync(themeId, limit);
+        return Ok(entries);
+    }
+
+    [HttpGet("rank/global")]
+    public async Task<IActionResult> GetUserGlobalRank()
+    {
+        var userId = User.GetUserId();
+        var rank = await leaderboard.GetUserGlobalRankAsync(userId);
+        return rank is null ? NotFound() : Ok(new { rank });
+    }
+
+    [HttpGet("rank/theme/{themeId:guid}")]
+    public async Task<IActionResult> GetUserThemeRank(Guid themeId)
+    {
+        var userId = User.GetUserId();
+        var rank = await leaderboard.GetUserThemeRankAsync(userId, themeId);
+        return rank is null ? NotFound() : Ok(new { rank });
+    }
 }
 
 

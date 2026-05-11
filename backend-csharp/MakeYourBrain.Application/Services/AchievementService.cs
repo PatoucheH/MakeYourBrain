@@ -5,6 +5,19 @@ namespace MakeYourBrain.Application.Services;
 
 public class AchievementService(IDbConnectionFactory db)
 {
+    public async Task<IEnumerable<dynamic>> GetAllWithUserStatusAsync(Guid userId)
+    {
+        using var conn = db.CreateConnection();
+        return await conn.QueryAsync(
+            """
+            SELECT a.*, ua.unlocked_at
+            FROM achievements a
+            LEFT JOIN user_achievements ua ON ua.achievement_id = a.id AND ua.user_id = @userId
+            ORDER BY a.category, a.condition_value
+            """,
+            new { userId });
+    }
+
     public async Task<IEnumerable<dynamic>> CheckAndGetNewAchievementsAsync(Guid userId)
     {
         using var conn = db.CreateConnection();
