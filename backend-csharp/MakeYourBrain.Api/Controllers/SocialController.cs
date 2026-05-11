@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Api.Infrastructure.Extensions;
-using MakeYourBrain.Api.Services;
+using MakeYourBrain.Api.Extensions;
+using MakeYourBrain.Application.Services;
+using MakeYourBrain.Infrastructure.Services;
 
 namespace MakeYourBrain.Api.Controllers;
 
@@ -63,7 +64,7 @@ public class SocialController(SocialService social) : ControllerBase
         return Ok(results);
     }
 
-    // Public — display name lookup
+    // Public â€” display name lookup
     [HttpGet("display-name/{userId:guid}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetDisplayName(Guid userId)
@@ -73,3 +74,5 @@ public class SocialController(SocialService social) : ControllerBase
         return name is null ? NotFound() : Ok(new { display_name = name });
     }
 }
+
+

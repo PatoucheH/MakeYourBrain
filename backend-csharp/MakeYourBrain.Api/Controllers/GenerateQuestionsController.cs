@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Api.Infrastructure.Extensions;
-using MakeYourBrain.Api.Models.Dtos;
-using MakeYourBrain.Api.Services;
+using MakeYourBrain.Api.Extensions;
+using MakeYourBrain.Domain.Dtos;
+using MakeYourBrain.Application.Services;
+using MakeYourBrain.Infrastructure.Services;
 
 namespace MakeYourBrain.Api.Controllers;
 
@@ -60,3 +61,5 @@ public class GenerateQuestionsController(
         }
     }
 }
+
+

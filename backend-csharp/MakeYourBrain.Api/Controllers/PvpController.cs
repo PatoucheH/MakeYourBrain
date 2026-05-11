@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Api.Infrastructure.Extensions;
-using MakeYourBrain.Api.Models.Dtos;
-using MakeYourBrain.Api.Services;
+using MakeYourBrain.Api.Extensions;
+using MakeYourBrain.Domain.Dtos;
+using MakeYourBrain.Application.Services;
+using MakeYourBrain.Infrastructure.Services;
 
 namespace MakeYourBrain.Api.Controllers;
 
@@ -11,7 +12,7 @@ namespace MakeYourBrain.Api.Controllers;
 [Authorize]
 public class PvpController(PvpService pvp) : ControllerBase
 {
-    // ─── Matchmaking ──────────────────────────────────────────────────────
+    // â”€â”€â”€ Matchmaking â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpPost("queue/join")]
     public async Task<IActionResult> JoinQueue([FromBody] PvpJoinQueueRequest req)
@@ -37,7 +38,7 @@ public class PvpController(PvpService pvp) : ControllerBase
         return Content(statusJson, "application/json");
     }
 
-    // ─── Polling (replaces Supabase Realtime streams) ─────────────────────
+    // â”€â”€â”€ Polling (replaces Supabase Realtime streams) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpGet("match/{matchId:guid}")]
     public async Task<IActionResult> GetMatch(Guid matchId)
@@ -63,7 +64,7 @@ public class PvpController(PvpService pvp) : ControllerBase
         return Ok(matches);
     }
 
-    // ─── Match lifecycle ──────────────────────────────────────────────────
+    // â”€â”€â”€ Match lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpPatch("match/{matchId:guid}/status")]
     public async Task<IActionResult> UpdateMatchStatus(Guid matchId, [FromBody] PvpUpdateMatchStatusRequest req)
@@ -85,7 +86,7 @@ public class PvpController(PvpService pvp) : ControllerBase
         return Ok();
     }
 
-    // ─── Rounds ───────────────────────────────────────────────────────────
+    // â”€â”€â”€ Rounds â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpPost("rounds")]
     public async Task<IActionResult> CreateRound([FromBody] PvpCreateRoundRequest req)
@@ -107,7 +108,7 @@ public class PvpController(PvpService pvp) : ControllerBase
         return Ok();
     }
 
-    // ─── Questions ────────────────────────────────────────────────────────
+    // â”€â”€â”€ Questions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpGet("questions")]
     public async Task<IActionResult> GetRandomQuestions(
@@ -139,7 +140,7 @@ public class PvpController(PvpService pvp) : ControllerBase
         return theme is null ? NotFound() : Content(theme, "application/json");
     }
 
-    // ─── Invitations ──────────────────────────────────────────────────────
+    // â”€â”€â”€ Invitations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpPost("invitations")]
     public async Task<IActionResult> SendInvitation([FromBody] PvpSendInvitationRequest req)
@@ -166,7 +167,7 @@ public class PvpController(PvpService pvp) : ControllerBase
         return Ok(invitations);
     }
 
-    // ─── PvP Leaderboard ──────────────────────────────────────────────────
+    // â”€â”€â”€ PvP Leaderboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     [HttpGet("leaderboard/following")]
     public async Task<IActionResult> GetFollowingLeaderboard()
@@ -176,6 +177,8 @@ public class PvpController(PvpService pvp) : ControllerBase
         return Ok(entries);
     }
 
-    // ─── Nested request records ───────────────────────────────────────────
+    // â”€â”€â”€ Nested request records â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public record GetQuestionsByIdsRequest(Guid[] QuestionIds, string Language = "en");
 }
+
+

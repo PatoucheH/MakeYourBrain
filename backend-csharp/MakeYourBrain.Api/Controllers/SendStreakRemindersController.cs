@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Api.Infrastructure;
-using MakeYourBrain.Api.Infrastructure.Extensions;
-using MakeYourBrain.Api.Services;
+using MakeYourBrain.Infrastructure.Data;
+using MakeYourBrain.Api.Extensions;
+using MakeYourBrain.Application.Services;
+using MakeYourBrain.Infrastructure.Services;
 using Dapper;
 
 namespace MakeYourBrain.Api.Controllers;
@@ -74,7 +75,7 @@ public class SendStreakRemindersController(
 
             var lang = (string?)user.preferred_language ?? "en";
             var streak = (int)(user.current_streak ?? 0);
-            var title = lang == "fr" ? "🔥 Ne perds pas ta série !" : "🔥 Don't lose your streak!";
+            var title = lang == "fr" ? "ðŸ”¥ Ne perds pas ta sÃ©rie !" : "ðŸ”¥ Don't lose your streak!";
             var body = lang == "fr"
                 ? $"Tu as {streak} jour{(streak > 1 ? "s" : "")} de suite. Joue maintenant avant minuit !"
                 : $"You have a {streak}-day streak. Play now before midnight!";
@@ -104,3 +105,5 @@ public class SendStreakRemindersController(
         return Ok(new { success = true, sent });
     }
 }
+
+

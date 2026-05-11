@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Api.Infrastructure.Extensions;
-using MakeYourBrain.Api.Services;
+using MakeYourBrain.Api.Extensions;
+using MakeYourBrain.Application.Services;
+using MakeYourBrain.Infrastructure.Services;
 
 namespace MakeYourBrain.Api.Controllers;
 
@@ -10,7 +11,7 @@ namespace MakeYourBrain.Api.Controllers;
 [Authorize]
 public class QuizController(QuizService quiz) : ControllerBase
 {
-    // ─── Request records ─────────────────────────────────────────────────
+    // â”€â”€â”€ Request records â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public record RandomQuestionsRequest(Guid ThemeId, string Language, int Limit = 10);
     public record SaveAnswerRequest(Guid QuestionId, Guid AnswerId, bool IsCorrect, string Language = "en");
     public record AddXpRequest(Guid ThemeId, Guid[] QuestionIds, Guid[] AnswerIds, bool IsDaily);
@@ -19,7 +20,7 @@ public class QuizController(QuizService quiz) : ControllerBase
     public record CompleteDailyRequest(Guid? ConceptId = null);
     public record UpdateLanguageRequest(string Language);
 
-    // ─── Random questions ─────────────────────────────────────────────────
+    // â”€â”€â”€ Random questions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPost("random")]
     public async Task<IActionResult> GetRandomQuestions([FromBody] RandomQuestionsRequest req)
     {
@@ -27,7 +28,7 @@ public class QuizController(QuizService quiz) : ControllerBase
         return Ok(questions);
     }
 
-    // ─── Save user answer ─────────────────────────────────────────────────
+    // â”€â”€â”€ Save user answer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPost("answer")]
     public async Task<IActionResult> SaveAnswer([FromBody] SaveAnswerRequest req)
     {
@@ -36,7 +37,7 @@ public class QuizController(QuizService quiz) : ControllerBase
         return Ok();
     }
 
-    // ─── XP & stats ───────────────────────────────────────────────────────
+    // â”€â”€â”€ XP & stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPost("xp")]
     public async Task<IActionResult> AddXp([FromBody] AddXpRequest req)
     {
@@ -61,7 +62,7 @@ public class QuizController(QuizService quiz) : ControllerBase
         return Ok();
     }
 
-    // ─── Progress ─────────────────────────────────────────────────────────
+    // â”€â”€â”€ Progress â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpGet("progress")]
     public async Task<IActionResult> GetProgressByTheme([FromQuery] string language = "en")
     {
@@ -70,7 +71,7 @@ public class QuizController(QuizService quiz) : ControllerBase
         return Ok(progress);
     }
 
-    // ─── Language ─────────────────────────────────────────────────────────
+    // â”€â”€â”€ Language â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPatch("language")]
     public async Task<IActionResult> UpdateLanguage([FromBody] UpdateLanguageRequest req)
     {
@@ -79,7 +80,7 @@ public class QuizController(QuizService quiz) : ControllerBase
         return Ok();
     }
 
-    // ─── Daily quiz ───────────────────────────────────────────────────────
+    // â”€â”€â”€ Daily quiz â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpGet("daily")]
     public async Task<IActionResult> GetDailyConcept([FromQuery] string language = "en")
     {
@@ -105,7 +106,7 @@ public class QuizController(QuizService quiz) : ControllerBase
         return Ok();
     }
 
-    // ─── Survival mode ────────────────────────────────────────────────────
+    // â”€â”€â”€ Survival mode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPost("survival/score")]
     public async Task<IActionResult> SaveSurvivalScore([FromBody] SurvivalScoreRequest req)
     {
@@ -122,3 +123,5 @@ public class QuizController(QuizService quiz) : ControllerBase
         return Ok(scores);
     }
 }
+
+

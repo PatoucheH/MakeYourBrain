@@ -1,9 +1,10 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Api.Infrastructure;
-using MakeYourBrain.Api.Infrastructure.Extensions;
-using MakeYourBrain.Api.Models.Dtos;
-using MakeYourBrain.Api.Services;
+using MakeYourBrain.Infrastructure.Data;
+using MakeYourBrain.Api.Extensions;
+using MakeYourBrain.Domain.Dtos;
+using MakeYourBrain.Application.Services;
+using MakeYourBrain.Infrastructure.Services;
 using Dapper;
 
 namespace MakeYourBrain.Api.Controllers;
@@ -24,11 +25,11 @@ public class SendNotificationController(
 
     private static readonly Dictionary<string, (string TitleEn, string BodyEn, string TitleFr, string BodyFr)> NotificationContent = new()
     {
-        ["match_found"]             = ("Match found!", "An opponent is waiting! Open the app to play.", "Match trouvé !", "Un adversaire t'attend ! Ouvre l'app pour jouer."),
-        ["your_turn"]               = ("Your turn!", "Your opponent has played. It's your turn!", "C'est ton tour !", "Ton adversaire a joué. À toi de jouer !"),
-        ["match_over"]              = ("Match over!", "Your match result is available!", "Match terminé !", "Le résultat de ta partie est disponible !"),
-        ["pvp_invitation"]          = ("PvP Challenge!", "{name} challenges you to a match!", "Défi PvP !", "{name} vous défie en match !"),
-        ["pvp_invitation_accepted"] = ("Challenge Accepted!", "{name} accepted your PvP challenge!", "Défi Accepté !", "{name} a accepté votre défi PvP !"),
+        ["match_found"]             = ("Match found!", "An opponent is waiting! Open the app to play.", "Match trouvÃ© !", "Un adversaire t'attend ! Ouvre l'app pour jouer."),
+        ["your_turn"]               = ("Your turn!", "Your opponent has played. It's your turn!", "C'est ton tour !", "Ton adversaire a jouÃ©. Ã€ toi de jouer !"),
+        ["match_over"]              = ("Match over!", "Your match result is available!", "Match terminÃ© !", "Le rÃ©sultat de ta partie est disponible !"),
+        ["pvp_invitation"]          = ("PvP Challenge!", "{name} challenges you to a match!", "DÃ©fi PvP !", "{name} vous dÃ©fie en match !"),
+        ["pvp_invitation_accepted"] = ("Challenge Accepted!", "{name} accepted your PvP challenge!", "DÃ©fi AcceptÃ© !", "{name} a acceptÃ© votre dÃ©fi PvP !"),
     };
 
     [HttpPost]
@@ -110,3 +111,5 @@ public class SendNotificationController(
         }
     }
 }
+
+

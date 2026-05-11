@@ -1,9 +1,10 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Api.Models.Entities;
-using MakeYourBrain.Api.Services;
+using MakeYourBrain.Domain.Entities;
+using MakeYourBrain.Application.Services;
+using MakeYourBrain.Infrastructure.Services;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace MakeYourBrain.Api.Controllers;
@@ -18,7 +19,7 @@ public class AuthController(
     SocialAuthService            socialAuth,
     IWebHostEnvironment          env) : ControllerBase
 {
-    // ─── Request / Response DTOs ──────────────────────────────────────────
+    // â”€â”€â”€ Request / Response DTOs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public record RegisterRequest(
         string Email,
         string Password,
@@ -46,7 +47,7 @@ public class AuthController(
         [property: JsonPropertyName("expires_in")]    int    ExpiresIn,
         [property: JsonPropertyName("refresh_token")] string RefreshToken);
 
-    // ─── Register ─────────────────────────────────────────────────────────
+    // â”€â”€â”€ Register â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -68,7 +69,7 @@ public class AuthController(
         return Ok(await BuildResponseAsync(user));
     }
 
-    // ─── Login ────────────────────────────────────────────────────────────
+    // â”€â”€â”€ Login â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
@@ -79,7 +80,7 @@ public class AuthController(
         return Ok(await BuildResponseAsync(user));
     }
 
-    // ─── Refresh ──────────────────────────────────────────────────────────
+    // â”€â”€â”€ Refresh â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
     {
@@ -91,7 +92,7 @@ public class AuthController(
         return Ok(await BuildResponseAsync(rt.User));
     }
 
-    // ─── Social — Google ──────────────────────────────────────────────────
+    // â”€â”€â”€ Social â€” Google â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPost("google")]
     public async Task<IActionResult> Google([FromBody] GoogleRequest request)
     {
@@ -100,7 +101,7 @@ public class AuthController(
         return await HandleSocialAsync("google", info);
     }
 
-    // ─── Social — Apple ───────────────────────────────────────────────────
+    // â”€â”€â”€ Social â€” Apple â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPost("apple")]
     public async Task<IActionResult> Apple([FromBody] AppleRequest request)
     {
@@ -109,7 +110,7 @@ public class AuthController(
         return await HandleSocialAsync("apple", info);
     }
 
-    // ─── Social — Facebook ────────────────────────────────────────────────
+    // â”€â”€â”€ Social â€” Facebook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPost("facebook")]
     [SwaggerOperation(Summary = "Login via Facebook", Description = "Not available yet")]
     public async Task<IActionResult> Facebook([FromBody] FacebookRequest request)
@@ -119,8 +120,8 @@ public class AuthController(
         return await HandleSocialAsync("facebook", info);
     }
 
-    // ─── Dev-only: simulate social login without hitting real OAuth provider ─
-    // Only available in Development environment — returns 404 in production.
+    // â”€â”€â”€ Dev-only: simulate social login without hitting real OAuth provider â”€
+    // Only available in Development environment â€” returns 404 in production.
     [HttpPost("dev/social")]
     public async Task<IActionResult> DevSocial([FromBody] DevSocialRequest request)
     {
@@ -137,7 +138,7 @@ public class AuthController(
         string? Email,
         string? Name);
 
-    // ─── Helpers ──────────────────────────────────────────────────────────
+    // â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private async Task<IActionResult> HandleSocialAsync(string provider, SocialUserInfo info)
     {
         // 1. Existing external login
@@ -191,3 +192,5 @@ public class AuthController(
         return new AuthResponse(token, "Bearer", expiresIn, refresh);
     }
 }
+
+

@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Api.Infrastructure.Extensions;
-using MakeYourBrain.Api.Services;
+using MakeYourBrain.Api.Extensions;
+using MakeYourBrain.Application.Services;
+using MakeYourBrain.Infrastructure.Services;
 
 namespace MakeYourBrain.Api.Controllers;
 
@@ -16,7 +17,7 @@ public class ProfileController(ProfileService profile, QuizService quiz) : Contr
     public record RegisterDeviceRequest(string FcmToken, string Platform, int TimezoneOffsetHours);
     public record RemoveDeviceRequest(string FcmToken);
 
-    // ─── Profile summary ──────────────────────────────────────────────────
+    // â”€â”€â”€ Profile summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpGet]
     public async Task<IActionResult> GetProfile()
     {
@@ -25,7 +26,7 @@ public class ProfileController(ProfileService profile, QuizService quiz) : Contr
         return summary is null ? NotFound() : Ok(summary);
     }
 
-    // Public — anyone can view another user's player info
+    // Public â€” anyone can view another user's player info
     [HttpGet("player/{userId:guid}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetPlayerInfo(Guid userId)
@@ -42,7 +43,7 @@ public class ProfileController(ProfileService profile, QuizService quiz) : Contr
         return Ok();
     }
 
-    // ─── XP helpers ───────────────────────────────────────────────────────
+    // â”€â”€â”€ XP helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPost("xp/bonus")]
     public async Task<IActionResult> AddBonusXp([FromBody] AddBonusXpRequest req)
     {
@@ -59,7 +60,7 @@ public class ProfileController(ProfileService profile, QuizService quiz) : Contr
         return Ok();
     }
 
-    // ─── Level helpers ────────────────────────────────────────────────────
+    // â”€â”€â”€ Level helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpGet("level")]
     public async Task<IActionResult> GetLevel([FromQuery] int xp)
     {
@@ -68,7 +69,7 @@ public class ProfileController(ProfileService profile, QuizService quiz) : Contr
         return Ok(new { level, cumulative_xp = cumXp });
     }
 
-    // ─── Progress by theme ────────────────────────────────────────────────
+    // â”€â”€â”€ Progress by theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpGet("progress")]
     public async Task<IActionResult> GetProgressByTheme([FromQuery] string language = "en")
     {
@@ -77,7 +78,7 @@ public class ProfileController(ProfileService profile, QuizService quiz) : Contr
         return Ok(progress);
     }
 
-    // ─── Device (FCM token + timezone) ───────────────────────────────────
+    // â”€â”€â”€ Device (FCM token + timezone) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     [HttpPost("device")]
     public async Task<IActionResult> RegisterDevice([FromBody] RegisterDeviceRequest req)
     {
@@ -94,3 +95,5 @@ public class ProfileController(ProfileService profile, QuizService quiz) : Contr
         return Ok();
     }
 }
+
+

@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="MakeYourBrain.Api/MakeYourBrain.Api.csproj" />
+  <Project Path="MakeYourBrain.Application/MakeYourBrain.Application.csproj" />
+  <Project Path="MakeYourBrain.Domain/MakeYourBrain.Domain.csproj" />
+  <Project Path="MakeYourBrain.Infrastructure/MakeYourBrain.Infrastructure.csproj" />
+  <Project Path="MakeYourBrain.Jobs/MakeYourBrain.Jobs.csproj" />
+</Solution>

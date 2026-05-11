@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Api.Infrastructure.Extensions;
-using MakeYourBrain.Api.Services;
+using MakeYourBrain.Api.Extensions;
+using MakeYourBrain.Application.Services;
+using MakeYourBrain.Infrastructure.Services;
 
 namespace MakeYourBrain.Api.Controllers;
 
@@ -10,7 +11,7 @@ namespace MakeYourBrain.Api.Controllers;
 [Authorize]
 public class LeaderboardController(LeaderboardService leaderboard, PvpService pvp) : ControllerBase
 {
-    // Public — anyone can see global weekly leaderboard
+    // Public â€” anyone can see global weekly leaderboard
     [HttpGet("weekly")]
     [AllowAnonymous]
     public async Task<IActionResult> GetWeekly()
@@ -43,3 +44,5 @@ public class LeaderboardController(LeaderboardService leaderboard, PvpService pv
         return Ok(entries);
     }
 }
+
+

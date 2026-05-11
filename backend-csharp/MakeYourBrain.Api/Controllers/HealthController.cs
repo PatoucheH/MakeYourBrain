@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MakeYourBrain.Api.Controllers;
@@ -11,3 +11,4 @@ public class HealthController : ControllerBase
     [HttpGet]
     public IActionResult Get() => Ok(new { status = "ok" });
 }
+

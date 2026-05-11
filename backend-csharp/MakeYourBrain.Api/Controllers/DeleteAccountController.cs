@@ -1,10 +1,10 @@
-using Dapper;
+﻿using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Api.Infrastructure;
-using MakeYourBrain.Api.Infrastructure.Extensions;
-using MakeYourBrain.Api.Models.Entities;
+using MakeYourBrain.Infrastructure.Data;
+using MakeYourBrain.Api.Extensions;
+using MakeYourBrain.Domain.Entities;
 
 namespace MakeYourBrain.Api.Controllers;
 
@@ -75,3 +75,4 @@ public class DeleteAccountController(
         }
     }
 }
+

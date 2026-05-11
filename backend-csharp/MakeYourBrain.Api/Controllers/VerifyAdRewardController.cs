@@ -1,12 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Api.Infrastructure;
-using MakeYourBrain.Api.Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using MakeYourBrain.Infrastructure.Data;
+using MakeYourBrain.Application.Services;
+using MakeYourBrain.Infrastructure.Services;
 using Dapper;
 
 namespace MakeYourBrain.Api.Controllers;
 
 /// <summary>
-/// AdMob SSV callback — no JWT required (called directly by Google).
+/// AdMob SSV callback â€” no JWT required (called directly by Google).
 /// </summary>
 [ApiController]
 [Route("functions/v1/verify-ad-reward")]
@@ -26,7 +27,7 @@ public class VerifyAdRewardController(
         [FromQuery] string? signature,
         [FromQuery] string? key_id)
     {
-        // AdMob sends a validation ping without parameters — return 200 to confirm the URL
+        // AdMob sends a validation ping without parameters â€” return 200 to confirm the URL
         if (user_id is null || transaction_id is null || signature is null || key_id is null)
             return Ok("OK");
 
@@ -82,3 +83,5 @@ public class VerifyAdRewardController(
         }
     }
 }
+
+
