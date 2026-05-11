@@ -177,6 +177,18 @@ firebase_options.dart
 # **/lib/config/supabase_config.dart
 **/lib/core/config/supabase_credentials.dart
 
+# ASP.NET Core — artefacts de build
+backend-csharp/**/bin/
+backend-csharp/**/obj/
+backend-csharp/**/*.user
+backend-csharp/**/*.suo
+backend-csharp/**/.vs/
+
+# ASP.NET Core — secrets (contient JWT secret, clés API)
+backend-csharp/**/appsettings.json
+!backend-csharp/**/appsettings.Development.json
+backend-csharp/**/*firebase-adminsdk*.json
+
 # ===========================
 # Système d'exploitation
 # ===========================
