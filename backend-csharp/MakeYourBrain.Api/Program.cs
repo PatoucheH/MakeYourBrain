@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MakeYourBrain.Application.Interfaces;
 using MakeYourBrain.Infrastructure.Data;
 using MakeYourBrain.Jobs;
 using MakeYourBrain.Domain.Entities;
@@ -19,6 +20,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddSingleton<DapperConnectionFactory>();
+builder.Services.AddSingleton<IDbConnectionFactory>(sp => sp.GetRequiredService<DapperConnectionFactory>());
 
 // â”€â”€â”€ ASP.NET Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 builder.Services.AddIdentityCore<ApplicationUser>(options =>

@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Infrastructure.Data;
+using MakeYourBrain.Application.Interfaces;
 using MakeYourBrain.Api.Extensions;
 using MakeYourBrain.Application.Services;
 using MakeYourBrain.Infrastructure.Services;
-using Dapper;
 
 namespace MakeYourBrain.Api.Controllers;
 
@@ -12,7 +12,7 @@ namespace MakeYourBrain.Api.Controllers;
 [Route("functions/v1/send-streak-reminders")]
 [Authorize]
 public class SendStreakRemindersController(
-    DapperConnectionFactory db,
+    IDbConnectionFactory db,
     FirebaseFcmService fcmService,
     ILogger<SendStreakRemindersController> logger) : ControllerBase
 {

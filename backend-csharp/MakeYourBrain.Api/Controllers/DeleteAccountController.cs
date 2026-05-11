@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MakeYourBrain.Infrastructure.Data;
+using MakeYourBrain.Application.Interfaces;
 using MakeYourBrain.Api.Extensions;
 using MakeYourBrain.Domain.Entities;
 
@@ -13,7 +13,7 @@ namespace MakeYourBrain.Api.Controllers;
 [Authorize]
 public class DeleteAccountController(
     UserManager<ApplicationUser> userManager,
-    DapperConnectionFactory db,
+    IDbConnectionFactory db,
     ILogger<DeleteAccountController> logger) : ControllerBase
 {
     [HttpPost]

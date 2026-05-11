@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MakeYourBrain.Api.Extensions;
 using MakeYourBrain.Domain.Dtos;
 using MakeYourBrain.Application.Services;
-using MakeYourBrain.Infrastructure.Services;
 
 namespace MakeYourBrain.Api.Controllers;
 
