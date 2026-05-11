@@ -61,9 +61,16 @@ public class VerifyAdRewardController(
                 return Ok("OK");
             }
 
+            // add_lives_from_ad checks request.jwt.claims.role = 'service_role'.
+            // SET LOCAL scopes the claim to this transaction, satisfying the SQL guard.
+            using var tran = conn.BeginTransaction();
+            await conn.ExecuteAsync(
+                "SET LOCAL \"request.jwt.claims\" = '{\"role\":\"service_role\"}'",
+                transaction: tran);
             await conn.ExecuteAsync(
                 "SELECT add_lives_from_ad(@userId)",
-                new { userId = Guid.Parse(user_id) });
+                new { userId = Guid.Parse(user_id) }, tran);
+            tran.Commit();
 
             logger.LogInformation("SSV: +2 lives granted to {UserId} (transaction: {TransactionId})", user_id, transaction_id);
             return Ok("OK");
